@@ -176,14 +176,75 @@ function ExhibitionsListRow({ ex, onNav, onHover }) {
   );
 }
 
-/* ---------- INSTALLATION STRIP -------------------------------------------- */
+/* ---------- INSTALLATION STRIP --------------------------------------------
+   A row of installation views. Each opens a full-screen lightbox you can
+   step through with the arrow keys or the on-screen ‹ › controls. */
 function InstallationStrip({ frames }) {
+  const [open, setOpen] = useState(-1);
+  const count = frames.length;
+  const go = (delta) => setOpen((i) => (i + delta + count) % count);
+
+  useEffect(() => {
+    if (open < 0) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") setOpen(-1);
+      else if (e.key === "ArrowRight") { e.preventDefault(); go(1); }
+      else if (e.key === "ArrowLeft")  { e.preventDefault(); go(-1); }
+    };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [open, count]);
+
   return (
-    <div className="inc-strip">
-      {frames.map((k, i) => (
-        <Tile key={i} kind={k} aspect={i % 3 === 0 ? "4/3" : "3/4"} />
-      ))}
-    </div>
+    <>
+      <div className="inc-strip">
+        {frames.map((k, i) => (
+          <button
+            key={i}
+            type="button"
+            className="inc-strip__btn"
+            aria-label={"Open installation view " + (i + 1) + " of " + count}
+            onClick={() => setOpen(i)}
+          >
+            <Tile kind={k} aspect={i % 3 === 0 ? "4/3" : "3/4"} />
+          </button>
+        ))}
+      </div>
+
+      {open >= 0 && (
+        <div
+          className="inc-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Installation views"
+          onClick={() => setOpen(-1)}
+        >
+          <button className="inc-lightbox__close" aria-label="Close" onClick={() => setOpen(-1)}>✕</button>
+          {count > 1 && (
+            <button
+              className="inc-lightbox__nav inc-lightbox__nav--prev"
+              aria-label="Previous view"
+              onClick={(e) => { e.stopPropagation(); go(-1); }}
+            >‹</button>
+          )}
+          <figure className="inc-lightbox__stage" onClick={(e) => e.stopPropagation()}>
+            <Tile kind={frames[open]} aspect="3/2" className="inc-lightbox__img" />
+            <figcaption className="inc-lightbox__caption">{(open + 1) + " / " + count}</figcaption>
+          </figure>
+          {count > 1 && (
+            <button
+              className="inc-lightbox__nav inc-lightbox__nav--next"
+              aria-label="Next view"
+              onClick={(e) => { e.stopPropagation(); go(1); }}
+            >›</button>
+          )}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -207,7 +268,6 @@ function Footer({ onNav }) {
     <footer className="inc-footer">
       <div className="container inc-footer__inner">
         <div className="inc-footer__brand">
-          <Wordmark size={22} />
           <p>
             2 Chiltern street<br/>
             Marylebone, W1U 7PR<br/>
@@ -224,8 +284,8 @@ function Footer({ onNav }) {
         <div className="inc-footer__contact">
           <p>
             <a href="mailto:incubator.enquiries@gmail.com">incubator.enquiries@gmail.com</a><br/>
-            <a href="#" onClick={(e)=>{e.preventDefault(); onNav && onNav("/contact");}}>Subscribe to mailing list</a><br/>
-            <a href="https://www.instagram.com/__incubator__/" target="_blank" rel="noopener">@__incubator__</a>
+            <a href="https://www.instagram.com/__incubator__/" target="_blank" rel="noopener">@__incubator__</a><br/>
+            <a href="#" onClick={(e)=>{e.preventDefault(); onNav && onNav("/contact");}}>Subscribe to mailing list</a>
           </p>
           <div className="inc-footer__legal">&copy; 2026 Incubator</div>
         </div>

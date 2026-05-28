@@ -165,23 +165,6 @@
   margin-top: 4px;
 }
 
-.inc-cta-line {
-  margin-top: var(--s-6);
-  padding-top: var(--s-6);
-  border-top: 1px solid var(--hairline);
-  display: flex; justify-content: space-between; align-items: baseline;
-  gap: var(--s-6);
-  font-family: var(--font-serif);
-}
-.inc-cta-line a {
-  font-size: 17px;
-  color: var(--green);
-  border-bottom: 1px solid var(--green);
-  padding-bottom: 2px;
-}
-.inc-cta-line a:hover { color: var(--ink); border-bottom-color: var(--ink); }
-.inc-cta-line__hint { font-size: 13px; color: var(--ink-3); letter-spacing: 0.04em; }
-
 /* ===========================================================================
    HOME — refinements
    =========================================================================== */
@@ -284,24 +267,33 @@
 
 /* ===========================================================================
    INSTALLATION STRIP — clarify interaction
-   Tiles open in a lightbox; cursor + hover affordance make that visible.
+   Each view is a button that opens the lightbox; cursor + hover affordance
+   (subtle zoom, vignette, ↗ badge) make that visible.
    =========================================================================== */
-.inc-strip .inc-tile {
-  cursor: zoom-in;
+.inc-strip__btn {
   position: relative;
-  transition: opacity var(--dur-fast) var(--ease);
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+  overflow: hidden;            /* clip the hover zoom inside the frame */
 }
-.inc-strip .inc-tile::after {
+.inc-strip__btn .inc-tile {
+  transition: transform var(--dur) var(--ease), opacity var(--dur-fast) var(--ease);
+}
+.inc-strip__btn::after {
   content: "";
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at center, rgba(0,0,0,0) 35%, rgba(0,0,0,0.18) 100%);
+    radial-gradient(circle at center, rgba(0,0,0,0) 35%, rgba(0,0,0,0.20) 100%);
   opacity: 0;
   transition: opacity var(--dur-fast) var(--ease);
   pointer-events: none;
 }
-.inc-strip .inc-tile::before {
+.inc-strip__btn::before {
   content: "↗";
   position: absolute;
   top: 12px; right: 12px;
@@ -313,12 +305,62 @@
   background: rgba(17,17,17,0.7);
   border-radius: 999px;
   opacity: 0;
-  transition: opacity var(--dur-fast) var(--ease);
+  transform: translateY(-4px);
+  transition: opacity var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
   pointer-events: none;
+  z-index: 1;
 }
-.inc-strip .inc-tile:hover { opacity: 0.95; }
-.inc-strip .inc-tile:hover::after,
-.inc-strip .inc-tile:hover::before { opacity: 1; }
+.inc-strip__btn:hover .inc-tile,
+.inc-strip__btn:focus-visible .inc-tile { transform: scale(1.05); }
+.inc-strip__btn:hover::after,
+.inc-strip__btn:focus-visible::after { opacity: 1; }
+.inc-strip__btn:hover::before,
+.inc-strip__btn:focus-visible::before { opacity: 1; transform: translateY(0); }
+.inc-strip__btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+/* ---------- Lightbox ------------------------------------------------------- */
+.inc-lightbox {
+  position: fixed; inset: 0; z-index: var(--z-modal);
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(24px, 5vw, 72px);
+  background: rgba(17, 17, 17, 0.94);
+  cursor: zoom-out;
+  animation: inc-lb-fade var(--dur) var(--ease);
+}
+@keyframes inc-lb-fade { from { opacity: 0; } to { opacity: 1; } }
+.inc-lightbox__stage {
+  margin: 0;
+  max-width: min(92vw, 1100px);
+  width: 100%;
+  cursor: default;
+  display: flex; flex-direction: column; gap: var(--s-3);
+  animation: inc-lb-rise var(--dur) var(--ease);
+}
+@keyframes inc-lb-rise { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.inc-lightbox__img { width: 100%; max-height: 80vh; }
+.inc-lightbox__caption {
+  font-family: var(--font-serif);
+  font-size: 13px; letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.75);
+  text-align: center;
+  font-feature-settings: "tnum";
+}
+.inc-lightbox__close,
+.inc-lightbox__nav {
+  position: absolute;
+  background: none; border: 0; color: #fff;
+  cursor: pointer;
+  font-family: var(--font-serif);
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+.inc-lightbox__close:hover,
+.inc-lightbox__nav:hover { opacity: 1; }
+.inc-lightbox__close { top: clamp(16px, 3vw, 32px); right: clamp(16px, 3vw, 32px); font-size: 24px; }
+.inc-lightbox__nav { top: 50%; transform: translateY(-50%); font-size: clamp(40px, 6vw, 72px); padding: 0 clamp(8px, 2vw, 24px); }
+.inc-lightbox__nav--prev { left: clamp(4px, 2vw, 24px); }
+.inc-lightbox__nav--next { right: clamp(4px, 2vw, 24px); }
 
 /* ===========================================================================
    PRESS — no persistent underline; hover-only colour shift.

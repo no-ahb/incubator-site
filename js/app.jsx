@@ -27,7 +27,7 @@ function MobileMenu({ onNav, onClose }) {
       <div className="inc-overlay__head container">
         <a
           className="inc-header__brand"
-          href="/"
+          href="#/"
           onClick={(e) => { e.preventDefault(); onNav("/"); }}
         >
           <Wordmark />
@@ -151,6 +151,7 @@ function App() {
         <Footer onNav={navigate} />
       </div>
       {menuOpen && <MobileMenu onNav={navigate} onClose={() => setMenuOpen(false)} />}
+      <ReportIssue />
     </div>
   );
 }

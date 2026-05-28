@@ -1,0 +1,10 @@
+name = "incubator-report-issue"
+main = "worker.js"
+compatibility_date = "2024-11-01"
+
+# Public config (safe to commit). The token is NOT here — set it as a secret:
+#   npx wrangler secret put GITHUB_TOKEN
+[vars]
+REPO = "no-ahb/incubator-site"
+ALLOWED_ORIGINS = "https://no-ahb.github.io,http://localhost:8000,http://127.0.0.1:8000"
+ISSUE_LABEL = "site-report"

@@ -268,10 +268,10 @@ ul { list-style: none; padding: 0; margin: 0; }
 /* ---------- Strip --------------------------------------------------------- */
 .inc-strip {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--s-3);
 }
-@media (min-width: 900px) { .inc-strip { grid-template-columns: repeat(6, 1fr); } }
+@media (min-width: 900px) { .inc-strip { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
 
 /* ---------- Press --------------------------------------------------------- */
 .inc-press-year { margin-bottom: var(--s-12); }

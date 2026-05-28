@@ -110,17 +110,25 @@ function ExhibitionsListScreen({ onNav }) {
   const all = msMemo(() => [...EXHIBITIONS, ...EXHIBITION_ARCHIVE], []);
   const [sort, setSort]   = msState("date");
   const [filter, setFilter] = msState("all"); // all | solo | group
+  const [query, setQuery] = msState("");
   const sorted = msMemo(() => {
     let xs = all.slice();
     if (filter === "solo")  xs = xs.filter((e) => !e.isGroup);
     if (filter === "group") xs = xs.filter((e) =>  e.isGroup);
+    const q = query.trim().toLowerCase();
+    if (q) {
+      xs = xs.filter((e) =>
+        (e.artist || "").toLowerCase().includes(q) ||
+        (e.title || "").toLowerCase().includes(q)
+      );
+    }
     xs.sort((a, b) =>
       sort === "date"
         ? (b.startISO || "").localeCompare(a.startISO || "")
-        : a.title.localeCompare(b.title)
+        : (a.artist || a.title).localeCompare(b.artist || b.title)
     );
     return xs;
-  }, [all, sort, filter]);
+  }, [all, sort, filter, query]);
 
   const [hovered, setHovered] = msState(sorted[0]);
   // keep hovered in sync if filter empties the list
@@ -132,6 +140,17 @@ function ExhibitionsListScreen({ onNav }) {
         <header className="inc-pagehead">
           <h1>Exhibitions</h1>
         </header>
+
+        <div className="inc-listsearch">
+          <input
+            type="search"
+            className="inc-search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by artist or exhibition…"
+            aria-label="Search exhibitions"
+          />
+        </div>
 
         <div className="inc-listbar">
           <div className="inc-toggle" role="tablist" aria-label="Filter">
@@ -151,12 +170,18 @@ function ExhibitionsListScreen({ onNav }) {
               </button>
             ))}
           </div>
-          <span className="inc-listbar__count">{sorted.length} exhibitions</span>
+          <span className="inc-listbar__count">{sorted.length} exhibition{sorted.length === 1 ? "" : "s"}</span>
           <div className="inc-toggle" role="tablist" aria-label="Sort">
             <button role="tab" aria-selected={sort==="date"}  className={sort==="date"  ? "is-active":""} onClick={()=>setSort("date")}>By date</button>
             <button role="tab" aria-selected={sort==="alpha"} className={sort==="alpha" ? "is-active":""} onClick={()=>setSort("alpha")}>A – Z</button>
           </div>
         </div>
+
+        {sorted.length === 0 && (
+          <p className="inc-prose" style={{ color: "var(--ink-3)", marginTop: "var(--s-8)" }}>
+            No exhibitions match “{query}”.
+          </p>
+        )}
 
         <div className="inc-list">
           <div className="inc-list__col">
@@ -199,6 +224,20 @@ function ExhibitionsListScreen({ onNav }) {
 function ExhibitionDetailScreen({ id, onNav }) {
   const all = [...EXHIBITIONS, ...EXHIBITION_ARCHIVE];
   const ex = all.find((e) => e.id === id) || EXHIBITIONS[0];
+  const artistRec = !ex.isGroup ? ARTISTS.find((a) => a.id === ex.artistId) : null;
+  const otherShows = (!ex.isGroup && ex.artistId)
+    ? all
+        .filter((e) => e.artistId === ex.artistId && e.id !== ex.id)
+        .sort((a, b) => (b.startISO || "").localeCompare(a.startISO || ""))
+    : [];
+  const artistLink = (label) => (
+    <a
+      href={"#/artists/" + ex.artistId}
+      onClick={(e) => { e.preventDefault(); onNav("/artists/" + ex.artistId); }}
+    >
+      {label}
+    </a>
+  );
   return (
     <main className="inc-main">
       <article className="inc-detail">
@@ -210,7 +249,9 @@ function ExhibitionDetailScreen({ id, onNav }) {
             {ex.isGroup ? " · Group show" : ""}
           </span>
           <h1>
-            {ex.isGroup ? <em>{ex.title}</em> : <>{ex.artist}: <em>{ex.title}</em></>}
+            {ex.isGroup
+              ? <em>{ex.title}</em>
+              : <>{artistRec ? artistLink(ex.artist) : ex.artist}: <em>{ex.title}</em></>}
           </h1>
           <div className="inc-meta">{ex.dates}</div>
 
@@ -243,12 +284,36 @@ function ExhibitionDetailScreen({ id, onNav }) {
         <section id="release" className="container inc-detail__release">
           <h3>Press release</h3>
           <Prose paragraphs={ex.pressRelease || []} />
-          {ex.privateView && (
-            <p className="inc-detail__more">
-              <a href={ex.privateView} target="_blank" rel="noopener">Please click here for more information →</a>
-            </p>
-          )}
         </section>
+
+        {(otherShows.length > 0 || artistRec) && (
+          <section className="container inc-related">
+            <h3>
+              {otherShows.length > 0
+                ? "Other exhibitions by " + ex.artist + " at Incubator"
+                : "Artist"}
+            </h3>
+            <div className="inc-related__items">
+              {otherShows.map((o) => (
+                <div key={o.id} className="inc-related__row">
+                  <a
+                    className="inc-related__link"
+                    href={"#/exhibitions/" + o.id}
+                    onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + o.id); }}
+                  >
+                    <span className="inc-related__title"><em>{o.title}</em></span>
+                    <span className="inc-related__dates">{o.dates}</span>
+                  </a>
+                </div>
+              ))}
+            </div>
+            {artistRec && (
+              <p className="inc-detail__more" style={{ marginTop: "var(--s-5)" }}>
+                {artistLink("View " + ex.artist + "’s full profile →")}
+              </p>
+            )}
+          </section>
+        )}
 
         <p className="container inc-back">
           <a href="#/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>← Back to exhibitions</a>
@@ -285,25 +350,11 @@ function ArtistScreen({ id, onNav }) {
         <div className="container inc-detail__head">
           <span className="inc-eyebrow">Artist</span>
           <h1>{artist.name}</h1>
-          <div className="inc-meta">
-            {shows.length === 1
-              ? "One exhibition at Incubator"
-              : shows.length + " exhibitions at Incubator"}
-          </div>
-          <div className="inc-jumps">
-            {shows.map((s, i) => (
-              <a key={s.id} href={"#show-" + i}>
-                <em>{s.title}</em>
-              </a>
-            ))}
-            <a href="#biography">Biography</a>
-          </div>
         </div>
 
         {shows.map((ex, idx) => (
           <div key={ex.id} id={"show-" + idx} className={"inc-detail__show " + (idx > 0 ? "is-sub" : "")}>
             <header className="container inc-detail__show-head">
-              <span className="inc-eyebrow">Exhibition {shows.length - idx} of {shows.length}</span>
               <h2><em>{ex.title}</em></h2>
               <div className="inc-detail__show-meta">{ex.dates}</div>
             </header>
@@ -319,23 +370,6 @@ function ArtistScreen({ id, onNav }) {
           <h3>Biography</h3>
           <Prose paragraphs={artist.bio} />
         </section>
-
-        {(() => {
-          const pv = (shows.find((s) => s.privateView) || {}).privateView;
-          return (
-            <div className="container inc-cta-line">
-              <a
-                href={pv || "#"}
-                {...(pv ? { target: "_blank", rel: "noopener" } : { onClick: (e) => e.preventDefault() })}
-              >
-                Please click here for more information →
-              </a>
-              <span className="inc-cta-line__hint">
-                Available works · prices on request
-              </span>
-            </div>
-          );
-        })()}
 
         <p className="container inc-back">
           <a href="#/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>← Back to exhibitions</a>
@@ -443,13 +477,20 @@ function ContactScreen() {
 
             <h3>Enquiries</h3>
             <p>
-              For all enquiries — sales, press, viewing requests, submissions — please write to:<br/>
+              For general enquiries, please reach out to:<br/>
               <a href="mailto:incubator.enquiries@gmail.com">incubator.enquiries@gmail.com</a>
+            </p>
+            <p>
+              For press enquiries, please reach out to:<br/>
+              <a href="mailto:fabian@strobellall.com">fabian@strobellall.com</a>
+            </p>
+            <p>
+              Incubator is unable to accept unsolicited artist submissions. We offer a number of internship opportunities throughout the year. Please send your resume and a cover letter to <a href="mailto:incubator.enquiries@gmail.com">incubator.enquiries@gmail.com</a>.
             </p>
 
             <h3>Follow</h3>
             <p>
-              <a href="https://www.instagram.com/__incubator__/" target="_blank" rel="noopener">Instagram — @__incubator__</a>
+              <a href="https://www.instagram.com/__incubator__/" target="_blank" rel="noopener">@__incubator__</a>
             </p>
 
             <h3>Mailing list</h3>
