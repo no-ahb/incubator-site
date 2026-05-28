@@ -1,0 +1,304 @@
+/* ===========================================================================
+   Incubator Design System — colors_and_type.css
+   Tokens for the 2026 refresh.
+   ========================================================================= */
+
+/* --- Brand webfont --------------------------------------------------------
+   Century Schoolbook is the brand face. The licensed TTF lives in fonts/.
+   Only the regular (400) weight is supplied; synthetic bold/italic are
+   allowed for now — flag this if the gallery provides more weights later.
+   --------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: "Century Schoolbook";
+  src: url("fonts/centuryschoolbook.ttf") format("truetype");
+  font-weight: 400 700;          /* let browser synthesise bold from regular */
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ---------- Colour palette ---------- */
+
+  /* Base */
+  --ink:                #111111;   /* primary text */
+  --ink-2:              #2A2A2A;   /* secondary text */
+  --ink-3:              #5A5A5A;   /* tertiary / metadata */
+  --ink-4:              #8A8A8A;   /* disabled / very subtle */
+
+  --paper:              #FFFFFF;   /* 2026: page background */
+  --surface:            #ECEBE9;   /* the legacy grey, now used for surfaces */
+  --surface-2:          #F6F5F3;   /* slightly lighter card tint */
+  --hairline:           #E5E4E2;   /* 1px separators */
+  --hairline-strong:    #D6D4D1;   /* heavier separator */
+
+  /* Accent — used sparingly: links, focus, hover */
+  --green:              #009838;   /* sampled from the zine wordmark */
+  --green-hover:        #007A2C;
+  --green-faint:        #E6F5EC;   /* tint for backgrounds (rare) */
+
+  /* ---------------------------------------------------------------------
+     PALETTE-PAIR SYSTEM — the zine identity.
+     Each exhibition is assigned one paired colorway; the wordmark, poster,
+     and full-bleed hero render in that pair (foreground "ink" on the pair's
+     background). Chrome (nav, body type, footer) stays neutral.
+     The default pair is sap green on stone grey — the canonical zine.
+     --------------------------------------------------------------------- */
+
+  /* default — sap green on stone grey */
+  --pair-bg:            #ECEBE9;
+  --pair-fg:            #009838;
+
+  /* full palette catalogue (define-but-don't-apply) */
+  --pal-sap-bg:         #ECEBE9;  --pal-sap-fg:         #009838;
+  --pal-sunflower-bg:   #D63753;  --pal-sunflower-fg:   #F3C065;
+  --pal-tobacco-bg:     #1691CC;  --pal-tobacco-fg:     #784818;
+  --pal-sky-bg:         #4A3844;  --pal-sky-fg:         #85C3DC;
+  --pal-vermilion-bg:   #DDE6B7;  --pal-vermilion-fg:   #BE3522;
+  --pal-persimmon-bg:   #FBEE6C;  --pal-persimmon-fg:   #F0772E;
+
+  /* Semantic */
+  --fg-1:               var(--ink);
+  --fg-2:               var(--ink-2);
+  --fg-3:               var(--ink-3);
+  --fg-muted:           var(--ink-4);
+  --bg:                 var(--paper);
+  --bg-surface:         var(--surface);
+  --link:               var(--ink);          /* base link is just black */
+  --link-hover:         var(--green);        /* green only on hover/active */
+  --focus:              var(--green);
+
+  /* ---------- Type ---------- */
+
+  --font-serif:
+    "Century Schoolbook", "New Century Schoolbook", "Century Schoolbook L",
+    "Source Serif 4", "Source Serif Pro", "Bookman", Georgia,
+    "Times New Roman", serif;
+
+  /* The brand only uses one family; a sans is provided ONLY for tabular
+     data / form internals where the serif reads poorly. Avoid using. */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial,
+    sans-serif;
+
+  /* Type scale — modest, editorial. Don't add new sizes; reuse these. */
+  --fs-xs:              12px;     /* metadata, captions */
+  --fs-sm:              14px;     /* small UI */
+  --fs-base:            16px;     /* body */
+  --fs-md:              18px;     /* lifted body / lead-in */
+  --fs-lg:              22px;     /* sub-headings */
+  --fs-xl:              28px;     /* h3 / card titles */
+  --fs-2xl:             36px;     /* h2 */
+  --fs-3xl:             48px;     /* h1 / exhibition title */
+  --fs-4xl:             64px;     /* very large display (rare) */
+
+  --lh-tight:           1.15;
+  --lh-snug:            1.3;
+  --lh-normal:          1.55;     /* body — long-form reading */
+  --lh-loose:           1.7;
+
+  --tracking-tight:    -0.01em;
+  --tracking-normal:    0;
+  --tracking-wide:      0.04em;
+  --tracking-caps:      0.08em;   /* used for INCUBATOR wordmark */
+
+  /* ---------- Spacing (8px grid) ---------- */
+  --s-1:                4px;
+  --s-2:                8px;
+  --s-3:                12px;
+  --s-4:                16px;
+  --s-5:                20px;
+  --s-6:                24px;
+  --s-8:                32px;
+  --s-10:               40px;
+  --s-12:               48px;
+  --s-14:               56px;
+  --s-16:               64px;
+  --s-20:               80px;
+  --s-24:               96px;
+  --s-32:               128px;
+
+  --section-gap:        var(--s-20);   /* default vertical rhythm between sections */
+  --gutter:             var(--s-6);    /* horizontal page gutter (mobile) */
+  --gutter-lg:          var(--s-16);   /* horizontal page gutter (desktop) */
+
+  --content-max:        1320px;        /* max content width */
+  --measure:            62ch;          /* long-form text measure */
+
+  /* ---------- Radii — almost always 0 ---------- */
+  --r-0:                0;
+  --r-1:                2px;       /* form fields, cookie modal */
+  --r-pill:             999px;
+
+  /* ---------- Borders ---------- */
+  --bw:                 1px;
+  --border:             var(--bw) solid var(--hairline);
+  --border-strong:      var(--bw) solid var(--hairline-strong);
+
+  /* ---------- Shadows — none ---------- */
+  --shadow-none:        none;
+  /* Only one elevation exists, used by the cart toast. */
+  --shadow-toast:       0 8px 24px rgba(0, 0, 0, 0.08);
+
+  /* ---------- Motion ---------- */
+  --ease:               cubic-bezier(0.2, 0.0, 0.2, 1);
+  --ease-out:           cubic-bezier(0.0, 0.0, 0.2, 1);
+  --dur-fast:           120ms;
+  --dur:                200ms;
+  --dur-slow:           300ms;
+
+  /* ---------- Z layers ---------- */
+  --z-header:           50;
+  --z-overlay:          70;
+  --z-modal:            80;
+  --z-toast:            90;
+
+  /* ---------- Header & layout heights ---------- */
+  --header-h:           64px;
+  --header-h-compact:   48px;
+}
+
+/* ===========================================================================
+   Semantic element styles. Apply these by tagging elements with
+   .h1 / .h2 / .body / .meta / etc., OR import them globally as element rules.
+   ========================================================================= */
+
+html, body {
+  background: var(--bg);
+  color: var(--fg-1);
+  font-family: var(--font-serif);
+  font-size: var(--fs-base);
+  line-height: var(--lh-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.wordmark {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.h1, h1 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: var(--fs-3xl);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  margin: 0 0 var(--s-6);
+}
+
+.h2, h2 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: var(--fs-2xl);
+  line-height: var(--lh-snug);
+  margin: 0 0 var(--s-5);
+}
+
+.h3, h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: var(--fs-xl);
+  line-height: var(--lh-snug);
+  margin: 0 0 var(--s-4);
+}
+
+.h4, h4 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: var(--fs-md);
+  line-height: var(--lh-snug);
+  margin: 0 0 var(--s-3);
+}
+
+.body, p {
+  font-family: var(--font-serif);
+  font-size: var(--fs-base);
+  line-height: var(--lh-normal);
+  margin: 0 0 var(--s-5);
+}
+
+.body-lg {
+  font-size: var(--fs-md);
+  line-height: var(--lh-normal);
+}
+
+.meta {
+  font-size: var(--fs-sm);
+  color: var(--fg-3);
+  letter-spacing: var(--tracking-wide);
+}
+
+.caption {
+  font-size: var(--fs-xs);
+  color: var(--fg-3);
+  letter-spacing: var(--tracking-wide);
+}
+
+.eyebrow {
+  font-size: var(--fs-xs);
+  color: var(--fg-3);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+em, .italic { font-style: italic; }
+strong { font-weight: 600; }
+
+/* ---------- Links ---------- */
+a {
+  color: var(--link);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease);
+}
+a:hover {
+  color: var(--link-hover);
+  border-bottom-color: currentColor;
+}
+a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ---------- Utility containers ---------- */
+.container {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+@media (min-width: 900px) {
+  .container { padding-inline: var(--gutter-lg); }
+}
+
+.prose { max-width: var(--measure); }
+
+/* ---------- Hairline ---------- */
+.hairline { border-top: var(--border); }
+
+/* ---------- Reduced motion respect ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ===========================================================================
+   PALETTE PAIRS — apply with class="palette palette--<name>" on any element
+   whose background should adopt the pair. Children use --pair-fg as their
+   text colour.  e.g. <header class="palette palette--sunflower">
+   ========================================================================= */
+
+.palette                  { background: var(--pair-bg); color: var(--pair-fg); }
+.palette--sap             { --pair-bg: var(--pal-sap-bg);       --pair-fg: var(--pal-sap-fg); }
+.palette--sunflower       { --pair-bg: var(--pal-sunflower-bg); --pair-fg: var(--pal-sunflower-fg); }
+.palette--tobacco         { --pair-bg: var(--pal-tobacco-bg);   --pair-fg: var(--pal-tobacco-fg); }
+.palette--sky             { --pair-bg: var(--pal-sky-bg);       --pair-fg: var(--pal-sky-fg); }
+.palette--vermilion       { --pair-bg: var(--pal-vermilion-bg); --pair-fg: var(--pal-vermilion-fg); }
+.palette--persimmon       { --pair-bg: var(--pal-persimmon-bg); --pair-fg: var(--pal-persimmon-fg); }
+
+/* Wordmark printed in the pair's foreground over its background. */
+.palette .wordmark,
+.palette .inc-wordmark { color: var(--pair-fg); }

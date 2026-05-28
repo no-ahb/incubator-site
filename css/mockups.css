@@ -1,0 +1,384 @@
+/* Mockup overrides + new components on top of the design system's site.css.
+   This file is loaded AFTER site.css so it can refine without forking. */
+
+/* No max width inside artboards — let the canvas handle width */
+.inc-main { padding-bottom: var(--s-24); }
+
+/* ===========================================================================
+   EXHIBITIONS LIST — adopted from the Artists list layout
+   Long single column of titles on the left, hover preview on the right.
+   =========================================================================== */
+.inc-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: var(--s-12);
+  margin-top: var(--s-6);
+  padding-bottom: var(--s-16);
+}
+.inc-list__col      { min-width: 0; }
+.inc-list__items    { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+.inc-list__row      { border-top: 1px solid var(--hairline); }
+.inc-list__row:last-child { border-bottom: 1px solid var(--hairline); }
+.inc-list__link {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--s-4) var(--s-6);
+  align-items: baseline;
+  padding: var(--s-5) 0;
+  color: var(--ink);
+  border: 0;
+  transition: color var(--dur-fast) var(--ease);
+}
+.inc-list__link:hover { color: var(--green); border: 0; }
+.inc-list__title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.inc-list__name {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(20px, 2.2vw, 28px);
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+}
+.inc-list__work {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(16px, 1.5vw, 20px);
+  line-height: 1.2;
+  color: var(--ink-2);
+}
+.inc-list__dates {
+  font-size: 13px;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+  font-feature-settings: "tnum";
+  white-space: nowrap;
+  align-self: center;
+}
+
+/* Narrow viewport: dates drop under the title, preview poster goes full-width above the list. */
+@container (max-width: 820px) {
+  .inc-list {
+    grid-template-columns: 1fr;
+    gap: var(--s-8);
+  }
+  .inc-list__preview {
+    position: static;
+    order: -1;
+  }
+  .inc-list__link {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .inc-list__dates {
+    align-self: start;
+    white-space: normal;
+  }
+  .inc-list__name { font-size: 22px; }
+  .inc-list__work { font-size: 17px; }
+}
+.inc-list__preview {
+  position: sticky;
+  top: calc(var(--header-h) + 24px);
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+.inc-list__preview .inc-poster { width: 100%; }
+.inc-list__preview-meta {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 14px;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+}
+.inc-list__preview-meta em { font-style: italic; color: var(--ink); }
+
+/* Sort + filter row above the list */
+.inc-listbar {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: var(--s-6);
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  padding: var(--s-3) 0;
+  margin-top: var(--s-4);
+}
+.inc-listbar__count {
+  font-size: 13px;
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ===========================================================================
+   EXHIBITION DETAIL — refinements
+   =========================================================================== */
+
+/* Solo title block — name + show title big and serif */
+.inc-detail__head h1 em { font-style: italic; }
+
+/* Group-show participating-artist row */
+.inc-participants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3) var(--s-5);
+  margin-top: var(--s-3);
+}
+.inc-participants__label {
+  font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-3);
+  align-self: center;
+}
+.inc-participants a {
+  font-size: 16px;
+  font-family: var(--font-serif);
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: 1px;
+}
+.inc-participants a:hover { color: var(--green); border-bottom-color: currentColor; }
+
+/* Section jump-links on detail pages */
+.inc-jumps {
+  display: flex; gap: var(--s-6);
+  margin-top: var(--s-4);
+  font-size: 13px; letter-spacing: 0.04em;
+  color: var(--ink-3);
+}
+.inc-jumps a { color: var(--ink-3); border-bottom: 1px solid var(--hairline); padding-bottom: 1px; }
+.inc-jumps a:hover { color: var(--green); border-bottom-color: currentColor; }
+
+/* ===========================================================================
+   ARTIST DETAIL — restructured per brief
+   1. Installation views   2. Biography   3. "more info" link
+   =========================================================================== */
+.inc-detail__show-head h2 {
+  font-size: clamp(22px, 2.4vw, 32px);
+  line-height: 1.15;
+}
+.inc-detail__show-meta {
+  font-size: 14px; color: var(--ink-3); letter-spacing: 0.04em;
+  font-feature-settings: "tnum";
+  margin-top: 4px;
+}
+
+.inc-cta-line {
+  margin-top: var(--s-6);
+  padding-top: var(--s-6);
+  border-top: 1px solid var(--hairline);
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: var(--s-6);
+  font-family: var(--font-serif);
+}
+.inc-cta-line a {
+  font-size: 17px;
+  color: var(--green);
+  border-bottom: 1px solid var(--green);
+  padding-bottom: 2px;
+}
+.inc-cta-line a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+.inc-cta-line__hint { font-size: 13px; color: var(--ink-3); letter-spacing: 0.04em; }
+
+/* ===========================================================================
+   HOME — refinements
+   =========================================================================== */
+
+.inc-hero__title { letter-spacing: -0.005em; }
+.inc-hero__title em { font-style: italic; }
+.inc-hero__cta {
+  display: inline-block;
+  margin-top: var(--s-3);
+  font-size: 14px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 2px;
+}
+.inc-hero__cta:hover { color: var(--green); border-bottom-color: currentColor; }
+
+.inc-coming {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: var(--s-10);
+  align-items: center;
+  padding-top: var(--s-12);
+  border-top: 1px solid var(--hairline);
+}
+.inc-coming__meta { display: flex; flex-direction: column; gap: var(--s-3); }
+
+/* The "Past" archive grid — denser than primary card grid */
+.inc-past {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-8) var(--s-6);
+}
+@container (max-width: 1000px) { .inc-past { grid-template-columns: repeat(3, 1fr); } }
+@container (max-width: 700px)  { .inc-past { grid-template-columns: repeat(2, 1fr); } }
+
+.inc-past .inc-card__title { font-size: 16px; }
+
+/* ===========================================================================
+   PRESS — 2026-first refinements
+   =========================================================================== */
+
+.inc-press-year h2 { font-size: 24px; }
+.inc-press-item__cta { color: var(--ink-3); }
+.inc-press-item:hover .inc-press-item__cta { color: var(--green); }
+
+/* ===========================================================================
+   CONTACT — refinements
+   =========================================================================== */
+
+.inc-contact__grid { grid-template-columns: repeat(2, 1fr); gap: var(--s-12); }
+.inc-map {
+  width: 100%; aspect-ratio: 4/3;
+  background:
+    radial-gradient(circle at 30% 40%, #e8e3da 0, transparent 30%),
+    radial-gradient(circle at 65% 70%, #d8d2c5 0, transparent 35%),
+    repeating-linear-gradient(90deg, #efece4 0 1px, transparent 1px 80px),
+    repeating-linear-gradient( 0deg, #efece4 0 1px, transparent 1px 80px),
+    #f4f1ea;
+  border: 1px solid var(--hairline);
+  position: relative;
+}
+.inc-map::after {
+  content: "";
+  position: absolute; left: 50%; top: 50%;
+  width: 12px; height: 12px;
+  border: 2px solid var(--green);
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  background: #fff;
+}
+.inc-map__caption {
+  font-size: 12px; color: var(--ink-3); letter-spacing: 0.06em;
+  margin-top: 6px;
+}
+
+/* ===========================================================================
+   COMPACT HEADER state (for the "Menu disclosure" mock)
+   =========================================================================== */
+.inc-header--compact .inc-header__inner { height: var(--header-h-compact); }
+.inc-menu-btn--show { display: inline-flex !important; }
+
+/* ===========================================================================
+   POSTER — size the wordmark by container width, not viewport
+   The .inc-poster is its own inline-size container so the wordmark scales
+   to the card / hero band it actually sits in, preventing the right-edge
+   cut-off on past-show cards in a 4-up grid.
+   =========================================================================== */
+.inc-poster { container-type: inline-size; overflow: hidden; }
+.inc-poster__wm {
+  font-size: clamp(18px, 10cqi, 56px) !important;
+  letter-spacing: 0.04em !important;
+}
+.inc-poster--card .inc-poster__wm {
+  font-size: clamp(14px, 11cqi, 32px) !important;
+  letter-spacing: 0.02em !important;
+}
+.inc-poster--hero .inc-poster__wm {
+  font-size: clamp(28px, 9cqi, 88px) !important;
+}
+
+/* ===========================================================================
+   INSTALLATION STRIP — clarify interaction
+   Tiles open in a lightbox; cursor + hover affordance make that visible.
+   =========================================================================== */
+.inc-strip .inc-tile {
+  cursor: zoom-in;
+  position: relative;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+.inc-strip .inc-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at center, rgba(0,0,0,0) 35%, rgba(0,0,0,0.18) 100%);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+  pointer-events: none;
+}
+.inc-strip .inc-tile::before {
+  content: "↗";
+  position: absolute;
+  top: 12px; right: 12px;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: #fff;
+  background: rgba(17,17,17,0.7);
+  border-radius: 999px;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+  pointer-events: none;
+}
+.inc-strip .inc-tile:hover { opacity: 0.95; }
+.inc-strip .inc-tile:hover::after,
+.inc-strip .inc-tile:hover::before { opacity: 1; }
+
+/* ===========================================================================
+   PRESS — no persistent underline; hover-only colour shift.
+   The row divider and the row-wide bottom-border that read as "underline"
+   are gone; rows are separated by space only. The title gets the underline
+   on hover, scoped to the title text itself (not the whole row).
+   =========================================================================== */
+.mock .inc-press-item {
+  border-bottom: 0;
+  padding: var(--s-3) 0;
+}
+.mock .inc-press-item__title {
+  border-bottom: 0;
+}
+.mock .inc-press-item:hover .inc-press-item__title {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--green);
+  border-bottom: 0;
+}
+.mock .inc-press-item__cta {
+  text-decoration: none;
+  border: 0;
+}
+
+/* ===========================================================================
+   ARTBOARD shell — the white frame each mockup sits inside on the canvas
+   Each frame is a container query root so layouts respond to the artboard
+   width (the design dimension) rather than the host viewport.
+   =========================================================================== */
+.shell-board__frame { container-type: inline-size; }
+
+.mock {
+  width: 100%;
+  background: var(--paper);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  container-type: inline-size;
+}
+.mock__scroll {
+  /* content flows naturally — the host scroller is the page */
+}
+
+/* Override the design-system container max width so the artboard width
+   becomes the page width — the artboard's px size IS the breakpoint. */
+.mock .container {
+  max-width: none;
+  padding-inline: var(--gutter-lg);
+}
+
+/* Footer: now 3 columns (no seal). The DS rule expects a 4th `auto` slot. */
+.mock .inc-footer__inner {
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s-8);
+}
+.inc-footer__brand .inc-wordmark { display: block; margin-bottom: var(--s-3); }
+@container (max-width: 900px) {
+  .mock .inc-footer__inner { grid-template-columns: 1fr 1fr; }
+}
+@container (max-width: 600px) {
+  .mock .inc-footer__inner { grid-template-columns: 1fr; gap: var(--s-6); }
+}

@@ -1,0 +1,45 @@
+/* ===========================================================================
+   Real-site layer — loaded LAST, after ds.css / site.css / mockups.css.
+   mockups.css was tuned for a fixed 1440px artboard inside a canvas viewer.
+   These rules adapt that to a live, full-viewport, navigable website.
+   =========================================================================== */
+
+/* The mockup forced the page wrapper to overflow:hidden so it could clip
+   inside an artboard frame — that turns .mock into a scroll container and
+   stops the sticky header from sticking to the viewport. Let it flow. */
+.mock {
+  overflow: visible;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.mock__scroll {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+.mock__scroll > .inc-main { flex: 1 0 auto; }
+
+/* Restore the design system's constrained content width + responsive gutters.
+   (mockups.css set `max-width:none` and a permanent large gutter because the
+   artboard width *was* the page width.) */
+.mock .container {
+  max-width: var(--content-max);
+  padding-inline: var(--gutter);
+}
+@media (min-width: 900px) {
+  .mock .container { padding-inline: var(--gutter-lg); }
+}
+
+/* Footer keeps its full-bleed surface background while its inner content
+   stays aligned to the same measure as the rest of the page. */
+.inc-footer__inner {
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+/* Smooth in-page jumps for the detail-page section links (#installation,
+   #release, #biography, #show-N) — offset so the sticky header never covers
+   the target heading. */
+html { scroll-behavior: smooth; }
+:target { scroll-margin-top: calc(var(--header-h) + 24px); }
