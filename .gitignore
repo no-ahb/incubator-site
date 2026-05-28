@@ -7,3 +7,6 @@
 # Local source materials — data workbook + original mockup reference.
 # Kept in the project folder but never published to GitHub Pages.
 source/
+
+# Original camera image; only the optimized assets/about-image.jpg is published.
+about-image.heic

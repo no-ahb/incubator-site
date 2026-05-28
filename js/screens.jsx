@@ -419,14 +419,17 @@ function AboutScreen() {
         <header className="inc-pagehead">
           <h1>About</h1>
         </header>
-        <Prose
-          paragraphs={[
-            "*Incubator* is a highly adrenalised exhibition programme showcasing the work of the most exceptional emerging artists working in London.",
-            "Founded as a vehicle for solo and small-group exhibitions of artists in the first phase of their public practice, Incubator runs a programme of roughly twelve shows a year from a single-room gallery on Chiltern Street in Marylebone. Each exhibition is accompanied by a press release written either by the artist, by a critic, or by the gallery.",
-            "The programme is built around close, sustained relationships with a small group of painters whose work the gallery believes will become essential. Many artists return — *Charlie Gosling*, for instance, has shown twice — and each return marks an attempt to track a practice in real time, not to recapitulate it.",
-            "The gallery is open to the public Thursday to Sunday. Mondays through Wednesdays are by appointment only — please write ahead."
-          ]}
-        />
+        <div className="inc-about__intro">
+          <Prose
+            paragraphs={[
+              "*Incubator* is a highly adrenalised exhibition programme showcasing the work of the most exceptional emerging artists working in London.",
+              "Founded as a vehicle for solo and small-group exhibitions of artists in the first phase of their public practice, Incubator runs a programme of roughly twelve shows a year from a single-room gallery on Chiltern Street in Marylebone. Each exhibition is accompanied by a press release written either by the artist, by a critic, or by the gallery.",
+              "The programme is built around close, sustained relationships with a small group of painters whose work the gallery believes will become essential. Many artists return — *Charlie Gosling*, for instance, has shown twice — and each return marks an attempt to track a practice in real time, not to recapitulate it.",
+              "The gallery is open to the public Thursday to Sunday. Mondays through Wednesdays are by appointment only — please write ahead."
+            ]}
+          />
+          <img className="inc-about__img" src="assets/about-image.jpg" alt="Inside the Incubator gallery on Chiltern Street" loading="lazy" />
+        </div>
 
         <section className="container inc-detail__bio" style={{ paddingInline: 0, marginTop: "var(--s-16)" }}>
           <h3>Founders &amp; staff</h3>

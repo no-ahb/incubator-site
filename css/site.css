@@ -261,6 +261,17 @@ ul { list-style: none; padding: 0; margin: 0; }
 .inc-detail__more { margin-top: var(--s-6); }
 .inc-detail__more a { font-size: 15px; }
 
+/* About: intro text with image on the right */
+.inc-about__intro {
+  display: grid; grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr);
+  gap: var(--s-12); align-items: start;
+}
+.inc-about__intro .inc-prose { max-width: none; }
+.inc-about__img { width: 100%; height: auto; display: block; }
+@media (max-width: 900px) {
+  .inc-about__intro { grid-template-columns: 1fr; gap: var(--s-10); }
+}
+
 .inc-back { margin-top: var(--s-12); }
 .inc-back a { font-size: 14px; color: var(--ink-3); }
 .inc-back a:hover { color: var(--green); }
