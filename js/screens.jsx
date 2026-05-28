@@ -7,11 +7,14 @@ const { useState: msState, useMemo: msMemo } = React;
    HOME
    ===================================================================== */
 function HomeScreen({ onNav }) {
+  const TODAY = "2026-05-28";
   const all = [...EXHIBITIONS, ...EXHIBITION_ARCHIVE];
-  const current = EXHIBITIONS.find((e) => e.current);
-  const next = EXHIBITIONS.find((e) => !e.current && e.startISO > "2026-04-29") || EXHIBITIONS[1];
+  const current = EXHIBITIONS.find((e) => e.current) || EXHIBITIONS[0];
+  const next = EXHIBITIONS
+    .filter((e) => !e.current && e.startISO > TODAY)
+    .sort((a, b) => (a.startISO || "").localeCompare(b.startISO || ""))[0];
   const past = all
-    .filter((e) => !e.current && e.id !== next.id)
+    .filter((e) => !e.current && (!next || e.id !== next.id))
     .sort((a, b) => (b.startISO || "").localeCompare(a.startISO || ""))
     .slice(0, 8);
 
@@ -47,7 +50,8 @@ function HomeScreen({ onNav }) {
         </div>
       </section>
 
-      {/* Forthcoming */}
+      {/* Forthcoming — only when a genuinely upcoming show exists */}
+      {next && (
       <section className="inc-section container">
         <header className="inc-section__head">
           <h2>Forthcoming</h2>
@@ -76,6 +80,7 @@ function HomeScreen({ onNav }) {
           </div>
         </div>
       </section>
+      )}
 
       {/* Past */}
       <section className="inc-section container">
@@ -238,9 +243,11 @@ function ExhibitionDetailScreen({ id, onNav }) {
         <section id="release" className="container inc-detail__release">
           <h3>Press release</h3>
           <Prose paragraphs={ex.pressRelease || []} />
-          <p className="inc-detail__more">
-            <a href="#" onClick={(e)=>e.preventDefault()}>Please click here for more information →</a>
-          </p>
+          {ex.privateView && (
+            <p className="inc-detail__more">
+              <a href={ex.privateView} target="_blank" rel="noopener">Please click here for more information →</a>
+            </p>
+          )}
         </section>
 
         <p className="container inc-back">
@@ -313,14 +320,22 @@ function ArtistScreen({ id, onNav }) {
           <Prose paragraphs={artist.bio} />
         </section>
 
-        <div className="container inc-cta-line">
-          <a href="#" onClick={(e)=>e.preventDefault()}>
-            Please click here for more information →
-          </a>
-          <span className="inc-cta-line__hint">
-            Available works · prices on request
-          </span>
-        </div>
+        {(() => {
+          const pv = (shows.find((s) => s.privateView) || {}).privateView;
+          return (
+            <div className="container inc-cta-line">
+              <a
+                href={pv || "#"}
+                {...(pv ? { target: "_blank", rel: "noopener" } : { onClick: (e) => e.preventDefault() })}
+              >
+                Please click here for more information →
+              </a>
+              <span className="inc-cta-line__hint">
+                Available works · prices on request
+              </span>
+            </div>
+          );
+        })()}
 
         <p className="container inc-back">
           <a href="#/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>← Back to exhibitions</a>
@@ -341,7 +356,13 @@ function PressScreen() {
         <header className="inc-pagehead">
           <h1>Press</h1>
         </header>
-        {ordered.map((year) => (
+        {ordered.length === 0 ? (
+          <p className="inc-prose" style={{ color: "var(--ink-3)", maxWidth: "62ch" }}>
+            Selected press and writing on Incubator exhibitions will be collected here.
+            For press enquiries, please write to{" "}
+            <a href="mailto:incubator.enquiries@gmail.com">incubator.enquiries@gmail.com</a>.
+          </p>
+        ) : ordered.map((year) => (
           <section key={year.year} className="inc-press-year">
             <h2>{year.year}</h2>
             <div className="inc-press-list">
