@@ -300,3 +300,106 @@ html { scroll-behavior: smooth; }
   .inc-report-fab__txt { display: none; }
   .inc-report-fab { padding: 12px; }
 }
+
+/* ===========================================================================
+   Real photography — posters / installation tiles / lightbox that carry a real
+   image instead of the palette + gradient placeholders.
+   =========================================================================== */
+.inc-poster--photo { padding: 0; }
+.inc-poster__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.inc-tile--photo { object-fit: cover; display: block; }
+.inc-lightbox__img--photo {
+  width: auto;
+  max-width: 100%;
+  max-height: 80vh;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+/* ===========================================================================
+   Data loading / error state (app.jsx)
+   =========================================================================== */
+.inc-datastate { display: flex; align-items: center; justify-content: center; min-height: 60vh; }
+.inc-datastate__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-5);
+  text-align: center;
+}
+.inc-datastate__msg { font-family: var(--font-serif); font-size: 16px; color: var(--ink-3); margin: 0; }
+
+/* ===========================================================================
+   Admin page (admin.jsx · #/admin)
+   =========================================================================== */
+.inc-admin { padding-block: var(--s-10) var(--s-16); max-width: 880px; }
+.inc-admin__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-4); margin-bottom: var(--s-6); }
+.inc-admin__head h1 { margin: 0; }
+.inc-admin__muted { font-family: var(--font-serif); font-size: 14px; color: var(--ink-3); margin: var(--s-2) 0; }
+
+.inc-admin__login { display: flex; flex-direction: column; gap: var(--s-4); max-width: 360px; margin-top: var(--s-6); }
+.inc-admin__login h2 { font-family: var(--font-serif); font-weight: 400; font-size: 22px; margin: 0; }
+
+.inc-admin__tabs { display: flex; gap: var(--s-2); border-bottom: 1px solid var(--hairline); margin-bottom: var(--s-6); }
+.inc-admin__tabs button {
+  appearance: none; background: none; border: 0; border-bottom: 2px solid transparent;
+  font-family: var(--font-serif); font-size: 15px; color: var(--ink-3);
+  padding: var(--s-2) var(--s-2) var(--s-3); cursor: pointer; margin-bottom: -1px;
+}
+.inc-admin__tabs button:hover { color: var(--ink); }
+.inc-admin__tabs button.is-active { color: var(--ink); border-bottom-color: var(--green); }
+
+.inc-admin__bar { margin-bottom: var(--s-5); }
+.inc-admin__flash {
+  font-family: var(--font-serif); font-size: 14px; color: var(--green);
+  background: var(--green-faint); border: 1px solid var(--green);
+  padding: var(--s-3) var(--s-4); margin: 0 0 var(--s-5);
+}
+
+.inc-admin__list { list-style: none; margin: 0; padding: 0; }
+.inc-admin__row {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-4);
+  padding: var(--s-4) 0; border-top: 1px solid var(--hairline);
+}
+.inc-admin__row:last-child { border-bottom: 1px solid var(--hairline); }
+.inc-admin__row.is-hidden { opacity: 0.5; }
+.inc-admin__row-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.inc-admin__row-title { font-family: var(--font-serif); font-size: 16px; }
+.inc-admin__row-title em { font-style: italic; }
+.inc-admin__row-dates { font-size: 12px; color: var(--ink-3); letter-spacing: 0.03em; }
+.inc-admin__row-actions { display: flex; gap: var(--s-2); flex-shrink: 0; }
+
+.inc-admin__btn-ghost {
+  appearance: none; background: none; border: 1px solid var(--hairline-strong);
+  font-family: var(--font-serif); font-size: 13px; color: var(--ink);
+  padding: 7px 12px; cursor: pointer; border-radius: 0; transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.inc-admin__btn-ghost:hover { border-color: var(--green); color: var(--green); }
+.inc-admin__btn-ghost:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.inc-admin__form { display: flex; flex-direction: column; gap: var(--s-4); }
+.inc-admin__formgrid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+.inc-admin__formgrid label,
+.inc-admin__form > label { display: flex; flex-direction: column; gap: var(--s-2); font-family: var(--font-serif); font-size: 13px; color: var(--ink-3); }
+.inc-admin__check { flex-direction: row !important; align-items: center; gap: var(--s-2); grid-column: 1 / -1; color: var(--ink); }
+.inc-admin__check input { width: auto; }
+@media (max-width: 640px) { .inc-admin__formgrid { grid-template-columns: 1fr; } }
+
+.inc-admin__images { display: flex; flex-direction: column; gap: var(--s-2); }
+.inc-admin__thumbs { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+.inc-admin__thumb { position: relative; width: 120px; height: 90px; border: 1px solid var(--hairline); background: var(--surface-2); }
+.inc-admin__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.inc-admin__addimg {
+  width: 120px; height: 90px; border: 1px dashed var(--hairline-strong); background: var(--surface-2);
+  font-family: var(--font-serif); font-size: 14px; color: var(--ink-3); cursor: pointer;
+}
+.inc-admin__addimg:hover { border-color: var(--green); color: var(--green); }
+
+.inc-admin__actions { display: flex; gap: var(--s-3); align-items: center; margin-top: var(--s-2); }
