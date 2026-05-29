@@ -60,3 +60,35 @@ curl -X POST https://incubator-report-issue.<you>.workers.dev \
   -d '{"title":"Test report","body":"Hello from curl"}'
 # -> {"ok":true,"url":"https://github.com/.../issues/1","number":1}
 ```
+
+## Admin CMS (the `/admin` page)
+
+The same Worker also powers the staff admin page at `/#/admin` on the site —
+add / edit / hide shows and view reported issues. Writes are committed to
+`data/shows.json` (and images under `assets/shows/<id>/`) in the repo, so the
+site redeploys on push. The browser never sees the GitHub token; the Worker
+checks the admin password on every write.
+
+**One extra secret is required:**
+
+```bash
+cd worker
+npx wrangler secret put ADMIN_PASSWORD   # choose a strong shared password
+npx wrangler deploy
+```
+
+The existing `GITHUB_TOKEN` already needs **Contents: Read and write** (it's
+used for screenshot uploads), which is the same permission the admin endpoints
+use — no token change needed.
+
+| Endpoint | Method | Purpose |
+| --- | --- | --- |
+| `/admin/login` | POST | Validate the password (gates the UI). |
+| `/admin/save-show` | POST | Create or edit a show (+ its artist). |
+| `/admin/visibility` | POST | Hide / unhide a show. |
+| `/admin/upload` | POST | Upload one image to `assets/shows/<id>/`. |
+| `/admin/issues` | GET | List open reported issues. |
+
+Every admin request carries an `X-Admin-Password` header and must come from an
+allow-listed origin. A wrong/missing password returns 401; the Worker is the
+real lock — the page's password prompt is only for convenience.

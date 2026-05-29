@@ -10,6 +10,21 @@ function HomeScreen({ onNav }) {
   const TODAY = "2026-05-28";
   const all = [...EXHIBITIONS, ...EXHIBITION_ARCHIVE];
   const current = EXHIBITIONS.find((e) => e.current) || EXHIBITIONS[0];
+
+  // No visible exhibitions (e.g. all hidden, or a brand-new gallery). Render a
+  // calm placeholder rather than dereferencing an undefined `current`.
+  if (!current) {
+    return (
+      <main className="inc-main">
+        <section className="inc-section container">
+          <header className="inc-section__head"><h2>Exhibitions</h2></header>
+          <p className="inc-prose" style={{ color: "var(--ink-3)" }}>
+            No exhibitions are on view at the moment. Please check back soon.
+          </p>
+        </section>
+      </main>
+    );
+  }
   const next = EXHIBITIONS
     .filter((e) => !e.current && e.startISO > TODAY)
     .sort((a, b) => (a.startISO || "").localeCompare(b.startISO || ""))[0];
@@ -531,4 +546,5 @@ Object.assign(window, {
   PressScreen,
   AboutScreen,
   ContactScreen,
+  slug,
 });

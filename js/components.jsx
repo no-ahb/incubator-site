@@ -20,7 +20,27 @@ const TILE_BG = {
   e: "linear-gradient(135deg,#e0dcd5 0%,#9c958c 100%)",
   f: "linear-gradient(135deg,#cac3bc 0%,#7a7167 100%)",
 };
-function Tile({ kind = "a", aspect = "4/3", className = "", style = {} }) {
+// A frame/hero value is a real photo (vs. a "a".."f" placeholder key) when it
+// looks like a path or URL. Real shows store paths like assets/shows/<id>/1.jpg.
+function isImageRef(v) {
+  return (
+    typeof v === "string" &&
+    (/^https?:\/\//.test(v) || v.includes("/") || /\.(jpe?g|png|webp|gif|avif)$/i.test(v))
+  );
+}
+
+function Tile({ kind = "a", aspect = "4/3", className = "", style = {}, alt = "" }) {
+  if (isImageRef(kind)) {
+    return (
+      <img
+        className={"inc-tile inc-tile--photo " + className}
+        src={kind}
+        alt={alt}
+        loading="lazy"
+        style={{ aspectRatio: aspect, ...style }}
+      />
+    );
+  }
   return (
     <div
       className={"inc-tile " + className}
@@ -111,6 +131,19 @@ function Header({ route, onNav, onOpenMenu, compact }) {
 
 /* ---------- POSTER -------------------------------------------------------- */
 function Poster({ ex, size = "card" }) {
+  // Shows with a real hero photo show it; the rest keep the palette identity.
+  if (ex.heroImage) {
+    return (
+      <div className={"inc-poster inc-poster--" + size + " inc-poster--photo"}>
+        <img
+          className="inc-poster__img"
+          src={ex.heroImage}
+          alt={ex.title ? ex.artist ? ex.artist + " — " + ex.title : ex.title : "Exhibition"}
+          loading="lazy"
+        />
+      </div>
+    );
+  }
   const cls = "inc-poster inc-poster--" + size + " palette palette--" + (ex.palette || "sap");
   return (
     <div className={cls}>
@@ -210,7 +243,7 @@ function InstallationStrip({ frames }) {
             aria-label={"Open installation view " + (i + 1) + " of " + count}
             onClick={() => setOpen(i)}
           >
-            <Tile kind={k} aspect={i % 3 === 0 ? "4/3" : "3/4"} />
+            <Tile kind={k} aspect={i % 3 === 0 ? "4/3" : "3/4"} alt={"Installation view " + (i + 1)} />
           </button>
         ))}
       </div>
@@ -232,7 +265,15 @@ function InstallationStrip({ frames }) {
             >‹</button>
           )}
           <figure className="inc-lightbox__stage" onClick={(e) => e.stopPropagation()}>
-            <Tile kind={frames[open]} aspect="3/2" className="inc-lightbox__img" />
+            {isImageRef(frames[open]) ? (
+              <img
+                className="inc-lightbox__img inc-lightbox__img--photo"
+                src={frames[open]}
+                alt={"Installation view " + (open + 1)}
+              />
+            ) : (
+              <Tile kind={frames[open]} aspect="3/2" className="inc-lightbox__img" />
+            )}
             <figcaption className="inc-lightbox__caption">{(open + 1) + " / " + count}</figcaption>
           </figure>
           {count > 1 && (
@@ -294,7 +335,15 @@ function Footer({ onNav }) {
   );
 }
 
-/* ---------- PROSE BLOCK --------------------------------------------------- */
+/* ---------- PROSE BLOCK ---------------------------------------------------
+   Paragraphs support a single inline convention: *emphasis* → <em>. Text now
+   comes from the admin form (committed to shows.json), so we HTML-escape first
+   and only then apply the emphasis transform — raw tags in the source can never
+   reach the DOM (defends the public site even if the admin password leaks). */
+const PROSE_ESCAPE = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" };
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"]/g, (c) => PROSE_ESCAPE[c]);
+}
 function Prose({ paragraphs, max }) {
   return (
     <div className="inc-prose" style={max ? { maxWidth: max } : null}>
@@ -302,7 +351,7 @@ function Prose({ paragraphs, max }) {
         <p
           key={i}
           dangerouslySetInnerHTML={{
-            __html: p.replace(/\*([^*]+)\*/g, "<em>$1</em>"),
+            __html: escapeHtml(p).replace(/\*([^*]+)\*/g, "<em>$1</em>"),
           }}
         />
       ))}
@@ -311,7 +360,7 @@ function Prose({ paragraphs, max }) {
 }
 
 Object.assign(window, {
-  Tile, Wordmark, Header, Poster,
+  Tile, Wordmark, Header, Poster, isImageRef,
   ExhibitionCard, ExhibitionsListRow,
   InstallationStrip, PressItem, Footer, Prose,
 });

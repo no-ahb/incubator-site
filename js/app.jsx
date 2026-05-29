@@ -77,8 +77,33 @@ function routeToScreen(route, navigate) {
     case "press":   return <PressScreen />;
     case "about":   return <AboutScreen />;
     case "contact": return <ContactScreen />;
+    case "admin":   return <AdminScreen />;
     default:        return <HomeScreen onNav={navigate} />;
   }
+}
+
+/* ---------- DATA LOADING / ERROR STATES ----------------------------------- */
+function SiteLoading() {
+  return (
+    <main className="inc-main inc-datastate" aria-busy="true">
+      <div className="container inc-datastate__inner">
+        <Wordmark />
+        <p className="inc-datastate__msg">Loading…</p>
+      </div>
+    </main>
+  );
+}
+
+function SiteError({ onRetry }) {
+  return (
+    <main className="inc-main inc-datastate">
+      <div className="container inc-datastate__inner">
+        <Wordmark />
+        <p className="inc-datastate__msg">We couldn’t load the gallery right now.</p>
+        <button type="button" className="inc-btn" onClick={onRetry}>Try again</button>
+      </div>
+    </main>
+  );
 }
 
 // Route lives in the hash (e.g. "#/exhibitions/foo") so the site works on any
@@ -92,6 +117,14 @@ function getRoute() {
 function App() {
   const [route, setRoute] = appState(getRoute());
   const [menuOpen, setMenuOpen] = appState(false);
+  const [dataState, setDataState] = appState("loading"); // loading | ready | error
+
+  const loadData = () => {
+    setDataState("loading");
+    loadSiteData()
+      .then(() => setDataState("ready"))
+      .catch(() => setDataState("error"));
+  };
 
   const navigate = (path) => {
     const target = "#" + path;
@@ -103,6 +136,9 @@ function App() {
     }
     setMenuOpen(false);
   };
+
+  // Fetch site content (shows + artists) once on mount.
+  appEffect(() => { loadData(); }, []);
 
   appEffect(() => {
     const onHash = () => {
@@ -139,6 +175,20 @@ function App() {
     return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
 
+  let content;
+  if (dataState === "loading") {
+    content = <SiteLoading />;
+  } else if (dataState === "error") {
+    content = <SiteError onRetry={loadData} />;
+  } else {
+    content = (
+      <>
+        {routeToScreen(route, navigate)}
+        <Footer onNav={navigate} />
+      </>
+    );
+  }
+
   return (
     <div className="mock" data-route={route}>
       <Header
@@ -146,10 +196,7 @@ function App() {
         onNav={navigate}
         onOpenMenu={() => setMenuOpen(true)}
       />
-      <div className="mock__scroll">
-        {routeToScreen(route, navigate)}
-        <Footer onNav={navigate} />
-      </div>
+      <div className="mock__scroll">{content}</div>
       {menuOpen && <MobileMenu onNav={navigate} onClose={() => setMenuOpen(false)} />}
       <ReportIssue />
     </div>
