@@ -296,7 +296,7 @@ function AdminShows({ pw, shows, onEdit, onToggle }) {
         {shows.map((s) => (
           <li key={s.id} className={"inc-admin__row" + (s.hidden ? " is-hidden" : "")}>
             <span className="inc-admin__row-main">
-              <span className="inc-admin__row-title">{s.artist ? s.artist + " — " : ""}<em>{s.title}</em></span>
+              <span className="inc-admin__row-title">{s.title ? <>{s.artist ? s.artist + " — " : ""}<em>{s.title}</em></> : (s.artist || "")}</span>
               <span className="inc-admin__row-dates">{s.dates}{s.hidden ? " · hidden" : ""}</span>
             </span>
             <span className="inc-admin__row-actions">

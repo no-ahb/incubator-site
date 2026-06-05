@@ -51,7 +51,7 @@ function HomeScreen({ onNav }) {
               href={"#/exhibitions/" + current.id}
               onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + current.id); }}
             >
-              {current.artist}:&nbsp;<em>{current.title}</em>
+              {current.artist}{current.title ? <>:&nbsp;<em>{current.title}</em></> : null}
             </a>
           </h1>
           <div className="inc-meta">{current.dates}</div>
@@ -82,7 +82,7 @@ function HomeScreen({ onNav }) {
           <div className="inc-coming__meta">
             <span className="inc-eyebrow">Opening {next.startISO.slice(8,10)} {monthName(next.startISO)}</span>
             <h3 className="inc-hero__title">
-              {next.isGroup ? <em>{next.title}</em> : <>{next.artist}:&nbsp;<em>{next.title}</em></>}
+              {next.isGroup ? <em>{next.title}</em> : <>{next.artist}{next.title ? <>:&nbsp;<em>{next.title}</em></> : null}</>}
             </h3>
             <div className="inc-meta">{next.dates}</div>
             <a
@@ -218,8 +218,8 @@ function ExhibitionsListScreen({ onNav }) {
                 <div className="inc-list__preview-meta">
                   <span>
                     {preview.isGroup
-                      ? <em>{preview.title}</em>
-                      : <>{preview.artist} · <em>{preview.title}</em></>
+                      ? (preview.title ? <em>{preview.title}</em> : null)
+                      : <>{preview.artist}{preview.title ? <> · <em>{preview.title}</em></> : null}</>
                     }
                   </span>
                   <span>{preview.dates}</span>
@@ -266,29 +266,9 @@ function ExhibitionDetailScreen({ id, onNav }) {
           <h1>
             {ex.isGroup
               ? <em>{ex.title}</em>
-              : <>{artistRec ? artistLink(ex.artist) : ex.artist}: <em>{ex.title}</em></>}
+              : <>{artistRec ? artistLink(ex.artist) : ex.artist}{ex.title ? <>: <em>{ex.title}</em></> : null}</>}
           </h1>
           <div className="inc-meta">{ex.dates}</div>
-
-          {ex.isGroup && (
-            <div className="inc-participants">
-              <span className="inc-participants__label">With</span>
-              {(ex.participants || ["Charlie Gosling", "Harry Grundy", "Katherine Qiyu Su", "Xiaochi Dong", "Lorena Levi", "Leonard \u201CSoldier\u201D Iheagwam"]).map((n) => (
-                <a
-                  key={n}
-                  href={"#/artists/" + slug(n)}
-                  onClick={(e) => { e.preventDefault(); onNav("/artists/" + slug(n)); }}
-                >
-                  {n}
-                </a>
-              ))}
-            </div>
-          )}
-
-          <div className="inc-jumps">
-            <a href="#installation">Installation views</a>
-            <a href="#release">Press release</a>
-          </div>
         </div>
 
         <section id="installation" className="container inc-detail__installation">
@@ -301,13 +281,9 @@ function ExhibitionDetailScreen({ id, onNav }) {
           <Prose paragraphs={ex.pressRelease || []} />
         </section>
 
-        {(otherShows.length > 0 || artistRec) && (
+        {otherShows.length > 0 && (
           <section className="container inc-related">
-            <h3>
-              {otherShows.length > 0
-                ? "Other exhibitions by " + ex.artist + " at Incubator"
-                : "Artist"}
-            </h3>
+            <h3>{"Other exhibitions by " + ex.artist + " at Incubator"}</h3>
             <div className="inc-related__items">
               {otherShows.map((o) => (
                 <div key={o.id} className="inc-related__row">
@@ -316,17 +292,12 @@ function ExhibitionDetailScreen({ id, onNav }) {
                     href={"#/exhibitions/" + o.id}
                     onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + o.id); }}
                   >
-                    <span className="inc-related__title"><em>{o.title}</em></span>
+                    <span className="inc-related__title">{o.title ? <em>{o.title}</em> : null}</span>
                     <span className="inc-related__dates">{o.dates}</span>
                   </a>
                 </div>
               ))}
             </div>
-            {artistRec && (
-              <p className="inc-detail__more" style={{ marginTop: "var(--s-5)" }}>
-                {artistLink("View " + ex.artist + "’s full profile →")}
-              </p>
-            )}
           </section>
         )}
 
@@ -370,7 +341,7 @@ function ArtistScreen({ id, onNav }) {
         {shows.map((ex, idx) => (
           <div key={ex.id} id={"show-" + idx} className={"inc-detail__show " + (idx > 0 ? "is-sub" : "")}>
             <header className="container inc-detail__show-head">
-              <h2><em>{ex.title}</em></h2>
+              {ex.title ? <h2><em>{ex.title}</em></h2> : null}
               <div className="inc-detail__show-meta">{ex.dates}</div>
             </header>
 
@@ -408,8 +379,8 @@ function PressScreen() {
         {ordered.length === 0 ? (
           <p className="inc-prose" style={{ color: "var(--ink-3)", maxWidth: "62ch" }}>
             Selected press and writing on Incubator exhibitions will be collected here.
-            For press enquiries, please write to{" "}
-            <a href="mailto:incubator.enquiries@gmail.com">incubator.enquiries@gmail.com</a>.
+            For press enquiries, please reach out to:{" "}
+            <a href="mailto:fabian@strobellall.com">fabian@strobellall.com</a>.
           </p>
         ) : ordered.map((year) => (
           <section key={year.year} className="inc-press-year">
@@ -437,29 +408,19 @@ function AboutScreen() {
         <div className="inc-about__intro">
           <Prose
             paragraphs={[
-              "*Incubator* is a highly adrenalised exhibition programme showcasing the work of the most exceptional emerging artists working in London.",
-              "Founded as a vehicle for solo and small-group exhibitions of artists in the first phase of their public practice, Incubator runs a programme of roughly twelve shows a year from a single-room gallery on Chiltern Street in Marylebone. Each exhibition is accompanied by a press release written either by the artist, by a critic, or by the gallery.",
-              "The programme is built around close, sustained relationships with a small group of painters whose work the gallery believes will become essential. Many artists return — *Charlie Gosling*, for instance, has shown twice — and each return marks an attempt to track a practice in real time, not to recapitulate it.",
-              "The gallery is open to the public Thursday to Sunday. Mondays through Wednesdays are by appointment only — please write ahead."
+              "Incubator is a London-based gallery dedicated to championing exceptional emerging artists. Since its founding in 2021, the gallery has established itself as a platform for ambitious, innovative voices in contemporary art.",
+              "Incubator presented the work of 42 artists in its first three years, earning a reputation for identifying and championing compelling new voices. Today, the gallery continues to provide a platform for emerging artists to engage new audiences and advance their artistic practices.",
+              "As a carbon-neutral organisation and member of the Gallery Climate Coalition, Incubator is committed to embedding sustainability across its operations. The gallery continually reviews its practices to minimise environmental impact and contribute to a more sustainable future for the arts."
             ]}
           />
           <img className="inc-about__img" src="assets/about-image.jpg" alt="Inside the Incubator gallery on Chiltern Street" loading="lazy" />
         </div>
 
         <section className="container inc-detail__bio" style={{ paddingInline: 0, marginTop: "var(--s-16)" }}>
-          <h3>Founders &amp; staff</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "var(--s-3) var(--s-10)", fontSize: 16, maxWidth: 720 }}>
-            <span><strong>Eliza Bonham Carter</strong></span><span>Founder &amp; Director</span>
-            <span><strong>Beatrice Wakeling</strong></span><span>Curator</span>
-            <span><strong>Anna Souter</strong></span><span>Gallery manager</span>
+            <span><strong>Angelica Jopling</strong></span><span>Founding Director</span>
+            <span><strong>Isabella Mackintosh</strong></span><span>Gallery Manager</span>
           </div>
-        </section>
-
-        <section className="container inc-detail__bio" style={{ paddingInline: 0, marginTop: "var(--s-12)" }}>
-          <h3>With thanks to</h3>
-          <p style={{ fontSize: 16, lineHeight: 1.6, maxWidth: 720 }}>
-            Arts Council England · The Elephant Trust · The Royal Drawing School · Sarabande Foundation · and the many private supporters who make the programme possible.
-          </p>
         </section>
       </article>
     </main>
@@ -469,9 +430,15 @@ function AboutScreen() {
 /* =====================================================================
    CONTACT  (new page)
    ===================================================================== */
+const SUBSCRIBE_URL  = "https://first-thursday.typeform.com/incubator";
+const MAPS_EMBED_URL = "https://maps.google.com/maps?q=2+Chiltern+Street+London+W1U+7PR&z=16&output=embed";
+// Open the First Thursday subscription form in a popup; fall back to the plain
+// target="_blank" link if the browser blocks the popup.
+function openSubscribe(e) {
+  const w = window.open(SUBSCRIBE_URL, "incubator-subscribe", "width=540,height=720");
+  if (w) e.preventDefault();
+}
 function ContactScreen() {
-  const [email, setEmail] = msState("");
-  const [sent, setSent]   = msState(false);
   return (
     <main className="inc-main">
       <div className="container inc-contact">
@@ -483,7 +450,7 @@ function ContactScreen() {
             <p>
               2 Chiltern street<br/>
               Marylebone, W1U 7PR<br/>
-              <a href="#" onClick={(e)=>e.preventDefault()}>View on Google Maps ↗</a>
+              <a href={MAPS_URL} target="_blank" rel="noopener">View on Google Maps ↗</a>
             </p>
 
             <h3>Hours</h3>
@@ -512,22 +479,22 @@ function ContactScreen() {
             </p>
 
             <h3>Mailing list</h3>
-            <p>Receive exhibition announcements roughly once a month. No other contact.</p>
-            <form className="inc-form" onSubmit={(e) => { e.preventDefault(); setSent(true); }}>
-              <label htmlFor="ml-email">Your email</label>
-              <input
-                id="ml-email" type="email" required
-                value={email}
-                onChange={(e)=>setEmail(e.target.value)}
-                placeholder="you@example.com"
-              />
-              <button className="inc-btn" type="submit">{sent ? "Subscribed" : "Subscribe"}</button>
-            </form>
+            <p>
+              <a className="inc-btn" href={SUBSCRIBE_URL} target="_blank" rel="noopener" onClick={openSubscribe}>
+                Subscribe
+              </a>
+            </p>
           </section>
 
           <section>
             <h3>Find us</h3>
-            <div className="inc-map" role="img" aria-label="Map showing 2 Chiltern Street" />
+            <iframe
+              className="inc-map"
+              src={MAPS_EMBED_URL}
+              title="Map showing Incubator, 2 Chiltern Street, London W1U 7PR"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
             <div className="inc-map__caption">
               Nearest tube — Baker Street (5 minutes' walk) · Marylebone (8 minutes)
             </div>

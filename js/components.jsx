@@ -3,6 +3,9 @@
 
 const { useState, useEffect, useRef } = React;
 
+// Gallery location on Google Maps — shared by the footer and the contact page.
+const MAPS_URL = "https://www.google.com/maps/search/?api=1&query=Incubator+2+Chiltern+Street+London+W1U+7PR";
+
 /* ---------- TILE ----------------------------------------------------------
    Coloured placeholder standing in for installation / hero photography.
    Variants approximate the warm-neutral palette of the gallery's photography. */
@@ -149,7 +152,7 @@ function Poster({ ex, size = "card" }) {
     <div className={cls}>
       <span className="inc-poster__wm">INCUBATOR</span>
       <span className="inc-poster__title">
-        {ex.isGroup ? ex.title : <em>{ex.title}</em>}
+        {ex.title ? (ex.isGroup ? ex.title : <em>{ex.title}</em>) : null}
       </span>
       <span className="inc-poster__addr">2&nbsp;CHILTERN&nbsp;STREET, LONDON, W1U&nbsp;7PR</span>
     </div>
@@ -171,7 +174,7 @@ function ExhibitionCard({ ex, onNav, eyebrow }) {
         <span className="inc-card__dates">{ex.dates}</span>
       </div>
       <h3 className="inc-card__title">
-        {ex.isGroup ? <em>{ex.title}</em> : <>{subtitle}: <em>{ex.title}</em></>}
+        {ex.isGroup ? (ex.title ? <em>{ex.title}</em> : null) : <>{subtitle}{ex.title ? <>: <em>{ex.title}</em></> : null}</>}
       </h3>
     </a>
   );
@@ -194,12 +197,12 @@ function ExhibitionsListRow({ ex, onNav, onHover }) {
           {ex.isGroup ? (
             <>
               <span className="inc-list__name">Group show</span>
-              <em className="inc-list__work">{ex.title}</em>
+              {ex.title ? <em className="inc-list__work">{ex.title}</em> : null}
             </>
           ) : (
             <>
               <span className="inc-list__name">{ex.artist}</span>
-              <em className="inc-list__work">{ex.title}</em>
+              {ex.title ? <em className="inc-list__work">{ex.title}</em> : null}
             </>
           )}
         </span>
@@ -312,14 +315,7 @@ function Footer({ onNav }) {
           <p>
             2 Chiltern street<br/>
             Marylebone, W1U 7PR<br/>
-            <a href="#" onClick={(e)=>e.preventDefault()}>View map</a>
-          </p>
-        </div>
-        <div>
-          <p>
-            Mon &ndash; Wed, appointment only<br/>
-            Thur &ndash; Sat, 11am &ndash; 6pm<br/>
-            Sun, 11am &ndash; 5pm
+            <a href={MAPS_URL} target="_blank" rel="noopener">View map</a>
           </p>
         </div>
         <div className="inc-footer__contact">
