@@ -1536,6 +1536,66 @@
         "e",
         "f"
       ]
+    },
+    {
+      "id": "lines-in-the-sand",
+      "artistId": null,
+      "artist": "Lines in the Sand",
+      "title": "Lines in the Sand",
+      "dates": "Dates TBC",
+      "current": false,
+      "isGroup": true,
+      "palette": "sap"
+    },
+    {
+      "id": "five-by-five",
+      "artistId": null,
+      "artist": "Five by Five",
+      "title": "Five by Five",
+      "dates": "Dates TBC",
+      "current": false,
+      "isGroup": true,
+      "palette": "sky"
+    },
+    {
+      "id": "utopia",
+      "artistId": null,
+      "artist": "Utopia",
+      "title": "Utopia",
+      "dates": "Dates TBC",
+      "current": false,
+      "isGroup": true,
+      "palette": "vermilion"
+    },
+    {
+      "id": "mind-to-hand",
+      "artistId": null,
+      "artist": "Mind to Hand",
+      "title": "Mind to Hand",
+      "dates": "Dates TBC",
+      "current": false,
+      "isGroup": true,
+      "palette": "tobacco"
+    },
+    {
+      "id": "the-yellow-wallpaper",
+      "artistId": null,
+      "artist": "The Yellow Wallpaper",
+      "title": "The Yellow Wallpaper",
+      "dates": "Dates TBC",
+      "current": false,
+      "isGroup": true,
+      "palette": "sunflower"
+    },
+    {
+      "id": "notes-from-the-studio",
+      "artistId": null,
+      "artist": "Notes from the Studio",
+      "title": "Notes from the Studio",
+      "dates": "Dates TBC",
+      "current": false,
+      "isGroup": true,
+      "palette": "persimmon"
     }
   ],
   "artists": [
