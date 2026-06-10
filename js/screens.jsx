@@ -269,6 +269,12 @@ function ExhibitionDetailScreen({ id, onNav }) {
               : <>{artistRec ? artistLink(ex.artist) : ex.artist}{ex.title ? <>: <em>{ex.title}</em></> : null}</>}
           </h1>
           <div className="inc-meta">{ex.dates}</div>
+          {ex.isGroup && (ex.groupArtists || []).length > 0 && (
+            <div className="inc-participants">
+              <span className="inc-participants__label">Artists</span>
+              <span className="inc-participants__names">{ex.groupArtists.join(", ")}</span>
+            </div>
+          )}
         </div>
 
         <section id="installation" className="container inc-detail__installation">
@@ -336,6 +342,12 @@ function ArtistScreen({ id, onNav }) {
         <div className="container inc-detail__head">
           <span className="inc-eyebrow">Artist</span>
           <h1>{artist.name}</h1>
+          <a
+            className="inc-btn"
+            href={"mailto:incubator.enquiries@gmail.com?subject=" + encodeURIComponent(artist.name)}
+          >
+            Inquire about available works
+          </a>
         </div>
 
         {shows.map((ex, idx) => (

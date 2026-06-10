@@ -369,6 +369,8 @@ ul { list-style: none; padding: 0; margin: 0; }
   align-items: start;
   font-family: var(--font-serif); font-size: 14px; line-height: 1.55;
 }
+/* Address stays hard left; contact column sits hard right (#34). */
+.inc-footer__contact { justify-self: end; text-align: right; }
 .inc-footer p { margin: var(--s-3) 0 0; }
 .inc-footer a { color: var(--ink); border-bottom: 1px solid transparent; }
 .inc-footer a:hover { color: var(--green); border-bottom-color: currentColor; }
@@ -380,5 +382,6 @@ ul { list-style: none; padding: 0; margin: 0; }
 }
 @media (max-width: 600px) {
   .inc-footer__inner { grid-template-columns: 1fr; gap: var(--s-6); }
+  .inc-footer__contact { justify-self: start; text-align: left; }
   .inc-footer__seal { grid-column: 1; }
 }

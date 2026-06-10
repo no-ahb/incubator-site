@@ -143,6 +143,11 @@
   border-bottom: 1px solid var(--hairline);
   padding-bottom: 1px;
 }
+.inc-participants__names {
+  font-size: 16px;
+  font-family: var(--font-serif);
+  font-style: italic;
+}
 .inc-participants a:hover { color: var(--green); border-bottom-color: currentColor; }
 
 /* Section jump-links on detail pages */

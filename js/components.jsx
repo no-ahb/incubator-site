@@ -196,8 +196,10 @@ function ExhibitionsListRow({ ex, onNav, onHover }) {
         <span className="inc-list__title">
           {ex.isGroup ? (
             <>
-              <span className="inc-list__name">Group show</span>
-              {ex.title ? <em className="inc-list__work">{ex.title}</em> : null}
+              <span className="inc-list__name">{ex.title || ex.artist}</span>
+              {(ex.groupArtists || []).length > 0 ? (
+                <em className="inc-list__work">{ex.groupArtists.slice(0, 5).join(", ")}</em>
+              ) : null}
             </>
           ) : (
             <>

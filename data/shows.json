@@ -1492,8 +1492,7 @@
       "palette": "persimmon",
       "hero": "warm-4",
       "pressRelease": [
-        "As well as cohabiting a studio space, the two artists have a shared interest in distilling and exposing the strangeness of quotidian life. These complimentary bodies of work engage in painting as an act of world-building. Burton creates synthetic environments that reflect",
-        "contemporary states of solitude and aspirational living, whilst the influence of Raines’ background in scenic painting is evident in the fluctuating states of unease and calm that manifest in the paintings’ uninhabited spaces. Together, these works converge to invite a meditation on the dormant anxieties of the everyday, whilst creating spaces that may also offer respite from these ever-present undercurrents."
+        "As well as cohabiting a studio space, the two artists have a shared interest in distilling and exposing the strangeness of quotidian life. These complimentary bodies of work engage in painting as an act of world-building. Burton creates synthetic environments that reflect contemporary states of solitude and aspirational living, whilst the influence of Raines’ background in scenic painting is evident in the fluctuating states of unease and calm that manifest in the paintings’ uninhabited spaces. Together, these works converge to invite a meditation on the dormant anxieties of the everyday, whilst creating spaces that may also offer respite from these ever-present undercurrents."
       ],
       "installation": [
         "a",
@@ -1517,16 +1516,8 @@
       "hero": "warm-1",
       "privateView": "Charlie Gosling is a London-based artist whose practice focuses on portraiture, exploring how a subject’s peculiarities can act as windows into their inner world. Born and raised in Hackney, he is currently studying Fine Art at Camberwell College of Arts.\n\n \n\nPainting the skew of a tie with the same devotion as the lips of a loved one, Gosling’s work reflects a sustained interest in capturing the quirks of his subjects—creating portraits that are lighthearted in style yet strikingly ambitious in their intent. Inspired by the portraits of service personnel by Chaïm Soutine (1893–1943), his most recent series depicts Uber drivers, prompting viewers to consider the complexities within faces that often go unnoticed.",
       "pressRelease": [
-        "Focusing on portraiture, Charlie Gosling’s work examines the ways in which a subject’s",
-        "peculiarities can act as windows into their inner world. Painting the skew of a tie with",
-        "the same devotion as the lips of a loved one, Gosling’s practice reflects a sustained",
-        "interest in capturing the quirks of his subjects and revealing the ineffable through them -",
-        "creating portraits that are lighthearted in style, yet strikingly ambitious in their mission.",
-        "Inspired by the portraits of service personnel by Chaïm Soutine (1893-1943),",
-        "Gosling’s most recent work is a series of drawings and paintings of Uber",
-        "drivers. These pieces ask us to consider the complexities present in faces which, over time,",
-        "appear ubiquitous and often go unnoticed. The work, to date, demonstrates Gosling’s",
-        "remarkable ability to recognise and reveal that which is often present but rarely seen."
+        "Focusing on portraiture, Charlie Gosling’s work examines the ways in which a subject’s peculiarities can act as windows into their inner world. Painting the skew of a tie with the same devotion as the lips of a loved one, Gosling’s practice reflects a sustained interest in capturing the quirks of his subjects and revealing the ineffable through them - creating portraits that are lighthearted in style, yet strikingly ambitious in their mission.",
+        "Inspired by the portraits of service personnel by Chaïm Soutine (1893-1943), Gosling’s most recent work is a series of drawings and paintings of Uber drivers. These pieces ask us to consider the complexities present in faces which, over time, appear ubiquitous and often go unnoticed. The work, to date, demonstrates Gosling’s remarkable ability to recognise and reveal that which is often present but rarely seen."
       ],
       "installation": [
         "a",
@@ -1545,57 +1536,137 @@
       "dates": "Dates TBC",
       "current": false,
       "isGroup": true,
-      "palette": "sap"
+      "palette": "sap",
+      "groupArtists": [
+        "Lynsey Addario",
+        "Charlie Gosling",
+        "John Richard",
+        "Antrea Tzourovits"
+      ],
+      "pressRelease": [
+        "Lines in the Sand is about capturing the impact of borders. Using a variety of lenses — from the personal, to the journalistic, to the artistic — the exhibition attempts to capture the ‘embodied experience of borders’, bringing together Lynsey Addario’s reportage photographs of migrants in motion, John Richard’s haunting images of the sea before dawn, Charlie Gosling’s portraits of refugees from all over the world, and Antrea Tzourovits’s sculpture, a nuanced manifestation of a memory of the ex-Yugoslavian war.",
+        "Addario’s photographs, mostly taken on assignment for the New York Times and National Geographic, depict bodies on the move from Ukraine, Syria, Chad and South Sudan. Richard’s platinum palladium prints depict an often still sea before dawn, offering a poetic counterbalance to the directness of Addario’s images. Gosling’s portraits ask viewers to consider the faces of individuals who are too often portrayed as depoliticised bodies en masse, while Tzourovits’s sculptural work echoes his own lived experience as an eleven-year-old refugee fleeing his homeland to Athens."
+      ]
     },
     {
       "id": "five-by-five",
       "artistId": null,
       "artist": "Five by Five",
       "title": "Five by Five",
-      "dates": "Dates TBC",
+      "dates": "10 January - 28 April 2024",
+      "startISO": "2024-01-10",
+      "endISO": "2024-04-28",
       "current": false,
       "isGroup": true,
-      "palette": "sky"
+      "palette": "sky",
+      "groupArtists": [
+        "Maggi Hambling",
+        "Jelly Green",
+        "Mona Hatoum",
+        "Tamara Al-Mashouk",
+        "Georgie Hopton",
+        "Alice McCabe",
+        "Abigail Lane",
+        "Rebecca Hancock",
+        "Ingrid Pollard",
+        "Matthew Arthur Williams"
+      ],
+      "pressRelease": [
+        "Incubator is pleased to present Five by Five, a group exhibition showcasing the work of five established artists working in the UK, each paired with an emerging artist selected by them: Maggi Hambling & Jelly Green, Mona Hatoum & Tamara Al-Mashouk, Georgie Hopton & Alice McCabe, Abigail Lane & Rebecca Hancock, and Ingrid Pollard & Matthew Arthur Williams.",
+        "Across painting, sculpture, photography, video and installation, these ten artists explore a diverse range of themes. A range of overlapping concerns and materials among the pairings gives rise to a rich and nuanced artistic tapestry, and Five by Five stands as a testament to the power of intergenerational collaboration and mentorship."
+      ]
     },
     {
       "id": "utopia",
       "artistId": null,
       "artist": "Utopia",
       "title": "Utopia",
-      "dates": "Dates TBC",
+      "dates": "28 June - 15 September 2024",
+      "startISO": "2024-06-28",
+      "endISO": "2024-09-15",
       "current": false,
       "isGroup": true,
-      "palette": "vermilion"
+      "palette": "vermilion",
+      "groupArtists": [
+        "Alicja Biała",
+        "Enej Gala",
+        "Laila Tara H",
+        "Ranny Macdonald",
+        "Emily Wilcock"
+      ],
+      "pressRelease": [
+        "For Utopia, Incubator partnered with environmental law charity ClientEarth on a group exhibition addressing the most urgent and pressing issue that faces humanity: the climate crisis. The exhibition features the work of Alicja Biała, Enej Gala, Laila Tara H, Ranny Macdonald and Emily Wilcock.",
+        "Each artist created works that are not only sustainable in their materiality and process but also in their transportation to Incubator, embracing a ‘leave no trace’ philosophy. Marking the gallery’s commitment to operating as a carbon-neutral organisation, Utopia invites visitors to imagine more hopeful futures while confronting the realities of environmental breakdown."
+      ]
     },
     {
       "id": "mind-to-hand",
       "artistId": null,
       "artist": "Mind to Hand",
       "title": "Mind to Hand",
-      "dates": "Dates TBC",
+      "dates": "14 December 2024 - 26 January 2025",
+      "startISO": "2024-12-14",
+      "endISO": "2025-01-26",
       "current": false,
       "isGroup": true,
-      "palette": "tobacco"
+      "palette": "tobacco",
+      "pressRelease": [
+        "Mind to Hand brings together drawings by 41 artists who have presented solo shows at the gallery over the past three years. The exhibition marks the culmination of Incubator’s signature series of back-to-back solo exhibitions and celebrates the diverse practices of each artist in a distilled, intimate format.",
+        "Each artist presents a single work that reveals a direct connection between thought and mark, interpreted through the unique lens of their individual practice. Drawing has been approached expansively: some artists choose traditional pencil on paper, while others expand the medium through collage, sculpture or mixed media. Mind to Hand marks a turning point for the gallery as it moves toward a new rhythm of programming."
+      ]
     },
     {
       "id": "the-yellow-wallpaper",
       "artistId": null,
       "artist": "The Yellow Wallpaper",
       "title": "The Yellow Wallpaper",
-      "dates": "Dates TBC",
+      "dates": "3 July - 3 August 2025",
+      "startISO": "2025-07-03",
+      "endISO": "2025-08-03",
       "current": false,
       "isGroup": true,
-      "palette": "sunflower"
+      "palette": "sunflower",
+      "groupArtists": [
+        "Kesewa Aboah",
+        "Shanti Bell",
+        "Suzanne Clements",
+        "Fleur Dempsey",
+        "Xingxin Hu",
+        "Lorena Levi",
+        "Florence Reekie",
+        "Anna Rocke",
+        "Elinor Stanley",
+        "Mary Stephenson",
+        "Maayan Sophia Weisstub"
+      ],
+      "pressRelease": [
+        "Incubator is pleased to present The Yellow Wallpaper, an exhibition bringing together twelve artists previously exhibited with Incubator or MAMA, a nomadic platform that showcases the work of women artists, including Kesewa Aboah, Shanti Bell, Suzanne Clements, Fleur Dempsey, Xingxin Hu, Lorena Levi, Florence Reekie, Anna Rocke, Elinor Stanley, Mary Stephenson and Maayan Sophia Weisstub.",
+        "Taking its title from Charlotte Perkins Gilman’s seminal 1892 short story, the exhibition explores the interior as a site of paradox: at once confinement and creation, intimacy and estrangement, resistance and release. The artists approach the interior not as a backdrop, but as subject.",
+        "From Womanhouse (1972), where artists transformed an abandoned home into a stage for critique, to Women House (2016), which revisited questions of spatial power and gender for a new generation, the interior has long served as a site of both limitation and invention. The Yellow Wallpaper continues this trajectory."
+      ]
     },
     {
       "id": "notes-from-the-studio",
       "artistId": null,
       "artist": "Notes from the Studio",
       "title": "Notes from the Studio",
-      "dates": "Dates TBC",
+      "dates": "11 December 2025 - 31 January 2026",
+      "startISO": "2025-12-11",
+      "endISO": "2026-01-31",
       "current": false,
       "isGroup": true,
-      "palette": "persimmon"
+      "palette": "persimmon",
+      "groupArtists": [
+        "Tracey Emin",
+        "Michael Armitage",
+        "Christian Marclay",
+        "Michael Stipe",
+        "Ben Okri"
+      ],
+      "pressRelease": [
+        "Notes from the Studio brings together artists of different generations and disciplines, each sharing an item fixed to their studio wall — a note, sketch, postcard, colour test or other small artefact — to reveal the immediacy of their process and evoke a collective studio environment focused on the fragments that shape their work.",
+        "Forty-five visual artists, writers, musicians and designers — including Tracey Emin, Michael Armitage, Christian Marclay, Mona Hatoum, Michael Stipe, Ben Okri, Paul Simonon, Francesco Risso, Claire Keegan, Bella Freud, Harland Miller, Talia Byre and Amanda Harlech — each contributed a single item they had pinned, taped or otherwise fixed to the wall of their studio or workspace, from a single dragonfly wing shared by Fleur Dempsey to flattened beer cans from Christian Marclay."
+      ]
     }
   ],
   "artists": [
