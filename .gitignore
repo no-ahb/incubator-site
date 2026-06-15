@@ -10,3 +10,6 @@ source/
 
 # Original camera image; only the optimized assets/about-image.jpg is published.
 about-image.heic
+
+# Original full-res show photography; only optimized assets/shows/ is published.
+WEBSITE IMAGES/
