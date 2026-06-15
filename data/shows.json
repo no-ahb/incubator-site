@@ -21,13 +21,14 @@
         "Good Luck with Me Here is Gosling's most personally exposed and formally resolved work to date, and his most committed to portraiture in its oldest sense. In the tradition of Freud, de Kooning, Auerbach and Cézanne, Gosling finds in the faces around him an inexhaustible subject that accumulates into something larger, a portrait of London now."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/charlie-gosling-good-luck-with-me-here/1.jpg",
+        "assets/shows/charlie-gosling-good-luck-with-me-here/2.jpg",
+        "assets/shows/charlie-gosling-good-luck-with-me-here/3.jpg",
+        "assets/shows/charlie-gosling-good-luck-with-me-here/4.jpg",
+        "assets/shows/charlie-gosling-good-luck-with-me-here/5.jpg",
+        "assets/shows/charlie-gosling-good-luck-with-me-here/6.jpg"
+      ],
+      "heroImage": "assets/shows/charlie-gosling-good-luck-with-me-here/hero.jpg"
     },
     {
       "id": "xiaochi-dong-leaves-leave",
@@ -54,13 +55,14 @@
         "His creative endeavors primarily encompass painting and mixed-media pieces. By creating images saturated with hints of light, humidity and atmosphere, Dong aims to give form to contemporary images of nature."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/xiaochi-dong-leaves-leave/1.jpg",
+        "assets/shows/xiaochi-dong-leaves-leave/2.jpg",
+        "assets/shows/xiaochi-dong-leaves-leave/3.jpg",
+        "assets/shows/xiaochi-dong-leaves-leave/4.jpg",
+        "assets/shows/xiaochi-dong-leaves-leave/5.jpg",
+        "assets/shows/xiaochi-dong-leaves-leave/6.jpg"
+      ],
+      "heroImage": "assets/shows/xiaochi-dong-leaves-leave/hero.jpg"
     },
     {
       "id": "katherine-qiyu-su-mountains-and-rivers-will-meet-again",
@@ -82,13 +84,14 @@
         "The title, Mountains and rivers will meet again, is an expression of hope across distance and time, addressed as much to people as to places, memories, and feelings once set aside. In that private experience of dislocation, Su finds something others will recognise: an emotional ground that is shared, even across entirely different lives, geographies and times."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/katherine-qiyu-su-mountains-and-rivers-will-meet-again/1.jpg",
+        "assets/shows/katherine-qiyu-su-mountains-and-rivers-will-meet-again/2.jpg",
+        "assets/shows/katherine-qiyu-su-mountains-and-rivers-will-meet-again/3.jpg",
+        "assets/shows/katherine-qiyu-su-mountains-and-rivers-will-meet-again/4.jpg",
+        "assets/shows/katherine-qiyu-su-mountains-and-rivers-will-meet-again/5.jpg",
+        "assets/shows/katherine-qiyu-su-mountains-and-rivers-will-meet-again/6.jpg"
+      ],
+      "heroImage": "assets/shows/katherine-qiyu-su-mountains-and-rivers-will-meet-again/hero.jpg"
     },
     {
       "id": "harry-grundy-full-pelt",
@@ -111,13 +114,14 @@
         "Full Pelt positions repetition not as monotony but as revelation: a way of attending to material, memory, and place that refuses the logic of speed or easy resolution. Local in origin yet expansive in resonance, Grundy's work brings a regional voice into central London, his soft geometries clarifying against the gallery's own angles and folds. Through abrasion and patience, inheritance becomes active, industrial process becomes meditation, and labour reveals itself as care."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/harry-grundy-full-pelt/1.jpg",
+        "assets/shows/harry-grundy-full-pelt/2.jpg",
+        "assets/shows/harry-grundy-full-pelt/3.jpg",
+        "assets/shows/harry-grundy-full-pelt/4.jpg",
+        "assets/shows/harry-grundy-full-pelt/5.jpg",
+        "assets/shows/harry-grundy-full-pelt/6.jpg"
+      ],
+      "heroImage": "assets/shows/harry-grundy-full-pelt/hero.jpg"
     },
     {
       "id": "lorena-levi-cold-hard-plastic",
@@ -143,13 +147,14 @@
         "If Frida Kahlo transformed the hospital bed into a theatre of myth and Tracey Emin made confession a mode of endurance, Lorena Levi continues this lineage, using painting as a means of negotiating the limits of the body and the image alike. Against Sontag’s prescription, she does not strip illness of metaphor; she reclaims it as a language of understanding, capable of holding pain without sanctifying it. In Cold Hard Plastic, the doll, the doctor, and the patient become participants in the same uneasy system of care. What endures is not necessarily catharsis, but it is lucidity – the recognition that to look, to paint, and to persist is itself a form of survival."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/lorena-levi-cold-hard-plastic/1.jpg",
+        "assets/shows/lorena-levi-cold-hard-plastic/2.jpg",
+        "assets/shows/lorena-levi-cold-hard-plastic/3.jpg",
+        "assets/shows/lorena-levi-cold-hard-plastic/4.jpg",
+        "assets/shows/lorena-levi-cold-hard-plastic/5.jpg",
+        "assets/shows/lorena-levi-cold-hard-plastic/6.jpg"
+      ],
+      "heroImage": "assets/shows/lorena-levi-cold-hard-plastic/hero.jpg"
     },
     {
       "id": "seraphina-mutscheller-woodwind",
@@ -174,13 +179,14 @@
         "Mutscheller’s work acknowledges vast agencies beyond the human. Her practice attends to what she calls “the slow breathing of the earth\" - a rhythm loose and unhurried, difficult to hear and largely unnoticed, but almost tangible in quiet places. She understands landscape not as a passive backdrop but as something alive with its own intelligence - perhaps many intelligences, nested within one another. Woodwind seeks to expand our ways of perceiving and to challenge the human-centric view that has dominated our relationship with nature. Through painting as language, she invites us to transcend the separation between ourselves and the natural world, to feel our participation in something larger. Her work casts that spell: the feeling of being inextricable from the living world and all we share with it."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/seraphina-mutscheller-woodwind/1.jpg",
+        "assets/shows/seraphina-mutscheller-woodwind/2.jpg",
+        "assets/shows/seraphina-mutscheller-woodwind/3.jpg",
+        "assets/shows/seraphina-mutscheller-woodwind/4.jpg",
+        "assets/shows/seraphina-mutscheller-woodwind/5.jpg",
+        "assets/shows/seraphina-mutscheller-woodwind/6.jpg"
+      ],
+      "heroImage": "assets/shows/seraphina-mutscheller-woodwind/hero.jpg"
     },
     {
       "id": "maya-gurung-russell-campbell-i-want-to-be-ready",
@@ -203,13 +209,14 @@
         "I Want to Be Ready presents Campbell as an artist deeply attuned to the political potential of seemingly simple acts. In a moment when readiness often implies militaristic preparation or anxious anticipation, Campbell proposes an alternative: readiness as presence, as process, as the patient accumulation of small gestures that ultimately reshape the space around us. In the gallery's transformed space, viewers encounter not a declaration but an invitation to witness the slow, determined work of making ready for whatever comes next."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/maya-gurung-russell-campbell-i-want-to-be-ready/1.jpg",
+        "assets/shows/maya-gurung-russell-campbell-i-want-to-be-ready/2.jpg",
+        "assets/shows/maya-gurung-russell-campbell-i-want-to-be-ready/3.jpg",
+        "assets/shows/maya-gurung-russell-campbell-i-want-to-be-ready/4.jpg",
+        "assets/shows/maya-gurung-russell-campbell-i-want-to-be-ready/5.jpg",
+        "assets/shows/maya-gurung-russell-campbell-i-want-to-be-ready/6.jpg"
+      ],
+      "heroImage": "assets/shows/maya-gurung-russell-campbell-i-want-to-be-ready/hero.jpg"
     },
     {
       "id": "kasia-wozniak-stillpoint",
@@ -235,13 +242,14 @@
         "Daring us to tune into the enlightening potential in the everyday, the works in Stillpoint came together while Wozniak was reading Ursula Le Guin’s radical 1976 essay Space Crone, which frames the three distinct stages of a woman’s life as a gift not to be not to be squandered. As Le Guin writes: “It seems a pity to have a built-in rite of passage and to dodge it, evade it and pretend nothing has changed. That is to dodge and evade one’s womanhood. Men, once initiated, never get the second chance. They never change again. That’s their loss, not ours.” Written by Orla Brennan"
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/kasia-wozniak-stillpoint/1.jpg",
+        "assets/shows/kasia-wozniak-stillpoint/2.jpg",
+        "assets/shows/kasia-wozniak-stillpoint/3.jpg",
+        "assets/shows/kasia-wozniak-stillpoint/4.jpg",
+        "assets/shows/kasia-wozniak-stillpoint/5.jpg",
+        "assets/shows/kasia-wozniak-stillpoint/6.jpg"
+      ],
+      "heroImage": "assets/shows/kasia-wozniak-stillpoint/hero.jpg"
     },
     {
       "id": "losel-yauch-until-next-time",
@@ -262,13 +270,14 @@
         "Until Next Time considers each place as an active witness, capable of holding memory, longing, and the weight of return. Yauch’s work suggests that spaces, like people, possess interiority. They bear the imprint of experience, accumulate residue, and quietly endure."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/losel-yauch-until-next-time/1.jpg",
+        "assets/shows/losel-yauch-until-next-time/2.jpg",
+        "assets/shows/losel-yauch-until-next-time/3.jpg",
+        "assets/shows/losel-yauch-until-next-time/4.jpg",
+        "assets/shows/losel-yauch-until-next-time/5.jpg",
+        "assets/shows/losel-yauch-until-next-time/6.jpg"
+      ],
+      "heroImage": "assets/shows/losel-yauch-until-next-time/hero.jpg"
     },
     {
       "id": "atticus-wakefield-after-the-allegory",
@@ -290,13 +299,14 @@
         "This new body of work extends Wakefield’s ongoing investigation into desire, violence, and the limits of the visible. But where earlier works revelled in corporeal immediacy, here the gaze turns outward and inward at once – toward the stars, the cells, and the strange, unstable terrain in between."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/atticus-wakefield-after-the-allegory/1.jpg",
+        "assets/shows/atticus-wakefield-after-the-allegory/2.jpg",
+        "assets/shows/atticus-wakefield-after-the-allegory/3.jpg",
+        "assets/shows/atticus-wakefield-after-the-allegory/4.jpg",
+        "assets/shows/atticus-wakefield-after-the-allegory/5.jpg",
+        "assets/shows/atticus-wakefield-after-the-allegory/6.jpg"
+      ],
+      "heroImage": "assets/shows/atticus-wakefield-after-the-allegory/hero.jpg"
     },
     {
       "id": "frank-kent-flowers",
@@ -328,13 +338,14 @@
         "He was awarded the Patricia Turner Prize for sculpture at the Royal Academy Schools in 2016."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/frank-kent-flowers/1.jpg",
+        "assets/shows/frank-kent-flowers/2.jpg",
+        "assets/shows/frank-kent-flowers/3.jpg",
+        "assets/shows/frank-kent-flowers/4.jpg",
+        "assets/shows/frank-kent-flowers/5.jpg",
+        "assets/shows/frank-kent-flowers/6.jpg"
+      ],
+      "heroImage": "assets/shows/frank-kent-flowers/hero.jpg"
     },
     {
       "id": "franklin-collins-living-receipts",
@@ -356,13 +367,14 @@
         "Living Receipts ultimately meditates on the paradox of presence and disappearance. Through forms that invite touch and gestures that resist permanence, Collins proposes that the material world is not passive or static, but charged with memory, receptive to our movements, and always in dialogue with the body. Whether through the intimate contact of sculpture or the abstract choreography of ink, his works offer an embodied record of encounter – traces of desire, memory, and relation made visible."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/franklin-collins-living-receipts/1.jpg",
+        "assets/shows/franklin-collins-living-receipts/2.jpg",
+        "assets/shows/franklin-collins-living-receipts/3.jpg",
+        "assets/shows/franklin-collins-living-receipts/4.jpg",
+        "assets/shows/franklin-collins-living-receipts/5.jpg",
+        "assets/shows/franklin-collins-living-receipts/6.jpg"
+      ],
+      "heroImage": "assets/shows/franklin-collins-living-receipts/hero.jpg"
     },
     {
       "id": "nina-ogden-sleight-of-the-canopy",
@@ -384,13 +396,14 @@
         "Ultimately, Sleight of the Canopy is an invitation to look closer—beyond the canopy of nature, past the lens flares and painted surfaces—to glimpse the elusive interplay between truth and trickery. It is a celebration of the hidden, the hyperreal, and the hypnotic dance of light and shadow."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/nina-ogden-sleight-of-the-canopy/1.jpg",
+        "assets/shows/nina-ogden-sleight-of-the-canopy/2.jpg",
+        "assets/shows/nina-ogden-sleight-of-the-canopy/3.jpg",
+        "assets/shows/nina-ogden-sleight-of-the-canopy/4.jpg",
+        "assets/shows/nina-ogden-sleight-of-the-canopy/5.jpg",
+        "assets/shows/nina-ogden-sleight-of-the-canopy/6.jpg"
+      ],
+      "heroImage": "assets/shows/nina-ogden-sleight-of-the-canopy/hero.jpg"
     },
     {
       "id": "yuma-radne-playing-with-hands",
@@ -413,13 +426,14 @@
         "Through Playing with Hands, Radne invites us to reconsider the spaces where cultural memory, personal identity, and play intersect. The exhibition offers a dynamic portrait of resilience and transformation, where ancient symbols are re-envisioned and given new life. In doing so, Radne reclaims and redefines the narrative of her heritage, offering a vision that is both joyful and reflective, playful and profound."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/yuma-radne-playing-with-hands/1.jpg",
+        "assets/shows/yuma-radne-playing-with-hands/2.jpg",
+        "assets/shows/yuma-radne-playing-with-hands/3.jpg",
+        "assets/shows/yuma-radne-playing-with-hands/4.jpg",
+        "assets/shows/yuma-radne-playing-with-hands/5.jpg",
+        "assets/shows/yuma-radne-playing-with-hands/6.jpg"
+      ],
+      "heroImage": "assets/shows/yuma-radne-playing-with-hands/hero.jpg"
     },
     {
       "id": "tamara-al-mashouk-i-don-t-want-to-stab-the-beast-i-just-want-to-go-home",
@@ -454,13 +468,14 @@
         "Emily for always being there"
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/tamara-al-mashouk-i-don-t-want-to-stab-the-beast-i-just-want-to-go-home/1.jpg",
+        "assets/shows/tamara-al-mashouk-i-don-t-want-to-stab-the-beast-i-just-want-to-go-home/2.jpg",
+        "assets/shows/tamara-al-mashouk-i-don-t-want-to-stab-the-beast-i-just-want-to-go-home/3.jpg",
+        "assets/shows/tamara-al-mashouk-i-don-t-want-to-stab-the-beast-i-just-want-to-go-home/4.jpg",
+        "assets/shows/tamara-al-mashouk-i-don-t-want-to-stab-the-beast-i-just-want-to-go-home/5.jpg",
+        "assets/shows/tamara-al-mashouk-i-don-t-want-to-stab-the-beast-i-just-want-to-go-home/6.jpg"
+      ],
+      "heroImage": "assets/shows/tamara-al-mashouk-i-don-t-want-to-stab-the-beast-i-just-want-to-go-home/hero.jpg"
     },
     {
       "id": "jelly-green-conflagration-ii",
@@ -481,13 +496,14 @@
         "Green’s work, steeped in immediacy and relevance, invites us to witness — and perhaps to protect — what remains. Each canvas becomes a site of confrontation, urging us to consider our place in the fragile network of life, as we stand before a world ablaze."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/jelly-green-conflagration-ii/1.jpg",
+        "assets/shows/jelly-green-conflagration-ii/2.jpg",
+        "assets/shows/jelly-green-conflagration-ii/3.jpg",
+        "assets/shows/jelly-green-conflagration-ii/4.jpg",
+        "assets/shows/jelly-green-conflagration-ii/5.jpg",
+        "assets/shows/jelly-green-conflagration-ii/6.jpg"
+      ],
+      "heroImage": "assets/shows/jelly-green-conflagration-ii/hero.jpg"
     },
     {
       "id": "antonia-caicedo-holguin-uplifted",
