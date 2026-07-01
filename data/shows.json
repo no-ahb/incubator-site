@@ -610,13 +610,14 @@
         "Interspersed within this monochromatic series are three vibrant works that hum with electric intensity. A mustard yellow painting echoes the repetitive motifs of the black paintings, while two purple-blue compositions remain centrally focused, their floating forms seem to hover and pulse, creating a psychological portal into an alternate reality. These vivid and isolated forms contrast sharply with the repetitive and often-vertical compositions of the black paintings that stretch to the edges of the canvas. Together, they highlight Barlow's mastery of both form and colour, offering a dynamic movement both laterally across the canvas and into the centre."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/paul-barlow-up-dn/1.jpg",
+        "assets/shows/paul-barlow-up-dn/2.jpg",
+        "assets/shows/paul-barlow-up-dn/3.jpg",
+        "assets/shows/paul-barlow-up-dn/4.jpg",
+        "assets/shows/paul-barlow-up-dn/5.jpg",
+        "assets/shows/paul-barlow-up-dn/6.jpg"
+      ],
+      "heroImage": "assets/shows/paul-barlow-up-dn/hero.jpg"
     },
     {
       "id": "elena-angelini-playing-sacred",
@@ -764,13 +765,14 @@
         "This is an exhibition engaged with the intimacy of touch, a touch that broaches both painting and sculpture, surface and materiality as well as the physical and the ethereal."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/antrea-tzourovits-hot-cold-pain-pressure/1.jpg",
+        "assets/shows/antrea-tzourovits-hot-cold-pain-pressure/2.jpg",
+        "assets/shows/antrea-tzourovits-hot-cold-pain-pressure/3.jpg",
+        "assets/shows/antrea-tzourovits-hot-cold-pain-pressure/4.jpg",
+        "assets/shows/antrea-tzourovits-hot-cold-pain-pressure/5.jpg",
+        "assets/shows/antrea-tzourovits-hot-cold-pain-pressure/6.jpg"
+      ],
+      "heroImage": "assets/shows/antrea-tzourovits-hot-cold-pain-pressure/hero.jpg"
     },
     {
       "id": "fleur-dempsey-how-much-the-present-moment-means",
@@ -959,13 +961,14 @@
         "Bizzari’s paintings are transformative vehicles, deftly carrying viewers across temporal and spatial dimensions. The resulting works serve as potent testimonies to the resonance of the past within the present, as well as the objects that vibrate with the echoes of memory. Bizzarri’s captivating paintings, realised with his unique and nuanced techniques, transcend the boundaries of time and invite contemplation of the profound significance of what we remember, what we forget, and the enduring reverberations of the past in the present"
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/marco-bizzarri-the-temple-still-stands/1.jpg",
+        "assets/shows/marco-bizzarri-the-temple-still-stands/2.jpg",
+        "assets/shows/marco-bizzarri-the-temple-still-stands/3.jpg",
+        "assets/shows/marco-bizzarri-the-temple-still-stands/4.jpg",
+        "assets/shows/marco-bizzarri-the-temple-still-stands/5.jpg",
+        "assets/shows/marco-bizzarri-the-temple-still-stands/6.jpg"
+      ],
+      "heroImage": "assets/shows/marco-bizzarri-the-temple-still-stands/hero.jpg"
     },
     {
       "id": "jungwon-jay-hur-a-woman-from-the-bird-egg",
@@ -984,13 +987,14 @@
         "Central to Jungwon’s artistic vocabulary are her poignant depictions of female figures, both real and fictional, which serve as conduits for contemplation and self-reflection. Through her masterful painting of these subjects, often layered onto oneiric landscapes, the artist deftly constructs a persona that transports the viewer into a realm reminiscent of a lucid dream, where the borders between reality and imagination dissolve."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/jungwon-jay-hur-a-woman-from-the-bird-egg/1.jpg",
+        "assets/shows/jungwon-jay-hur-a-woman-from-the-bird-egg/2.jpg",
+        "assets/shows/jungwon-jay-hur-a-woman-from-the-bird-egg/3.jpg",
+        "assets/shows/jungwon-jay-hur-a-woman-from-the-bird-egg/4.jpg",
+        "assets/shows/jungwon-jay-hur-a-woman-from-the-bird-egg/5.jpg",
+        "assets/shows/jungwon-jay-hur-a-woman-from-the-bird-egg/6.jpg"
+      ],
+      "heroImage": "assets/shows/jungwon-jay-hur-a-woman-from-the-bird-egg/hero.jpg"
     },
     {
       "id": "atticus-wakefield-the-song-remains-the-same",
@@ -1009,13 +1013,14 @@
         "Wakefield’s painting process is born out of a knowledge of art history and, in particular, a deep appreciation of the paintings of both Rubens and Poussin; but, in truth, his frame of references and artistic influences encompass a whole array of European painters - from Bruegel to Titian to Hogarth - all of whose central explorations similarly touched upon the darkest recesses of the human psyche. Like others before him, Wakefield engages with extremes of human behaviour, choosing to hone in on that essential struggle between desire and restraint, violence and vulnerability, and it is these visceral dichotomies of human endeavour that play out so deftly and timelessly across his canvases."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/atticus-wakefield-the-song-remains-the-same/1.jpg",
+        "assets/shows/atticus-wakefield-the-song-remains-the-same/2.jpg",
+        "assets/shows/atticus-wakefield-the-song-remains-the-same/3.jpg",
+        "assets/shows/atticus-wakefield-the-song-remains-the-same/4.jpg",
+        "assets/shows/atticus-wakefield-the-song-remains-the-same/5.jpg",
+        "assets/shows/atticus-wakefield-the-song-remains-the-same/6.jpg"
+      ],
+      "heroImage": "assets/shows/atticus-wakefield-the-song-remains-the-same/hero.jpg"
     },
     {
       "id": "graham-silveria-martin-talisman",
@@ -1125,13 +1130,14 @@
         "canny artificiality even closer to our world."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/marius-steiger-lust-for-life/1.jpg",
+        "assets/shows/marius-steiger-lust-for-life/2.jpg",
+        "assets/shows/marius-steiger-lust-for-life/3.jpg",
+        "assets/shows/marius-steiger-lust-for-life/4.jpg",
+        "assets/shows/marius-steiger-lust-for-life/5.jpg",
+        "assets/shows/marius-steiger-lust-for-life/6.jpg"
+      ],
+      "heroImage": "assets/shows/marius-steiger-lust-for-life/hero.jpg"
     },
     {
       "id": "pia-ortuno-a-blue-fire",
@@ -1150,13 +1156,14 @@
         "“In this volatile and saturated world, I find relief and calm in the simple smell of salt, the slow oxidising of nails and the narratives of time in these portals. I have wondered how slowly I can provoke time to pass, how much attention it is willing to give. I encourage the viewer to explore these harrowing and salty landscapes, to look deep into the cavernous holdings and seek the objects that layer personal and collective memory, and to let time pass through the work and onto themselves.”"
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/pia-ortuno-a-blue-fire/1.jpg",
+        "assets/shows/pia-ortuno-a-blue-fire/2.jpg",
+        "assets/shows/pia-ortuno-a-blue-fire/3.jpg",
+        "assets/shows/pia-ortuno-a-blue-fire/4.jpg",
+        "assets/shows/pia-ortuno-a-blue-fire/5.jpg",
+        "assets/shows/pia-ortuno-a-blue-fire/6.jpg"
+      ],
+      "heroImage": "assets/shows/pia-ortuno-a-blue-fire/hero.jpg"
     },
     {
       "id": "jose-rafael-mendes-outskirts",
@@ -1536,13 +1543,13 @@
         "Inspired by the portraits of service personnel by Chaïm Soutine (1893-1943), Gosling’s most recent work is a series of drawings and paintings of Uber drivers. These pieces ask us to consider the complexities present in faces which, over time, appear ubiquitous and often go unnoticed. The work, to date, demonstrates Gosling’s remarkable ability to recognise and reveal that which is often present but rarely seen."
       ],
       "installation": [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f"
-      ]
+        "assets/shows/charlie-gosling-charlie-gosling/1.jpg",
+        "assets/shows/charlie-gosling-charlie-gosling/2.jpg",
+        "assets/shows/charlie-gosling-charlie-gosling/3.jpg",
+        "assets/shows/charlie-gosling-charlie-gosling/4.jpg",
+        "assets/shows/charlie-gosling-charlie-gosling/5.jpg"
+      ],
+      "heroImage": "assets/shows/charlie-gosling-charlie-gosling/hero.jpg"
     },
     {
       "id": "lines-in-the-sand",
@@ -1590,7 +1597,16 @@
       "pressRelease": [
         "Incubator is pleased to present Five by Five, a group exhibition showcasing the work of five established artists working in the UK, each paired with an emerging artist selected by them: Maggi Hambling & Jelly Green, Mona Hatoum & Tamara Al-Mashouk, Georgie Hopton & Alice McCabe, Abigail Lane & Rebecca Hancock, and Ingrid Pollard & Matthew Arthur Williams.",
         "Across painting, sculpture, photography, video and installation, these ten artists explore a diverse range of themes. A range of overlapping concerns and materials among the pairings gives rise to a rich and nuanced artistic tapestry, and Five by Five stands as a testament to the power of intergenerational collaboration and mentorship."
-      ]
+      ],
+      "installation": [
+        "assets/shows/five-by-five/1.jpg",
+        "assets/shows/five-by-five/2.jpg",
+        "assets/shows/five-by-five/3.jpg",
+        "assets/shows/five-by-five/4.jpg",
+        "assets/shows/five-by-five/5.jpg",
+        "assets/shows/five-by-five/6.jpg"
+      ],
+      "heroImage": "assets/shows/five-by-five/hero.jpg"
     },
     {
       "id": "utopia",
