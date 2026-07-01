@@ -117,6 +117,14 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+/* On narrow artboards the three groups can't share one row: the tabs get
+   squeezed until their labels ("Group shows", "By date", "A – Z") break
+   mid-word. Stack the row instead — filter tabs, count, then sort tabs — each
+   on its own line. Container query (not @media) to match the artboard-driven
+   breakpoints used elsewhere in this file. */
+@container (max-width: 600px) {
+  .inc-listbar { flex-direction: column; gap: var(--s-3); }
+}
 
 /* ===========================================================================
    EXHIBITION DETAIL — refinements
