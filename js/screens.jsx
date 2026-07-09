@@ -298,7 +298,7 @@ function ExhibitionDetailScreen({ id, onNav }) {
                     href={"#/exhibitions/" + o.id}
                     onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + o.id); }}
                   >
-                    <span className="inc-related__title">{o.title ? <em>{o.title}</em> : null}</span>
+                    <span className="inc-related__title">{o.title ? <em>{o.title}</em> : (o.artist || "Untitled")}</span>
                     <span className="inc-related__dates">{o.dates}</span>
                   </a>
                 </div>
