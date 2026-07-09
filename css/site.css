@@ -55,6 +55,7 @@ ul { list-style: none; padding: 0; margin: 0; }
 @media (max-width: 720px) {
   .inc-header__nav { display: none; }
   .inc-menu-btn { display: inline-flex; }
+  .inc-menu-btn__txt { display: none; }   /* icon only on phones */
 }
 
 /* ---------- Menu overlay -------------------------------------------------- */
