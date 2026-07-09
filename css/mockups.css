@@ -295,7 +295,7 @@
   padding: 0;
   border: 0;
   background: none;
-  cursor: zoom-in;
+  cursor: pointer;
   overflow: hidden;            /* clip the hover zoom inside the frame */
 }
 .inc-strip__btn .inc-tile {
