@@ -3,6 +3,18 @@
 
 const { useState: msState, useMemo: msMemo } = React;
 
+// Eyebrow label for a show's status, based on the real current date. A show
+// still flagged "current" whose end date has passed reads "Most recent
+// exhibition" until the next show is published, rather than "Current".
+// heroFallback: on the home hero, an unflagged fallback show is the most
+// recent one (not a "past" one).
+function exhibitionStatus(ex, { heroFallback = false } = {}) {
+  const todayISO = new Date().toISOString().slice(0, 10);
+  const ended = ex.endISO && ex.endISO < todayISO;
+  if (ex.current) return ended ? "Most recent exhibition" : "Current exhibition";
+  return heroFallback ? "Most recent exhibition" : "Past exhibition";
+}
+
 /* =====================================================================
    HOME
    ===================================================================== */
@@ -45,7 +57,7 @@ function HomeScreen({ onNav }) {
           <Poster ex={current} size="hero" />
         </a>
         <div className="container inc-hero__meta">
-          <span className="inc-eyebrow">Current exhibition</span>
+          <span className="inc-eyebrow">{exhibitionStatus(current, { heroFallback: true })}</span>
           <h1 className="inc-hero__title">
             <a
               href={"#/exhibitions/" + current.id}
@@ -260,7 +272,7 @@ function ExhibitionDetailScreen({ id, onNav }) {
 
         <div className="container inc-detail__head">
           <span className="inc-eyebrow">
-            {ex.current ? "Current exhibition" : "Past exhibition"}
+            {exhibitionStatus(ex)}
             {ex.isGroup ? " · Group show" : ""}
           </span>
           <h1>
