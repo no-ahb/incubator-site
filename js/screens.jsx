@@ -285,7 +285,7 @@ function ExhibitionDetailScreen({ id, onNav }) {
             <div className="inc-participants">
               <span className="inc-participants__label">Artists</span>
               <span className="inc-participants__names">
-                {ex.groupArtists.map((n, i) => {
+                {sortByLastName(ex.groupArtists).map((n, i) => {
                   const aid = participantArtistId(n);
                   return (
                     <React.Fragment key={i}>
