@@ -315,10 +315,15 @@ async function handleAdminUpload(request, env, cors) {
 // Build a clean show entry from posted fields, preserving the field shape the
 // site reads. Unknown fields are dropped.
 function normalizeShow(input) {
-  const artist = String(input.artist || "").trim();
+  // Group shows have no single artist: the title names the show and the
+  // participant list carries the artists, so there's no per-artist page to key.
+  const isGroup = !!input.isGroup;
   const title = String(input.title || "").trim();
-  const id = slugify(input.id) || slugify(artist + " " + title);
-  const artistId = slugify(input.artistId) || slugify(artist);
+  // A group show has no single artist; fall back to the title so the field is
+  // never empty (the site uses `artist` as a display fallback).
+  const artist = String(input.artist || "").trim() || (isGroup ? title : "");
+  const id = slugify(input.id) || slugify(isGroup ? title : artist + " " + title);
+  const artistId = isGroup ? null : (slugify(input.artistId) || slugify(artist));
 
   let pressRelease = input.pressRelease;
   if (typeof pressRelease === "string") {
@@ -343,6 +348,12 @@ function normalizeShow(input) {
     pressRelease,
     installation,
   };
+  if (isGroup) {
+    show.isGroup = true;
+    show.groupArtists = Array.isArray(input.groupArtists)
+      ? input.groupArtists.map((s) => String(s).trim()).filter(Boolean)
+      : [];
+  }
   if (input.privateView) show.privateView = String(input.privateView).trim();
   if (input.heroImage) show.heroImage = String(input.heroImage).trim();
   // Visibility is managed solely via /admin/visibility, never the show form, so
@@ -362,8 +373,8 @@ async function handleAdminSaveShow(request, env, cors) {
   const payload = body.payload;
 
   const show = normalizeShow(payload.show || {});
-  if (!show.artist || !show.title) {
-    return json({ ok: false, error: "Artist and title are required." }, 400, cors);
+  if (!show.title || (!show.isGroup && !show.artist)) {
+    return json({ ok: false, error: show.isGroup ? "A group show needs a title." : "Artist and title are required." }, 400, cors);
   }
 
   let bio = payload.artistBio;
@@ -378,18 +389,24 @@ async function handleAdminSaveShow(request, env, cors) {
       // Editing: always carry the prior hidden flag (the form never sets it).
       const merged = { ...data.exhibitions[idx], ...show };
       if (data.exhibitions[idx].hidden) merged.hidden = true;
+      // normalizeShow only emits the group fields for a group show, so a
+      // group→solo edit would otherwise keep the stale flags from the merge.
+      if (!show.isGroup) { delete merged.isGroup; delete merged.groupArtists; }
       data.exhibitions[idx] = merged;
     } else {
       data.exhibitions.unshift(show);
     }
 
-    // Upsert the artist record so the artist page + link work.
-    const aIdx = data.artists.findIndex((a) => a.id === show.artistId);
-    if (aIdx >= 0) {
-      if (bio && bio.length) data.artists[aIdx].bio = bio;
-      if (!data.artists[aIdx].name) data.artists[aIdx].name = show.artist;
-    } else {
-      data.artists.push({ id: show.artistId, name: show.artist, bio: bio && bio.length ? bio : [] });
+    // Upsert the artist record so the artist page + link work. Group shows have
+    // no single artist (artistId is null), so there's nothing to upsert.
+    if (show.artistId) {
+      const aIdx = data.artists.findIndex((a) => a.id === show.artistId);
+      if (aIdx >= 0) {
+        if (bio && bio.length) data.artists[aIdx].bio = bio;
+        if (!data.artists[aIdx].name) data.artists[aIdx].name = show.artist;
+      } else {
+        data.artists.push({ id: show.artistId, name: show.artist, bio: bio && bio.length ? bio : [] });
+      }
     }
 
     return { message: `Admin: save show "${show.title}"` };

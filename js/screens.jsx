@@ -51,7 +51,7 @@ function HomeScreen({ onNav }) {
               href={"#/exhibitions/" + current.id}
               onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + current.id); }}
             >
-              {current.artist}{current.title ? <>:&nbsp;<em>{current.title}</em></> : null}
+              {current.isGroup ? <em>{current.title}</em> : <>{current.artist}{current.title ? <>:&nbsp;<em>{current.title}</em></> : null}</>}
             </a>
           </h1>
           <div className="inc-meta">{current.dates}</div>
@@ -329,9 +329,14 @@ function slug(name) {
    ===================================================================== */
 function ArtistScreen({ id, onNav }) {
   const artist = ARTISTS.find((a) => a.id === id);
+  // Solo shows key off artistId; group shows list participants by free-text name.
+  // Match those by slug, and by the artist's own record name, so a group show
+  // appears on each featured artist's page even when the stored id was slugged
+  // differently from the name (e.g. accents or a legacy import typo).
+  const artistName = artist ? artist.name.trim().toLowerCase() : "";
   const shows = EXHIBITIONS
-    .filter((e) => e.artistId === id)
-    .sort((a, b) => b.startISO.localeCompare(a.startISO));
+    .filter((e) => e.artistId === id || (e.isGroup && (e.groupArtists || []).some((n) => slug(n) === id || (artistName && n.trim().toLowerCase() === artistName))))
+    .sort((a, b) => (b.startISO || "").localeCompare(a.startISO || ""));
   if (!artist || shows.length === 0) {
     return <div className="container" style={{padding:"80px 0"}}>Not found.</div>;
   }
@@ -354,12 +359,19 @@ function ArtistScreen({ id, onNav }) {
           <div key={ex.id} id={"show-" + idx} className={"inc-detail__show " + (idx > 0 ? "is-sub" : "")}>
             <header className="container inc-detail__show-head">
               {ex.title ? <h2><em>{ex.title}</em></h2> : null}
-              <div className="inc-detail__show-meta">{ex.dates}</div>
+              <div className="inc-detail__show-meta">
+                {ex.isGroup ? (
+                  <>
+                    Group show · {ex.dates} ·{" "}
+                    <a href={"#/exhibitions/" + ex.id} onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + ex.id); }}>View exhibition →</a>
+                  </>
+                ) : ex.dates}
+              </div>
             </header>
 
             <section className="container inc-detail__installation">
               <h3>Installation views</h3>
-              <InstallationStrip frames={ex.installation} />
+              <InstallationStrip frames={ex.installation || []} />
             </section>
           </div>
         ))}
