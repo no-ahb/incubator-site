@@ -284,7 +284,22 @@ function ExhibitionDetailScreen({ id, onNav }) {
           {ex.isGroup && (ex.groupArtists || []).length > 0 && (
             <div className="inc-participants">
               <span className="inc-participants__label">Artists</span>
-              <span className="inc-participants__names">{ex.groupArtists.join(", ")}</span>
+              <span className="inc-participants__names">
+                {ex.groupArtists.map((n, i) => {
+                  const aid = participantArtistId(n);
+                  return (
+                    <React.Fragment key={i}>
+                      {i > 0 ? ", " : ""}
+                      {aid ? (
+                        <a
+                          href={"#/artists/" + aid}
+                          onClick={(e) => { e.preventDefault(); onNav("/artists/" + aid); }}
+                        >{n}</a>
+                      ) : n}
+                    </React.Fragment>
+                  );
+                })}
+              </span>
             </div>
           )}
         </div>
@@ -332,6 +347,16 @@ function slug(name) {
     .replace(/[\u201C\u201D"'']/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
+}
+
+// Resolve a group participant's free-text name to their artist-page id, or null
+// when they have no page (external/one-off contributors have no artist record).
+// Matches by slug or by the artist record's real name \u2014 mirrors ArtistScreen.
+function participantArtistId(name) {
+  const s = slug(name);
+  const nm = name.trim().toLowerCase();
+  const rec = ARTISTS.find((a) => a.id === s || (a.name || "").trim().toLowerCase() === nm);
+  return rec ? rec.id : null;
 }
 
 /* =====================================================================
