@@ -8,6 +8,9 @@
 //      X-Admin-Password header; the Worker is the real lock (browser gating is
 //      cosmetic). Shows live in data/shows.json in the repo; the Worker commits
 //      changes to it via the GitHub Contents API and the static site redeploys.
+//   3. End-of-show reminder (cron) — a scheduled trigger emails the gallery a
+//      week before a show ends, so the next show's details get uploaded in time.
+//      Inert until Email Routing + the cron are configured (see wrangler.toml).
 //
 // Bindings (see wrangler.toml + `wrangler secret`):
 //   GITHUB_TOKEN     secret — fine-grained PAT with Issues:write + Contents:write
@@ -16,6 +19,11 @@
 //   REPO             var    — "owner/repo" issues + content live in.
 //   ALLOWED_ORIGINS  var    — comma-separated origins allowed to call this Worker.
 //   ISSUE_LABEL      var    — label applied to every created issue.
+//   SEND_EMAIL       send_email binding — Cloudflare Email Routing sender used by
+//                    the reminder cron (optional; reminder no-ops when absent).
+//   REMINDER_FROM    var    — from address on your Email Routing domain.
+
+import { EmailMessage } from "cloudflare:email";
 
 const GITHUB_API = "https://api.github.com";
 const MAX_BODY_CHARS = 20000;
@@ -24,6 +32,10 @@ const MAX_SCREENSHOT_BYTES = 5 * 1024 * 1024;
 // base64 and rides inside JSON, so allow generous headroom over that.
 const MAX_REQUEST_BYTES = 8 * 1024 * 1024;
 const SHOWS_PATH = "data/shows.json";
+// End-of-show reminder: fire this many days before a show's end date.
+const REMINDER_LEAD_DAYS = 7;
+const REMINDER_TO = "incubator.enquiries@gmail.com";
+const ADMIN_URL = "https://no-ahb.github.io/incubator-site/#/admin";
 const EXT_FOR_MIME = {
   "image/png": "png",
   "image/jpeg": "jpg",
@@ -385,6 +397,7 @@ async function handleAdminSaveShow(request, env, cors) {
     data.artists = Array.isArray(data.artists) ? data.artists : [];
 
     const idx = data.exhibitions.findIndex((e) => e.id === show.id);
+    const prevArtistId = idx >= 0 ? data.exhibitions[idx].artistId : null;
     if (idx >= 0) {
       // Editing: always carry the prior hidden flag (the form never sets it).
       const merged = { ...data.exhibitions[idx], ...show };
@@ -407,6 +420,14 @@ async function handleAdminSaveShow(request, env, cors) {
       } else {
         data.artists.push({ id: show.artistId, name: show.artist, bio: bio && bio.length ? bio : [] });
       }
+    }
+
+    // If this edit moved the show off its old artist (solo→group, or an artist
+    // rename), drop the now-orphaned artist record when no show references it —
+    // otherwise a direct /artists/<id> URL would resolve to a dead page.
+    if (prevArtistId && prevArtistId !== show.artistId &&
+        !data.exhibitions.some((e) => e.artistId === prevArtistId)) {
+      data.artists = data.artists.filter((a) => a.id !== prevArtistId);
     }
 
     return { message: `Admin: save show "${show.title}"` };
@@ -470,7 +491,87 @@ async function handleAdminIssues(request, env, cors) {
   return json({ ok: true, issues }, 200, cors);
 }
 
+/* ===========================================================================
+   END-OF-SHOW REMINDER  (cron)  — email a week before a show ends
+   =========================================================================== */
+
+// ISO date (YYYY-MM-DD) n days from now, UTC.
+function isoDaysFromNow(n) {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+// Strip CR/LF so an interpolated value can't inject extra email headers.
+function headerSafe(s) {
+  return String(s).replace(/[\r\n]+/g, " ").trim();
+}
+
+// Minimal RFC 5322 message. CRLF line endings; blank line before the body.
+function buildReminderMime(from, to, subject, body) {
+  const domain = headerSafe(from.split("@")[1] || "incubator.local");
+  return [
+    `From: Incubator <${headerSafe(from)}>`,
+    `To: ${headerSafe(to)}`,
+    `Subject: ${headerSafe(subject)}`,
+    `Message-ID: <${Date.now()}.reminder@${domain}>`,
+    `Date: ${new Date().toUTCString()}`,
+    "MIME-Version: 1.0",
+    'Content-Type: text/plain; charset="utf-8"',
+    "",
+    body,
+  ].join("\r\n");
+}
+
+// Runs on the cron trigger: if a visible show ends in exactly REMINDER_LEAD_DAYS,
+// email the gallery so the next show's details get uploaded in time. No-ops
+// unless Email Routing (SEND_EMAIL) and REMINDER_FROM are configured.
+// Assumes a single daily cron run: the exact-day match sends once (no de-dup
+// state), so keep the crons entry to one run per day. A dropped run means that
+// day's reminder is missed — acceptable for a low-stakes nudge.
+async function handleScheduled(env) {
+  const from = (env.REMINDER_FROM || "").trim();
+  if (!env.SEND_EMAIL || !from || !env.GITHUB_TOKEN) return;
+  const { owner, repo } = adminRepo(env);
+  if (!owner || !repo) return;
+
+  let data;
+  try {
+    ({ json: data } = await readRepoJson(env, owner, repo, SHOWS_PATH));
+  } catch (err) {
+    console.error("Reminder: could not read shows.json:", err && err.message ? err.message : err);
+    return;
+  }
+  const shows = data && Array.isArray(data.exhibitions) ? data.exhibitions : [];
+  const target = isoDaysFromNow(REMINDER_LEAD_DAYS);
+  const ending = shows.filter((e) => !e.hidden && e.endISO === target);
+
+  for (const show of ending) {
+    const name = show.title || show.artist || "the current exhibition";
+    const when = show.dates || target;
+    const subject = `Reminder: “${name}” ends ${when} — upload the next show`;
+    const body =
+      `“${name}” ends on ${when} (in ${REMINDER_LEAD_DAYS} days).\n\n` +
+      `Please add the next exhibition's details on the admin page so the site ` +
+      `switches over in time:\n${ADMIN_URL}\n\n` +
+      `Until the next show is published, the site will label this one ` +
+      `“Most recent exhibition”.\n`;
+    try {
+      await env.SEND_EMAIL.send(
+        new EmailMessage(from, REMINDER_TO, buildReminderMime(from, REMINDER_TO, subject, body))
+      );
+      console.log(`Reminder sent for "${name}" (ends ${when}).`);
+    } catch (err) {
+      console.error("Reminder email failed:", err && err.message ? err.message : err);
+    }
+  }
+}
+
 export default {
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(handleScheduled(env));
+  },
+
   async fetch(request, env) {
     const allowed = (env.ALLOWED_ORIGINS || "")
       .split(",")
