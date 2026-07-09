@@ -376,7 +376,20 @@
 .inc-lightbox__close:hover,
 .inc-lightbox__nav:hover { opacity: 1; }
 .inc-lightbox__close { top: clamp(16px, 3vw, 32px); right: clamp(16px, 3vw, 32px); font-size: 24px; }
-.inc-lightbox__nav { top: 50%; transform: translateY(-50%); font-size: clamp(40px, 6vw, 72px); padding: 0 clamp(8px, 2vw, 24px); }
+/* Nav arrows: hide the heavy ‹ › glyph and draw a thin, angular chevron. */
+.inc-lightbox__nav {
+  top: 50%; transform: translateY(-50%);
+  font-size: 0;
+  width: clamp(48px, 7vw, 84px); height: clamp(48px, 7vw, 84px);
+  display: flex; align-items: center; justify-content: center;
+}
+.inc-lightbox__nav::before {
+  content: "";
+  width: clamp(15px, 2.1vw, 24px); height: clamp(15px, 2.1vw, 24px);
+  border: solid currentColor; border-width: 0 1.25px 1.25px 0;
+}
+.inc-lightbox__nav--prev::before { transform: rotate(135deg); margin-left: 0.25em; }
+.inc-lightbox__nav--next::before { transform: rotate(-45deg); margin-right: 0.25em; }
 .inc-lightbox__nav--prev { left: clamp(4px, 2vw, 24px); }
 .inc-lightbox__nav--next { right: clamp(4px, 2vw, 24px); }
 
