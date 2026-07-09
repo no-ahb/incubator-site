@@ -248,7 +248,7 @@ function InstallationStrip({ frames }) {
             aria-label={"Open installation view " + (i + 1) + " of " + count}
             onClick={() => setOpen(i)}
           >
-            <Tile kind={k} aspect={i % 3 === 0 ? "4/3" : "3/4"} alt={"Installation view " + (i + 1)} />
+            <Tile kind={k} aspect="1/1" alt={"Installation view " + (i + 1)} />
           </button>
         ))}
       </div>
