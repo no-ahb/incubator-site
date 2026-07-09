@@ -424,9 +424,9 @@
   padding-inline: var(--gutter-lg);
 }
 
-/* Footer: now 3 columns (no seal). The DS rule expects a 4th `auto` slot. */
+/* Footer: two columns (address left, contact hard right — no seal). */
 .mock .inc-footer__inner {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: var(--s-8);
 }
 .inc-footer__brand .inc-wordmark { display: block; margin-bottom: var(--s-3); }
