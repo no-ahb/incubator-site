@@ -19,7 +19,7 @@ function exhibitionStatus(ex, { heroFallback = false } = {}) {
    HOME
    ===================================================================== */
 function HomeScreen({ onNav }) {
-  const TODAY = "2026-05-28";
+  const TODAY = new Date().toISOString().slice(0, 10);
   const all = [...EXHIBITIONS, ...EXHIBITION_ARCHIVE];
   const current = EXHIBITIONS.find((e) => e.current) || EXHIBITIONS[0];
 
