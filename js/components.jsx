@@ -32,6 +32,13 @@ function isImageRef(v) {
   );
 }
 
+// Sort a list of full names alphabetically by last name (the last whitespace
+// token). Returns a new array; the source order is left untouched.
+function sortByLastName(names) {
+  const lastName = (n) => n.trim().split(/\s+/).pop().toLowerCase();
+  return [...names].sort((a, b) => lastName(a).localeCompare(lastName(b)));
+}
+
 function Tile({ kind = "a", aspect = "4/3", className = "", style = {}, alt = "" }) {
   if (isImageRef(kind)) {
     return (
@@ -198,7 +205,7 @@ function ExhibitionsListRow({ ex, onNav, onHover }) {
             <>
               <span className="inc-list__name">{ex.title || ex.artist}</span>
               {(ex.groupArtists || []).length > 0 ? (
-                <em className="inc-list__work">{ex.groupArtists.slice(0, 5).join(", ")}</em>
+                <em className="inc-list__work">{sortByLastName(ex.groupArtists).slice(0, 5).join(", ")}</em>
               ) : null}
             </>
           ) : (
