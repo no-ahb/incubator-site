@@ -8,3 +8,22 @@ compatibility_date = "2024-11-01"
 REPO = "no-ahb/incubator-site"
 ALLOWED_ORIGINS = "https://no-ahb.github.io,http://localhost:8000,http://127.0.0.1:8000"
 ISSUE_LABEL = "site-report"
+# REMINDER_FROM = "reminders@yourdomain.com"   # uncomment + set once Email Routing is on (below)
+
+# ---------------------------------------------------------------------------
+# End-of-show reminder email (issue #58). DISABLED until Email Routing is set
+# up — leaving these commented keeps the normal `wrangler deploy` working.
+#
+# To enable:
+#   1. Add a domain to this Cloudflare account and turn on Email Routing.
+#   2. Verify incubator.enquiries@gmail.com as a destination address.
+#   3. Set REMINDER_FROM above to an address on that domain.
+#   4. Uncomment the two blocks below, then `wrangler deploy`.
+# The Worker code is already in place and safely no-ops until then.
+# ---------------------------------------------------------------------------
+# [triggers]
+# crons = ["0 9 * * *"]           # daily 09:00 UTC
+#
+# [[send_email]]
+# name = "SEND_EMAIL"
+# destination_address = "incubator.enquiries@gmail.com"
