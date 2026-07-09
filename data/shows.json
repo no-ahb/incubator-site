@@ -1,6 +1,36 @@
 {
   "exhibitions": [
     {
+      "id": "eva-dixon-crash",
+      "artistId": "eva-dixon",
+      "artist": "Eva Dixon",
+      "title": "Crash",
+      "dates": "3 - 28 June 2026",
+      "startISO": "2026-06-03",
+      "endISO": "2026-06-28",
+      "current": false,
+      "palette": "sap",
+      "pressRelease": [
+        "“Maybe the next time, darling. Maybe the next time.”",
+        "– James Ballard (James Spader) to his wife Catherine (Deborah Kara Unger) after a near-fatal car wreck in the final lines of David Cronenberg's 1996 erotic thriller Crash",
+        "When you cum, you are (an) animal. Not in any flattering sense, not the animal of appetite or instinct or grace, but the animal of pure and involuntary response. Your eyes roll back, your legs shake, you make sounds devoid of human dignity or decorum. You are, for approximately four to twelve seconds, operating entirely outside the terms of the self. You are, as you buck, a body doing what a body is designed to do.",
+        "When you crash, you are also (an) animal. Soft and soggy, subject to velocity and the same blunt, wet physics that kills a dog or a deer. The car had promised you otherwise— it has been selling you otherwise for decades, in showrooms and on Formula 1 circuits and the pages of magazines where women recline across bonnets like they, too, are part of the machinery. You are, as you fly across the highway straight into a suburban family’s fender, a body doing what a body is designed to do.",
+        "Eva Dixon (b. 2000) grew up around the idea of the garage: the artists uncle's, specifically, with its wall of women who looked nothing like their aunt. Dixon has spent their practice asking what it means that the erotic and the mechanical were located, from the beginning, in the same room. Crash is the latest instalment of that question; a body of work made from the materials of automotive culture and the images that have always accompanied them, asking what we are when we are moving very fast, and what we become when we stop.",
+        "The image, like the orgasm and the crash, is also constructed. In both death and climax, briefly or permanently, the self the image constructed simply stops. Bataille wrote that eroticism is the approval of life even unto death; Dixon is interested in how we reach either state, and remains of it at the moment of arrival. Their practice stacks these metonymic images, layers them and builds from them until the accumulated fantasy of desire becomes, quite literally, a building material.",
+        "Speed, Dixon’s works show, is evolutionary: the predator's drive toward prey, the post-capitalist grasp for/of novelty, the residual force of the foot pressed to accelerator. Pornography outlives itself by anaclisis, the sexual drive leaning on an existing object, the body in climax and the body in the wreck. The line between eros and thanatos is a seatbelt, a tyre tube, a tensioning belt.",
+        "The French call the orgasm la petite mort for a good reason.",
+        "Written by Victoria Comstock-Kershaw | @rothkosgirlfriend"
+      ],
+      "installation": [
+        "assets/shows/eva-dixon-crash/1783617298807-Incubator_-_Eva_Dixon_-_Works_-_066.jpg",
+        "assets/shows/eva-dixon-crash/1783617300123-Incubator_-_Eva_Dixon_-_Works_-_009__1_.jpg",
+        "assets/shows/eva-dixon-crash/1783617301622-Incubator_-_Eva_Dixon_-_011.jpg",
+        "assets/shows/eva-dixon-crash/1783617303004-Incubator_-_Eva_Dixon_-_001.jpg"
+      ],
+      "privateView": "https://privateviews.artlogic.net/2/a7bd9f910e791f39a67271/",
+      "heroImage": "assets/shows/eva-dixon-crash/1783617297497-Incubator_-_Eva_Dixon_-_Works_-_057.jpg"
+    },
+    {
       "id": "charlie-gosling-good-luck-with-me-here",
       "artistId": "charlie-gosling",
       "artist": "Charlie Gosling",
@@ -2222,6 +2252,13 @@
         "Radné has presented solo exhibitions at galleries and institutions including the National Museum of Art of the Republic of Buryatia (2018), Bloom Galerie, Saint-Tropez (2023), and Steve Turner, Los Angeles (2023).",
         "Her work has been exhibited at Art Fair Bordeaux with Bloom Galerie (2023); Enter Art Fair, Copenhagen, and Vienna Contemporary with Steve Turner (both 2023); Untitled Miami with Steve Turner (2024); and Future Fair in New York with Newcube (2024).",
         "She has also participated in group exhibitions internationally, including at Fiumano Clase, London (2023); STUDIO WEST, London (2023); Hilger Next Gallery, Vienna (2022); Ars Pro Dono Gallery, Berlin (2021); Zaluu Centre, Ulaan-Ude, Russia (2021); Exhibit Studio, Vienna (2021); Semperdepot Academy of Fine Arts, Vienna (2021); and Art Revolution Taipei, Taiwan (2020), among others."
+      ]
+    },
+    {
+      "id": "eva-dixon",
+      "name": "Eva Dixon",
+      "bio": [
+        "Eva Dixon (b. 2000, Australia) lives and works in London. Dixon received their BA in Fine Art from Central Saint Martin's (2023) and is attending the Royal Academy from October 2026. Recent solo presentations include All-American (2026) at Art Cologne Palma with Particular Ideas, SCORE! at Split Rivera (2025), Mercury 13 at WIP Space (2025), Lesbian Trucker Paintings at The Fores Project (2023). Notable group exhibitions include 'What Holds Things Together' CC Jasper, New York, Preview art fair with Caption Seoul (Korea, 2026), Lands End (London, Art Mama, 2024) and duo exhibition Top Dog at Parlour Gallery (London, 2026), Rose Easton (London, 2025), Saatchi Gallery (London 2023, 2025), Christie's (London, 2023). Dixon is a recipient of the Maison/0 This Earth award with LVMH (2023) and 'Best UK solo presentation' at Minor Attractions (2025, Split Rivera)."
       ]
     }
   ],
