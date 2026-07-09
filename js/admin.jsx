@@ -16,7 +16,24 @@ const AD_MAX_DIM = 1600;
 const AD_JPEG_Q = 0.82;
 const AD_MAX_RAW_BYTES = 25 * 1024 * 1024; // guard against reading absurd files
 const AD_ALLOWED_MIME = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
-const AD_PALETTES = ["sap", "sunflower", "tobacco", "sky", "vermilion", "persimmon"];
+
+// Build the human date string shown across the site from the ISO pickers, so
+// staff never hand-type it. "2026-06-01"+"2026-06-30" -> "1 – 30 June 2026".
+// Reuses monthName() from screens.jsx (shared global scope).
+function adFormatDates(startISO, endISO) {
+  const parse = (iso) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec((iso || "").trim());
+    return m ? { y: +m[1], mo: +m[2] - 1, d: +m[3], iso: m[0] } : null;
+  };
+  const one = (p) => p.d + " " + monthName(p.iso) + " " + p.y;
+  const s = parse(startISO), e = parse(endISO);
+  if (!s && !e) return "";
+  if (!s) return one(e);
+  if (!e) return one(s);
+  if (s.y === e.y && s.mo === e.mo) return s.d + " – " + e.d + " " + monthName(e.iso) + " " + e.y;
+  if (s.y === e.y) return s.d + " " + monthName(s.iso) + " – " + e.d + " " + monthName(e.iso) + " " + e.y;
+  return one(s) + " – " + one(e);
+}
 
 // Downscale + re-encode an image file to a JPEG data URL.
 function adResizeImage(file) {
@@ -150,13 +167,13 @@ function AdminImagePicker({ label, multiple, items, onChange }) {
 /* ---------- SHOW FORM (add / edit) ---------------------------------------- */
 function AdminShowForm({ pw, existing, onSaved, onCancel }) {
   const init = existing || {};
+  const [isGroup, setIsGroup] = adState(!!init.isGroup);
   const [artist, setArtist] = adState(init.artist || "");
   const [title, setTitle] = adState(init.title || "");
-  const [dates, setDates] = adState(init.dates || "");
+  const [groupArtists, setGroupArtists] = adState(Array.isArray(init.groupArtists) ? init.groupArtists.join("\n") : "");
   const [startISO, setStartISO] = adState(init.startISO || "");
   const [endISO, setEndISO] = adState(init.endISO || "");
   const [current, setCurrent] = adState(!!init.current);
-  const [palette, setPalette] = adState(init.palette || "sap");
   const [privateView, setPrivateView] = adState(init.privateView || "");
   const [pressRelease, setPressRelease] = adState(Array.isArray(init.pressRelease) ? init.pressRelease.join("\n\n") : (init.pressRelease || ""));
   const [artistBio, setArtistBio] = adState("");
@@ -170,7 +187,7 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
   const [status, setStatus] = adState("");
   const [error, setError] = adState("");
 
-  const showId = slug(init.id || "") || slug(artist + " " + title);
+  const showId = slug(init.id || "") || slug(isGroup ? title : artist + " " + title);
 
   async function uploadEntry(entry) {
     if (entry.path && !entry.file) return entry.path; // already committed
@@ -188,7 +205,13 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
 
   async function submit(e) {
     e.preventDefault();
-    if (!artist.trim() || !title.trim()) { setError("Artist and title are required."); return; }
+    // Group shows have no single artist: the exhibition title names the show and
+    // the participant list carries the artists. Solo shows keep the artist field.
+    const showArtist = isGroup ? title.trim() : artist.trim();
+    if (!title.trim() || (!isGroup && !artist.trim())) {
+      setError(isGroup ? "Exhibition title is required." : "Artist and title are required.");
+      return;
+    }
     setBusy(true);
     setError("");
     setStatus("");
@@ -200,13 +223,14 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
       setStatus("Saving…");
       const show = {
         id: init.id || undefined,
-        artist: artist.trim(),
+        isGroup,
+        artist: showArtist,
         title: title.trim(),
-        dates: dates.trim(),
+        groupArtists: isGroup ? groupArtists.split(/[\n,]+/).map((s) => s.trim()).filter(Boolean) : [],
+        dates: adFormatDates(startISO, endISO) || init.dates || "",
         startISO: startISO.trim(),
         endISO: endISO.trim(),
         current,
-        palette,
         privateView: privateView.trim(),
         pressRelease,
         heroImage: heroPath,
@@ -220,7 +244,7 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
       const data = await res.json().catch(() => null);
       if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || "Save failed.");
 
-      onSaved({ ...show, id: data.id, artistId: slug(artist) });
+      onSaved({ ...show, id: data.id, artistId: isGroup ? null : slug(showArtist) });
     } catch (err) {
       setError(err.message || "Save failed.");
       setBusy(false);
@@ -230,20 +254,23 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
 
   return (
     <form className="inc-admin__form" onSubmit={submit}>
+      <label className="inc-admin__check"><input type="checkbox" checked={isGroup} onChange={(e) => setIsGroup(e.target.checked)} /> Group show (multiple artists)</label>
+
       <div className="inc-admin__formgrid">
-        <label>Artist *<input className="inc-report__input" value={artist} onChange={(e) => setArtist(e.target.value)} required /></label>
+        {!isGroup && <label>Artist *<input className="inc-report__input" value={artist} onChange={(e) => setArtist(e.target.value)} required /></label>}
         <label>Exhibition title *<input className="inc-report__input" value={title} onChange={(e) => setTitle(e.target.value)} required /></label>
-        <label>Dates (display)<input className="inc-report__input" value={dates} onChange={(e) => setDates(e.target.value)} placeholder="1 – 30 June 2026" /></label>
-        <label>Palette
-          <select className="inc-report__input" value={palette} onChange={(e) => setPalette(e.target.value)}>
-            {AD_PALETTES.map((p) => <option key={p} value={p}>{p}</option>)}
-          </select>
-        </label>
         <label>Start date<input type="date" className="inc-report__input" value={startISO} onChange={(e) => setStartISO(e.target.value)} /></label>
         <label>End date<input type="date" className="inc-report__input" value={endISO} onChange={(e) => setEndISO(e.target.value)} /></label>
         <label>Private view link<input className="inc-report__input" value={privateView} onChange={(e) => setPrivateView(e.target.value)} placeholder="https://…" /></label>
         <label className="inc-admin__check"><input type="checkbox" checked={current} onChange={(e) => setCurrent(e.target.checked)} /> Current exhibition (featured on home)</label>
       </div>
+
+      {isGroup && (
+        <>
+          <label className="inc-report__label">Participating artists</label>
+          <textarea className="inc-report__textarea" rows={5} value={groupArtists} onChange={(e) => setGroupArtists(e.target.value)} placeholder="One name per line (or comma-separated)." />
+        </>
+      )}
 
       <AdminImagePicker label="Hero image (poster)" multiple={false} items={hero} onChange={setHero} />
       <AdminImagePicker label="Installation views" multiple={true} items={installs} onChange={setInstalls} />
@@ -251,8 +278,12 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
       <label className="inc-report__label">Press release</label>
       <textarea className="inc-report__textarea" rows={8} value={pressRelease} onChange={(e) => setPressRelease(e.target.value)} placeholder="One paragraph per block, separated by a blank line." />
 
-      <label className="inc-report__label">Artist bio {existing ? "(leave blank to keep existing)" : "(optional)"}</label>
-      <textarea className="inc-report__textarea" rows={4} value={artistBio} onChange={(e) => setArtistBio(e.target.value)} placeholder="Short biography, blank line between paragraphs." />
+      {!isGroup && (
+        <>
+          <label className="inc-report__label">Artist bio {existing ? "(leave blank to keep existing)" : "(optional)"}</label>
+          <textarea className="inc-report__textarea" rows={4} value={artistBio} onChange={(e) => setArtistBio(e.target.value)} placeholder="Short biography, blank line between paragraphs." />
+        </>
+      )}
 
       {error ? <p className="inc-report__error">{error}</p> : null}
       {status ? <p className="inc-admin__muted">{status}</p> : null}
@@ -296,7 +327,7 @@ function AdminShows({ pw, shows, onEdit, onToggle }) {
         {shows.map((s) => (
           <li key={s.id} className={"inc-admin__row" + (s.hidden ? " is-hidden" : "")}>
             <span className="inc-admin__row-main">
-              <span className="inc-admin__row-title">{s.title ? <>{s.artist ? s.artist + " — " : ""}<em>{s.title}</em></> : (s.artist || "")}</span>
+              <span className="inc-admin__row-title">{s.isGroup ? <em>{s.title || s.artist}</em> : s.title ? <>{s.artist ? s.artist + " — " : ""}<em>{s.title}</em></> : (s.artist || "")}</span>
               <span className="inc-admin__row-dates">{s.dates}{s.hidden ? " · hidden" : ""}</span>
             </span>
             <span className="inc-admin__row-actions">
