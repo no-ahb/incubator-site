@@ -286,7 +286,7 @@
 /* ===========================================================================
    INSTALLATION STRIP — clarify interaction
    Each view is a button that opens the lightbox; cursor + hover affordance
-   (subtle zoom, vignette, ↗ badge) make that visible.
+   (subtle zoom, vignette) make that visible.
    =========================================================================== */
 .inc-strip__btn {
   position: relative;
@@ -311,29 +311,10 @@
   transition: opacity var(--dur-fast) var(--ease);
   pointer-events: none;
 }
-.inc-strip__btn::before {
-  content: "↗";
-  position: absolute;
-  top: 12px; right: 12px;
-  width: 28px; height: 28px;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-serif);
-  font-size: 14px;
-  color: #fff;
-  background: rgba(17,17,17,0.7);
-  border-radius: 999px;
-  opacity: 0;
-  transform: translateY(-4px);
-  transition: opacity var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
-  pointer-events: none;
-  z-index: 1;
-}
 .inc-strip__btn:hover .inc-tile,
 .inc-strip__btn:focus-visible .inc-tile { transform: scale(1.05); }
 .inc-strip__btn:hover::after,
 .inc-strip__btn:focus-visible::after { opacity: 1; }
-.inc-strip__btn:hover::before,
-.inc-strip__btn:focus-visible::before { opacity: 1; transform: translateY(0); }
 .inc-strip__btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 
 /* ---------- Lightbox ------------------------------------------------------- */
