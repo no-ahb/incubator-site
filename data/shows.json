@@ -715,11 +715,11 @@
       "artistId": "lucrezia-abatzoglu",
       "artist": "Lucrezia Abatzoglu",
       "title": "Feminarium",
-      "dates": "2 - 12 May 2024",
+      "dates": "2 – 12 May 2024",
       "startISO": "2024-05-02",
       "endISO": "2024-05-12",
       "current": false,
-      "palette": "vermilion",
+      "palette": "sap",
       "hero": "cool-2",
       "privateView": "https://privateviews.artlogic.net/2/60930403c5c4c0d8028c70/",
       "pressRelease": [
@@ -735,7 +735,7 @@
         "assets/shows/lucrezia-abatzoglu-feminarium/5.jpg",
         "assets/shows/lucrezia-abatzoglu-feminarium/6.jpg"
       ],
-      "heroImage": "assets/shows/lucrezia-abatzoglu-feminarium/hero.jpg"
+      "heroImage": "assets/shows/lucrezia-abatzoglu-feminarium/1783697422026-Bitersweet.jpg"
     },
     {
       "id": "leonard-soldier-iheagwam-when-the-saints-go-marching",
