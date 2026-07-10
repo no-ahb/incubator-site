@@ -65,11 +65,11 @@
       "artistId": "xiaochi-dong",
       "artist": "Xiaochi Dong",
       "title": "Leaves Leave",
-      "dates": "1 - 25 April 2026",
+      "dates": "1 – 25 April 2026",
       "startISO": "2026-04-01",
       "endISO": "2026-04-25",
       "current": false,
-      "palette": "sunflower",
+      "palette": "sap",
       "hero": "cool-1",
       "privateView": "https://privateviews.artlogic.net/2/e71a84fd45165beb1d372c/",
       "pressRelease": [
@@ -92,7 +92,7 @@
         "assets/shows/xiaochi-dong-leaves-leave/5.jpg",
         "assets/shows/xiaochi-dong-leaves-leave/6.jpg"
       ],
-      "heroImage": "assets/shows/xiaochi-dong-leaves-leave/hero.jpg"
+      "heroImage": "assets/shows/xiaochi-dong-leaves-leave/1783697103322-DSC09091_LR.jpg"
     },
     {
       "id": "katherine-qiyu-su-mountains-and-rivers-will-meet-again",
