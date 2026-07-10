@@ -314,11 +314,11 @@
       "artistId": "atticus-wakefield",
       "artist": "Atticus Wakefield",
       "title": "After the Allegory",
-      "dates": "6 - 17 May 2025",
+      "dates": "6 – 17 May 2025",
       "startISO": "2025-05-06",
       "endISO": "2025-05-17",
       "current": false,
-      "palette": "sky",
+      "palette": "sap",
       "hero": "warm-3",
       "privateView": "https://privateviews.artlogic.net/2/87cd0952d8732b756535d5/",
       "pressRelease": [
@@ -336,7 +336,7 @@
         "assets/shows/atticus-wakefield-after-the-allegory/5.jpg",
         "assets/shows/atticus-wakefield-after-the-allegory/6.jpg"
       ],
-      "heroImage": "assets/shows/atticus-wakefield-after-the-allegory/hero.jpg"
+      "heroImage": "assets/shows/atticus-wakefield-after-the-allegory/1783697635757-IMG-4009.jpg"
     },
     {
       "id": "frank-kent-flowers",
