@@ -861,11 +861,11 @@
       "artistId": "elinor-stanley",
       "artist": "Elinor Stanley",
       "title": "Tropo",
-      "dates": "5 - 15 November 2023",
+      "dates": "5 – 15 November 2023",
       "startISO": "2023-11-05",
       "endISO": "2023-11-15",
       "current": false,
-      "palette": "sky",
+      "palette": "sap",
       "hero": "warm-3",
       "pressRelease": [
         "In the paintings presented in the exhibition Tropo, Elinor Stanley puts on stage our daily life at the height of its intensity. It is no one’s life in particular. Anyone and everyone could hide beneath the locks of brown hair of the female characters, or behind the swollen heads of her male counterparts. Each of us is, in turn, the object and the subject of the gaze, performing and experiencing the transformations that are brought about by the desire of the other. By looking at someone, we carve them out of the world. Where there used to be only an indistinct landscape, our intent gazing brings forth the presence of “someone”. When we are looked at, we ourselves are created.",
@@ -879,7 +879,9 @@
         "you are ennobled. ... “You”, she writes, and... she places on paper the only word",
         "that can hold the sentence, the syntax, together as though she had addressed the",
         "subject of it by its proper name. “You”... A mysterious word. ... And in so nam-",
-        "ing “you”, it is as if she were engaged in an act of creation, re-creating you.>>"
+        "ing “you”, it is as if she were engaged in an act of creation, re-creating you.>>",
+        "(S. Marai, Casanova in Bolzano, New York, NY, Alfred A. Knopf, 2004, pp. 195-197)",
+        "Exhibition text by Federico Campagna"
       ],
       "installation": [
         "assets/shows/elinor-stanley-tropo/1.jpg",
@@ -889,7 +891,7 @@
         "assets/shows/elinor-stanley-tropo/5.jpg",
         "assets/shows/elinor-stanley-tropo/6.jpg"
       ],
-      "heroImage": "assets/shows/elinor-stanley-tropo/hero.jpg"
+      "heroImage": "assets/shows/elinor-stanley-tropo/1783697606337-Screenshot_2026-07-10_at_16_33_11.jpg"
     },
     {
       "id": "oleksandra-marston-still",
