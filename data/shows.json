@@ -1608,7 +1608,7 @@
       "artistId": null,
       "artist": "Lines in the Sand",
       "title": "Lines in the Sand",
-      "dates": "Dates TBC",
+      "dates": "6 July – 10 September 2023",
       "current": false,
       "isGroup": true,
       "palette": "sap",
@@ -1630,7 +1630,9 @@
         "assets/shows/lines-in-the-sand/5.jpg",
         "assets/shows/lines-in-the-sand/6.jpg"
       ],
-      "heroImage": "assets/shows/lines-in-the-sand/hero.jpg"
+      "heroImage": "assets/shows/lines-in-the-sand/hero.jpg",
+      "startISO": "2023-07-06",
+      "endISO": "2023-09-10"
     },
     {
       "id": "five-by-five",
