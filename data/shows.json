@@ -191,11 +191,11 @@
       "artistId": "seraphina-mutscheller",
       "artist": "Seraphina Mutscheller",
       "title": "Woodwind",
-      "dates": "8 October - 2 November 2025",
+      "dates": "8 October – 2 November 2025",
       "startISO": "2025-10-08",
       "endISO": "2025-11-02",
       "current": false,
-      "palette": "persimmon",
+      "palette": "sap",
       "hero": "warm-4",
       "privateView": "https://privateviews.artlogic.net/2/4bbfd09f5d78486ba49dbb",
       "pressRelease": [
@@ -216,7 +216,7 @@
         "assets/shows/seraphina-mutscheller-woodwind/5.jpg",
         "assets/shows/seraphina-mutscheller-woodwind/6.jpg"
       ],
-      "heroImage": "assets/shows/seraphina-mutscheller-woodwind/hero.jpg"
+      "heroImage": "assets/shows/seraphina-mutscheller-woodwind/1783697214162-Screenshot_2026-07-10_at_16_26_00.jpg"
     },
     {
       "id": "maya-gurung-russell-campbell-i-want-to-be-ready",
