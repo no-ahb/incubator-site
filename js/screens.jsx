@@ -184,7 +184,7 @@ function ExhibitionsListScreen({ onNav }) {
             {[
               ["all",   "All"],
               ["solo",  "Solo"],
-              ["group", "Group shows"],
+              ["group", "Group"],
             ].map(([k, l]) => (
               <button
                 key={k}
@@ -268,7 +268,7 @@ function ExhibitionDetailScreen({ id, onNav }) {
   return (
     <main className="inc-main">
       <article className="inc-detail">
-        <Poster ex={ex} size="hero" />
+        <HeroPoster ex={ex} size="hero" />
 
         <div className="container inc-detail__head">
           <span className="inc-eyebrow">
@@ -308,6 +308,12 @@ function ExhibitionDetailScreen({ id, onNav }) {
           <h3>Installation views</h3>
           <InstallationStrip frames={ex.installation || ["a","b","c","d","e","f"]} />
         </section>
+
+        {!ex.isGroup && ex.artist && (
+          <p className="container inc-detail__enquire">
+            <EnquireButton name={ex.artist} />
+          </p>
+        )}
 
         <section id="release" className="container inc-detail__release">
           <h3>Press release</h3>
@@ -384,12 +390,6 @@ function ArtistScreen({ id, onNav }) {
         <div className="container inc-detail__head">
           <span className="inc-eyebrow">Artist</span>
           <h1>{artist.name}</h1>
-          <a
-            className="inc-btn"
-            href={"mailto:incubator.enquiries@gmail.com?subject=" + encodeURIComponent(artist.name)}
-          >
-            Inquire about available works
-          </a>
         </div>
 
         {shows.map((ex, idx) => (
@@ -412,6 +412,10 @@ function ArtistScreen({ id, onNav }) {
             </section>
           </div>
         ))}
+
+        <p className="container inc-detail__enquire">
+          <EnquireButton name={artist.name} />
+        </p>
 
         <section id="biography" className="container inc-detail__bio">
           <h3>Biography</h3>

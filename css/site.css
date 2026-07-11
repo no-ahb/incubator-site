@@ -357,6 +357,16 @@ ul { list-style: none; padding: 0; margin: 0; }
 }
 .inc-btn:hover { background: var(--green); }
 
+/* Zoomable lead image — reset the wrapping button to render like the poster. */
+.inc-poster-zoom {
+  display: block; width: 100%; padding: 0; border: 0;
+  background: none; font: inherit; color: inherit; text-align: inherit;
+  cursor: zoom-in;
+}
+
+/* Enquire button sits on its own line between the images and the prose. */
+.inc-detail__enquire { margin: var(--s-10) 0 0; }
+
 /* ---------- Footer -------------------------------------------------------- */
 .inc-footer {
   background: var(--surface);
@@ -370,8 +380,8 @@ ul { list-style: none; padding: 0; margin: 0; }
   align-items: start;
   font-family: var(--font-serif); font-size: 14px; line-height: 1.55;
 }
-/* Address stays hard left; contact column sits hard right (#34). */
-.inc-footer__contact { justify-self: end; text-align: right; }
+/* Both columns are left-justified within their grid cell (#81). */
+.inc-footer__contact { justify-self: start; text-align: left; }
 .inc-footer p { margin: var(--s-3) 0 0; }
 .inc-footer a { color: var(--ink); border-bottom: 1px solid transparent; }
 .inc-footer a:hover { color: var(--green); border-bottom-color: currentColor; }

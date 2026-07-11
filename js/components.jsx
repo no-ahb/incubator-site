@@ -166,6 +166,68 @@ function Poster({ ex, size = "card" }) {
   );
 }
 
+/* ---------- HERO POSTER (zoomable) ---------------------------------------
+   The lead image on a detail page. When the show has a real hero photo,
+   clicking it opens the full image in the same lightbox the installation
+   strip uses; placeholder posters stay static. */
+function HeroPoster({ ex, size = "hero" }) {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [open]);
+
+  if (!ex.heroImage) return <Poster ex={ex} size={size} />;
+
+  const alt = [ex.artist, ex.title].filter(Boolean).join(" — ") || "Exhibition";
+  return (
+    <>
+      <button
+        type="button"
+        className="inc-poster-zoom"
+        aria-label="View full image"
+        onClick={() => setOpen(true)}
+      >
+        <Poster ex={ex} size={size} />
+      </button>
+      {open && (
+        <div
+          className="inc-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={alt}
+          onClick={() => setOpen(false)}
+        >
+          <button className="inc-lightbox__close" aria-label="Close" onClick={() => setOpen(false)}>✕</button>
+          <figure className="inc-lightbox__stage" onClick={(e) => e.stopPropagation()}>
+            <img className="inc-lightbox__img inc-lightbox__img--photo" src={ex.heroImage} alt={alt} />
+          </figure>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ---------- ENQUIRE BUTTON ------------------------------------------------
+   Opens the visitor's mail client pre-addressed to the gallery with the
+   artist's name in the subject and a ready-made enquiry line in the body. */
+function EnquireButton({ name }) {
+  const href =
+    "mailto:incubator.enquiries@gmail.com" +
+    "?subject=" + encodeURIComponent("Enquiry - " + name) +
+    "&body=" + encodeURIComponent("I would like to enquire about available works by " + name + ".");
+  return (
+    <a className="inc-btn" href={href}>Enquire about available works</a>
+  );
+}
+
 /* ---------- EXHIBITION CARD (legacy grid — used on home) ----------------- */
 function ExhibitionCard({ ex, onNav, eyebrow }) {
   const subtitle = ex.isGroup ? "Group show" : ex.artist;
@@ -237,10 +299,11 @@ function InstallationStrip({ frames }) {
       else if (e.key === "ArrowLeft")  { e.preventDefault(); go(-1); }
     };
     document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      document.body.style.overflow = prevOverflow;
     };
   }, [open, count]);
 
@@ -365,7 +428,7 @@ function Prose({ paragraphs, max }) {
 }
 
 Object.assign(window, {
-  Tile, Wordmark, Header, Poster, isImageRef,
+  Tile, Wordmark, Header, Poster, HeroPoster, EnquireButton, isImageRef,
   ExhibitionCard, ExhibitionsListRow,
   InstallationStrip, PressItem, Footer, Prose,
 });
