@@ -39,6 +39,16 @@ function sortByLastName(names) {
   return [...names].sort((a, b) => lastName(a).localeCompare(lastName(b)));
 }
 
+// Compact one-line cast for a group show in a list row: the first few names,
+// then "…and N others" once the cast is larger than a row can comfortably show
+// (#98). Shows the whole list when only one name would be hidden.
+function groupArtistSummary(names, max = 4) {
+  const list = sortByLastName(names);
+  if (list.length <= max + 1) return list.join(", ");
+  const rest = list.length - max;
+  return list.slice(0, max).join(", ") + " …and " + rest + " others";
+}
+
 function Tile({ kind = "a", aspect = "4/3", className = "", style = {}, alt = "" }) {
   if (isImageRef(kind)) {
     return (
@@ -267,7 +277,7 @@ function ExhibitionsListRow({ ex, onNav, onHover }) {
             <>
               <span className="inc-list__name">{ex.title || ex.artist}</span>
               {(ex.groupArtists || []).length > 0 ? (
-                <em className="inc-list__work">{sortByLastName(ex.groupArtists).slice(0, 5).join(", ")}</em>
+                <em className="inc-list__work">{groupArtistSummary(ex.groupArtists)}</em>
               ) : null}
             </>
           ) : (
