@@ -138,6 +138,23 @@ ul { list-style: none; padding: 0; margin: 0; }
   .inc-menu-btn__ic span { transition: none !important; }
 }
 
+/* ---------- Route enter + scroll reveal ---------------------------------- */
+/* Each navigation re-keys .mock__view, replaying a soft fade-up of the new
+   page. The reduced-motion kill-switch in ds.css neutralises the animation. */
+.mock__view { animation: inc-view-enter var(--dur-slow) var(--ease-out); }
+@keyframes inc-view-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+/* Grid/list items below the fold start hidden (class added by JS only when
+   motion is allowed) and ease in when scrolled into view. */
+.inc-reveal {
+  opacity: 0; transform: translateY(14px);
+  transition: opacity var(--dur-slow) var(--ease-out),
+              transform var(--dur-slow) var(--ease-out);
+}
+.inc-reveal--in { opacity: 1; transform: none; }
+
 /* ---------- Main / sections ---------------------------------------------- */
 .inc-main { padding-bottom: var(--s-24); }
 
@@ -355,12 +372,16 @@ ul { list-style: none; padding: 0; margin: 0; }
   border-bottom: 1px solid var(--hairline);
   border-radius: 0;
   align-items: baseline;
+  transition: color var(--dur-fast) var(--ease);
 }
 .inc-press-item:hover { color: var(--green); }
 .inc-press-item:hover .inc-press-item__title { border-bottom-color: currentColor; }
 .inc-press-item__date { font-size: 14px; color: var(--ink-3); }
 .inc-press-item__pub { font-size: 15px; font-style: italic; }
-.inc-press-item__title { font-size: 17px; border-bottom: 1px solid transparent; }
+.inc-press-item__title {
+  font-size: 17px; border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-fast) var(--ease);
+}
 .inc-press-item__cta { font-size: 14px; color: var(--ink-3); text-align: right; }
 @media (max-width: 720px) {
   .inc-press-item { grid-template-columns: 1fr; gap: 4px; padding: var(--s-5) 0; }
@@ -370,12 +391,21 @@ ul { list-style: none; padding: 0; margin: 0; }
 /* ---------- Sort toggle --------------------------------------------------- */
 .inc-toggle { display: flex; gap: 18px; }
 .inc-toggle button {
-  background: none; border: 0; padding: 2px 0; cursor: pointer;
+  position: relative;
+  background: none; border: 0; padding: 2px 0 4px; cursor: pointer;
   font-family: var(--font-serif); font-size: 14px;
   color: var(--ink-3);
-  border-bottom: 1px solid transparent;
+  transition: color var(--dur-fast) var(--ease);
 }
-.inc-toggle button.is-active { color: var(--ink); border-bottom-color: var(--ink); }
+/* The active underline grows in from the left rather than blinking on. */
+.inc-toggle button::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: currentColor;
+  transform: scaleX(0); transform-origin: left center;
+  transition: transform var(--dur) var(--ease);
+}
+.inc-toggle button.is-active { color: var(--ink); }
+.inc-toggle button.is-active::after { transform: scaleX(1); }
 .inc-toggle button:hover { color: var(--green); }
 
 /* ---------- Contact ------------------------------------------------------- */
@@ -408,12 +438,17 @@ ul { list-style: none; padding: 0; margin: 0; }
   font-family: var(--font-serif); font-size: 14px;
   padding: 12px 22px; cursor: pointer; align-self: flex-start;
   margin-top: 8px; border-radius: 0;
-  transition: background var(--dur-fast) var(--ease);
+  transition: background var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease);
 }
 /* Incubator green by default, a darker green on hover/click. The label is
    pinned light because the global `a:hover` turns links green, which on the
    green background would otherwise make the text invisible (#94). */
 .inc-btn:hover, .inc-btn:active { background: var(--green-hover); color: var(--paper); }
+.inc-btn:active { transform: translateY(1px); }             /* tactile press */
+/* Explicit ring: .inc-btn is sometimes an <a>, sometimes a <button>, so give
+   both a consistent, visible focus indicator on the green field. */
+.inc-btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 
 /* Zoomable lead image — reset the wrapping button to render like the poster. */
 .inc-poster-zoom {

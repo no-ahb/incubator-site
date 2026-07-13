@@ -3,7 +3,10 @@
 // client-side router, a functioning mobile menu, and per-route scroll reset.
 // All page-type screens + components + data are reused unchanged.
 
-const { useState: appState, useEffect: appEffect } = React;
+const { useState: appState, useEffect: appEffect, useLayoutEffect: appLayout } = React;
+
+const prefersReducedMotion = () =>
+  !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
 /* ---------- MOBILE MENU OVERLAY ------------------------------------------
    Uses the design system's .inc-overlay styles (site.css). Shown when the
@@ -141,7 +144,10 @@ function App() {
       window.location.hash = target; // fires hashchange -> updates route
     } else {
       setRoute(getRoute());
-      window.scrollTo(0, 0);
+      // Instant, not smooth: `html { scroll-behavior: smooth }` (app.css) would
+      // otherwise animate this reset, and the scroll-reveal layout effect would
+      // then measure element positions before the page returned to the top.
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     }
     setMenuOpen(false);
   };
@@ -153,7 +159,7 @@ function App() {
     const onHash = () => {
       setRoute(getRoute());
       setMenuOpen(false);
-      window.scrollTo(0, 0);
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" }); // see navigate()
     };
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
@@ -184,6 +190,34 @@ function App() {
     return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
 
+  // Scroll-reveal: fade grid/list items up as they enter the viewport. The
+  // hidden start state is added here by JS (never in base CSS) so content stays
+  // visible if scripts fail, and is skipped wholesale under reduced-motion.
+  // Runs after each route render / once data is ready; above-the-fold items are
+  // left untouched so they never flash. Layout effect => no first-paint flicker.
+  appLayout(() => {
+    if (dataState !== "ready") return;
+    if (prefersReducedMotion() || !("IntersectionObserver" in window)) return;
+    const scope = document.querySelector(".mock__scroll");
+    if (!scope) return;
+    const targets = scope.querySelectorAll(".inc-card, .inc-list__row, .inc-press-item");
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) {
+          en.target.classList.add("inc-reveal--in");
+          io.unobserve(en.target);
+        }
+      });
+    }, { rootMargin: "0px 0px -10% 0px" });
+    const fold = window.innerHeight * 0.9;
+    targets.forEach((el) => {
+      if (el.getBoundingClientRect().top < fold) return; // already in view
+      el.classList.add("inc-reveal");
+      io.observe(el);
+    });
+    return () => io.disconnect();
+  }, [route, dataState]);
+
   let content;
   if (dataState === "loading") {
     content = <SiteLoading />;
@@ -206,7 +240,11 @@ function App() {
         onOpenMenu={() => setMenuOpen((v) => !v)}
         menuOpen={menuOpen}
       />
-      <div className="mock__scroll">{content}</div>
+      <div className="mock__scroll">
+        {/* Keyed so the route-enter animation replays on every navigation and
+            when data finishes loading (see .mock__view in site.css). */}
+        <div className="mock__view" key={route + "|" + dataState}>{content}</div>
+      </div>
       <MobileMenu open={menuOpen} onNav={navigate} onClose={() => setMenuOpen(false)} />
       <ReportIssue />
     </div>

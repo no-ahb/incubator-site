@@ -124,9 +124,15 @@ html { scroll-behavior: smooth; }
   cursor: pointer;
   box-shadow: 0 2px 10px rgba(17, 17, 17, 0.08);
   transition: color var(--dur-fast) var(--ease),
-              border-color var(--dur-fast) var(--ease);
+              border-color var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease);
+  /* Settle in after the page content, then hold. `both` + the reduced-motion
+     kill-switch means it simply appears (never stuck hidden) when motion is off. */
+  animation: inc-fab-in var(--dur-slow) var(--ease-out) 400ms both;
 }
+@keyframes inc-fab-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .inc-report-fab:hover { color: var(--green); border-color: var(--green); }
+.inc-report-fab:active { transform: scale(0.97); }
 .inc-report-fab__mark {
   display: inline-flex;
   align-items: center;
@@ -279,9 +285,11 @@ html { scroll-behavior: smooth; }
   cursor: pointer;
   align-self: flex-start;
   border-radius: 0;
-  transition: background var(--dur-fast) var(--ease);
+  transition: background var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease);
 }
 .inc-report__btn:hover { background: var(--green); }
+.inc-report__btn:not(:disabled):active { transform: translateY(1px); }
 .inc-report__btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .inc-report__btn:disabled:hover { background: var(--ink); }
 
@@ -327,6 +335,12 @@ html { scroll-behavior: smooth; }
    Data loading / error state (app.jsx)
    =========================================================================== */
 .inc-datastate { display: flex; align-items: center; justify-content: center; min-height: 60vh; }
+/* Gentle breathing pulse while loading so a slow fetch never looks frozen.
+   Reduced-motion (ds.css) stops it; the "Loading…" text still conveys state. */
+.inc-datastate[aria-busy="true"] .inc-datastate__inner {
+  animation: inc-datastate-pulse 1.4s ease-in-out infinite;
+}
+@keyframes inc-datastate-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
 .inc-datastate__inner {
   display: flex;
   flex-direction: column;
