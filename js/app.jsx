@@ -26,15 +26,32 @@ function MobileMenu({ open, onNav, onClose }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
+  // Move focus into the panel when it opens and hand it back to the header
+  // toggle when it closes, so keyboard/AT users follow the menu (the close
+  // control is the header hamburger, which lives outside this panel). The ref
+  // guard skips the initial mount so we never steal focus on page load.
+  const wasOpen = React.useRef(false);
+  appEffect(() => {
+    if (open) {
+      wasOpen.current = true;
+      const first = document.querySelector(".inc-overlay__nav a");
+      if (first) first.focus();
+    } else if (wasOpen.current) {
+      wasOpen.current = false;
+      const btn = document.querySelector(".inc-menu-btn");
+      if (btn) btn.focus();
+    }
+  }, [open]);
+
   // Kept mounted so the panel can unfold/roll-up both ways. It sits just below
   // the real header and never covers the INCUBATOR sign — the header hamburger
   // (which morphs to a ✕) is the close control, so there's no duplicate wordmark
-  // to flash. See .inc-overlay in site.css.
+  // to flash. Not aria-modal: the toggle/close lives outside the panel, so we
+  // keep it in the AT flow rather than fencing it off. See .inc-overlay (site.css).
   return (
     <div
       className={"inc-overlay" + (open ? " is-open" : "")}
       role="dialog"
-      aria-modal="true"
       aria-label="Menu"
       aria-hidden={open ? undefined : "true"}
     >
