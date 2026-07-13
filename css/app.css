@@ -227,6 +227,71 @@ html { scroll-behavior: smooth; }
 .inc-report__input:focus,
 .inc-report__textarea:focus { border-color: var(--green); }
 
+/* ---------- Rich-text editor (press releases & bios) --------------------- */
+.inc-admin__hint { font-size: 13px; color: var(--ink-3); margin: 0 0 8px; }
+.inc-admin__hint strong { font-weight: 600; }
+.inc-admin__hint em { font-style: italic; }
+.inc-rte {
+  width: 100%;
+  background: var(--paper);
+  border: 1px solid var(--hairline-strong);
+  transition: border-color var(--dur-fast) var(--ease);
+}
+.inc-rte:focus-within { border-color: var(--green); }
+.inc-rte__bar {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 6px;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--surface-2);
+}
+.inc-rte__btn {
+  appearance: none;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  line-height: 1;
+  min-width: 30px;
+  padding: 7px 10px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.inc-rte__btn:hover { background: var(--hairline); }
+.inc-rte__btn strong { font-weight: 700; }
+.inc-rte__btn em { font-style: italic; }
+.inc-rte__sep { width: 1px; background: var(--hairline); margin: 3px 4px; }
+.inc-rte__area {
+  min-height: 200px;
+  max-width: none;
+  padding: 14px 16px;
+  outline: none;
+  color: var(--ink);
+}
+/* In-editor preview so roles read differently while typing. */
+.inc-rte__area p { margin: 0 0 0.9em; }
+.inc-rte__area strong { font-weight: 600; }
+.inc-rte__area em { font-style: italic; }
+.inc-rte__area blockquote {
+  margin: 0 0 0.9em;
+  font-style: italic;
+  font-size: 19px;
+  color: var(--ink);
+}
+.inc-rte__area blockquote em { font-style: normal; }
+.inc-rte__area .attrib { color: var(--ink-3); font-size: 14px; }
+.inc-rte__area .byline {
+  color: var(--ink-3);
+  font-size: 13px;
+  font-style: italic;
+  border-top: 1px solid var(--hairline);
+  padding-top: 8px;
+}
+.inc-rte__area .indent { text-indent: 1.5em; }
+
 .inc-report__drop {
   width: 100%;
   display: flex;
