@@ -97,7 +97,7 @@ function Wordmark({ size = 20, color, className = "", as: Tag = "span", style })
 }
 
 /* ---------- HEADER ------------------------------------------------------- */
-function Header({ route, onNav, onOpenMenu, compact }) {
+function Header({ route, onNav, onOpenMenu, compact, menuOpen }) {
   const items = [
     { id: "exhibitions", label: "Exhibitions" },
     { id: "press",       label: "Press" },
@@ -135,8 +135,9 @@ function Header({ route, onNav, onOpenMenu, compact }) {
         )}
 
         <button
-          className={"inc-menu-btn" + (compact ? " inc-menu-btn--show" : "")}
-          aria-label="Menu"
+          className={"inc-menu-btn" + (compact ? " inc-menu-btn--show" : "") + (menuOpen ? " is-open" : "")}
+          aria-label={menuOpen ? "Close menu" : "Menu"}
+          aria-expanded={menuOpen ? "true" : "false"}
           onClick={onOpenMenu}
         >
           <span className="inc-menu-btn__ic" aria-hidden="true">

@@ -8,7 +8,7 @@ const { useState: appState, useEffect: appEffect } = React;
 /* ---------- MOBILE MENU OVERLAY ------------------------------------------
    Uses the design system's .inc-overlay styles (site.css). Shown when the
    compact-header "Menu" button is tapped on narrow viewports. */
-function MobileMenu({ onNav, onClose }) {
+function MobileMenu({ open, onNav, onClose }) {
   const items = [
     ["/exhibitions", "Exhibitions"],
     ["/press", "Press"],
@@ -17,13 +17,22 @@ function MobileMenu({ onNav, onClose }) {
   ];
 
   appEffect(() => {
+    if (!open) return;
     const onKey = (e) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, []);
+  }, [open]);
 
+  // Kept mounted so the reveal/collapse can transition both ways; the
+  // .is-open class drives the animation (see .inc-overlay in site.css).
   return (
-    <div className="inc-overlay" role="dialog" aria-modal="true" aria-label="Menu">
+    <div
+      className={"inc-overlay" + (open ? " is-open" : "")}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Menu"
+      aria-hidden={open ? undefined : "true"}
+    >
       <div className="inc-overlay__head container">
         <a
           className="inc-header__brand"
@@ -194,10 +203,11 @@ function App() {
       <Header
         route={route}
         onNav={navigate}
-        onOpenMenu={() => setMenuOpen(true)}
+        onOpenMenu={() => setMenuOpen((v) => !v)}
+        menuOpen={menuOpen}
       />
       <div className="mock__scroll">{content}</div>
-      {menuOpen && <MobileMenu onNav={navigate} onClose={() => setMenuOpen(false)} />}
+      <MobileMenu open={menuOpen} onNav={navigate} onClose={() => setMenuOpen(false)} />
       <ReportIssue />
     </div>
   );
