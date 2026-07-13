@@ -88,6 +88,9 @@ html { scroll-behavior: smooth; }
 .inc-related__link:hover { color: var(--green); border: 0; }
 .inc-related__title { font-size: var(--fs-md); }
 .inc-related__title em { font-style: italic; }
+.inc-related__tag {
+  font-size: 13px; color: var(--ink-3); letter-spacing: 0.04em; font-style: normal;
+}
 .inc-related__dates {
   font-size: 13px; color: var(--ink-3); letter-spacing: 0.04em;
   font-feature-settings: "tnum"; white-space: nowrap;
@@ -126,9 +129,10 @@ html { scroll-behavior: smooth; }
   transition: color var(--dur-fast) var(--ease),
               border-color var(--dur-fast) var(--ease),
               transform var(--dur-fast) var(--ease);
-  /* Settle in after the page content, then hold. `both` + the reduced-motion
-     kill-switch means it simply appears (never stuck hidden) when motion is off. */
-  animation: inc-fab-in var(--dur-slow) var(--ease-out) 400ms both;
+  /* Settle in after the page content. `backwards` holds the hidden start state
+     during the delay but releases it once done — so the retained transform can't
+     override the :active press below (and reduced-motion just shows it at rest). */
+  animation: inc-fab-in var(--dur-slow) var(--ease-out) 400ms backwards;
 }
 @keyframes inc-fab-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 .inc-report-fab:hover { color: var(--green); border-color: var(--green); }
