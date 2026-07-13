@@ -280,9 +280,18 @@ function ExhibitionDetailScreen({ id, onNav }) {
   const all = [...EXHIBITIONS, ...EXHIBITION_ARCHIVE];
   const ex = all.find((e) => e.id === id) || EXHIBITIONS[0];
   const artistRec = !ex.isGroup ? ARTISTS.find((a) => a.id === ex.artistId) : null;
+  // "Other exhibitions by …" includes both the artist's own solo shows and any
+  // group shows they were featured in. Solo shows key off artistId; group shows
+  // list participants as free-text names, so match those by slug or by this
+  // artist's name — mirroring ArtistScreen's resolver (#96).
+  const exArtistName = (!ex.isGroup && ex.artist) ? ex.artist.trim().toLowerCase() : "";
   const otherShows = (!ex.isGroup && ex.artistId)
     ? all
-        .filter((e) => e.artistId === ex.artistId && e.id !== ex.id)
+        .filter((e) => e.id !== ex.id && (
+          e.artistId === ex.artistId ||
+          (e.isGroup && (e.groupArtists || []).some((n) =>
+            slug(n) === ex.artistId || (exArtistName && n.trim().toLowerCase() === exArtistName)))
+        ))
         .sort((a, b) => (b.startISO || "").localeCompare(a.startISO || ""))
     : [];
   const artistLink = (label) => (
@@ -350,7 +359,7 @@ function ExhibitionDetailScreen({ id, onNav }) {
 
         {otherShows.length > 0 && (
           <section className="container inc-related">
-            <h3>{"Other exhibitions by " + ex.artist + " at Incubator"}</h3>
+            <h3>{"Other exhibitions featuring " + ex.artist + " at Incubator"}</h3>
             <div className="inc-related__items">
               {otherShows.map((o) => (
                 <div key={o.id} className="inc-related__row">
@@ -359,7 +368,10 @@ function ExhibitionDetailScreen({ id, onNav }) {
                     href={"#/exhibitions/" + o.id}
                     onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + o.id); }}
                   >
-                    <span className="inc-related__title">{o.title ? <em>{o.title}</em> : (o.artist || "Untitled")}</span>
+                    <span className="inc-related__title">
+                      {o.title ? <em>{o.title}</em> : (o.artist || "Untitled")}
+                      {o.isGroup ? <span className="inc-related__tag"> — Group show</span> : null}
+                    </span>
                     <span className="inc-related__dates">{o.dates}</span>
                   </a>
                 </div>
