@@ -132,66 +132,51 @@ function SiteError({ onRetry }) {
   );
 }
 
-// Route now lives in the real URL path (e.g. "/exhibitions/foo") so every page
-// is a distinct, crawlable URL that the prerender build (build/prerender.mjs)
-// emits as static HTML. Legacy hash links ("#/exhibitions/foo") are still
-// honoured and rewritten to the clean path on load, so old bookmarks/shares work.
+// Route lives in the hash (e.g. "#/exhibitions/foo") so the site works on any
+// static host and survives a refresh on a deep link. Hashes that don't start
+// with "/" are treated as in-page anchors, not routes.
 function getRoute() {
-  const hash = window.location.hash || "";
-  if (hash.startsWith("#/")) return hash.slice(1); // legacy #/… deep link
-  const p = window.location.pathname.replace(/\/+$/, ""); // trim trailing slash
-  return p === "" ? "/" : p;
+  const h = window.location.hash.replace(/^#/, "");
+  return h.startsWith("/") ? h : "/";
 }
 
 function App() {
   const [route, setRoute] = appState(getRoute());
   const [menuOpen, setMenuOpen] = appState(false);
-  // Prerendered pages ship data inline (js/data.jsx boots it synchronously), so
-  // we can render immediately with no loading flash. Only pages without inline
-  // data (or a bare shell) start in "loading".
-  const [dataState, setDataState] = appState(getSiteData() ? "ready" : "loading");
+  const [dataState, setDataState] = appState("loading"); // loading | ready | error
 
   const loadData = () => {
-    const haveData = !!getSiteData();
-    if (!haveData) setDataState("loading");
+    setDataState("loading");
     loadSiteData()
       .then(() => setDataState("ready"))
-      // Keep showing inline data if a background refresh fails; only error when
-      // we have nothing to show.
-      .catch(() => setDataState(getSiteData() ? "ready" : "error"));
+      .catch(() => setDataState("error"));
   };
 
   const navigate = (path) => {
-    if (getRoute() !== path) {
-      window.history.pushState({}, "", path);
+    const target = "#" + path;
+    if (window.location.hash !== target) {
+      window.location.hash = target; // fires hashchange -> updates route
+    } else {
+      setRoute(getRoute());
+      // Instant, not smooth: `html { scroll-behavior: smooth }` (app.css) would
+      // otherwise animate this reset, and the scroll-reveal layout effect would
+      // then measure element positions before the page returned to the top.
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     }
-    setRoute(path);
-    // Instant, not smooth: `html { scroll-behavior: smooth }` (app.css) would
-    // otherwise animate this reset, and the scroll-reveal layout effect would
-    // then measure element positions before the page returned to the top.
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     setMenuOpen(false);
   };
 
-  // Rewrite any legacy hash deep link to the clean path once, on mount. Data is
-  // normally already loaded before the app mounts (see mountApp below), so we
-  // only fetch here to recover if that pre-mount load failed.
-  appEffect(() => {
-    if (window.location.hash.startsWith("#/")) {
-      window.history.replaceState({}, "", getRoute());
-    }
-    if (dataState !== "ready") loadData();
-  }, []);
+  // Fetch site content (shows + artists) once on mount.
+  appEffect(() => { loadData(); }, []);
 
-  // Back/forward through History-API navigations.
   appEffect(() => {
-    const onPop = () => {
+    const onHash = () => {
       setRoute(getRoute());
       setMenuOpen(false);
       window.scrollTo({ top: 0, left: 0, behavior: "instant" }); // see navigate()
     };
-    window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
   // In-page anchor links inside the screens (#installation, #release,
@@ -280,17 +265,5 @@ function App() {
   );
 }
 
-function mountApp() {
-  ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-}
-
-// Prerendered pages paint full content into #root before any JS runs. To swap
-// that static content for the live app in a single step — no "Loading…" flash,
-// no yank — we wait for site data before the first mount. The App still starts
-// in "ready" (getSiteData() is set by then) and renders the same content. If the
-// pre-mount fetch fails we mount anyway and App's effect retries / shows an error.
-if (getSiteData()) {
-  mountApp();
-} else {
-  loadSiteData().then(mountApp, mountApp);
-}
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);

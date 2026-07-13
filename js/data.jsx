@@ -23,8 +23,12 @@ let SITE_DATA = null;
 
 const DATA_URL = "data/shows.json";
 
-// Populate the shared bindings from a parsed payload (used by the fetch path).
-function applySiteData(data) {
+async function loadSiteData() {
+  // no-store so an admin sees their edit immediately after the Pages redeploy.
+  const res = await fetch(DATA_URL, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Failed to load site data (${res.status})`);
+  const data = await res.json();
+
   SITE_DATA = data;
   ARTISTS = Array.isArray(data.artists) ? data.artists : [];
   PRESS = Array.isArray(data.press) ? data.press : [];
@@ -32,16 +36,9 @@ function applySiteData(data) {
   EXHIBITIONS = (Array.isArray(data.exhibitions) ? data.exhibitions : []).filter((e) => !e.hidden);
   ABOUT = (data.about && typeof data.about === "object") ? data.about : null;
   CONTACT = (data.contact && typeof data.contact === "object") ? data.contact : null;
+
   Object.assign(window, { EXHIBITIONS, ARTISTS, PRESS, EXHIBITION_ARCHIVE, ABOUT, CONTACT, SITE_DATA });
   return data;
-}
-
-async function loadSiteData() {
-  // no-store so an admin sees their edit immediately after the Pages redeploy.
-  // Relative URL resolves against <base href="/">, so it works at any route depth.
-  const res = await fetch(DATA_URL, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Failed to load site data (${res.status})`);
-  return applySiteData(await res.json());
 }
 
 Object.assign(window, {

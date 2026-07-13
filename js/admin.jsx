@@ -1,4 +1,4 @@
-// Incubator — staff admin page (/admin), unlisted (not in the public nav).
+// Incubator — staff admin page (#/admin), unlisted (not in the public nav).
 //
 // Lets gallery staff add / edit / hide shows and view open issue reports.
 // All writes go to the Worker, which validates the shared password SERVER-SIDE
