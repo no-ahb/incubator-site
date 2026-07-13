@@ -26,8 +26,10 @@ function MobileMenu({ open, onNav, onClose }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
-  // Kept mounted so the reveal/collapse can transition both ways; the
-  // .is-open class drives the animation (see .inc-overlay in site.css).
+  // Kept mounted so the panel can unfold/roll-up both ways. It sits just below
+  // the real header and never covers the INCUBATOR sign — the header hamburger
+  // (which morphs to a ✕) is the close control, so there's no duplicate wordmark
+  // to flash. See .inc-overlay in site.css.
   return (
     <div
       className={"inc-overlay" + (open ? " is-open" : "")}
@@ -36,19 +38,6 @@ function MobileMenu({ open, onNav, onClose }) {
       aria-label="Menu"
       aria-hidden={open ? undefined : "true"}
     >
-      <div className="inc-overlay__head container">
-        <a
-          className="inc-header__brand"
-          href="#/"
-          onClick={(e) => { e.preventDefault(); onNav("/"); }}
-        >
-          <Wordmark />
-        </a>
-        <button className="inc-overlay__close" aria-label="Close menu" onClick={onClose}>
-          <span aria-hidden="true" style={{ fontSize: 22, lineHeight: 1 }}>✕</span>
-        </button>
-      </div>
-
       <nav className="inc-overlay__nav container" aria-label="Primary">
         <ul>
           {items.map(([path, label]) => (
