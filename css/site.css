@@ -316,10 +316,91 @@ ul { list-style: none; padding: 0; margin: 0; }
 .inc-prose em { font-style: italic; }
 .inc-prose strong { font-weight: 600; }
 
-/* Press release and artist biography span the full content width as a single
-   column, rather than the narrow measure used for other prose (#91). */
-.inc-detail__release .inc-prose,
+/* Artist biography spans the full content width as a single column, rather than
+   the narrow measure used for other prose (#91). */
 .inc-detail__bio .inc-prose { max-width: none; }
+
+/* ---------- Press release: set like published editorial text -------------
+   Spans the full content width (as before, #91), now with editorial spacing,
+   proper quotation blocks, attributions and a colophon byline. Numerals are set
+   as oldstyle figures and common ligatures are enabled so running text reads
+   like a gallery publication rather than a web article. */
+.inc-detail__release .inc-prose.inc-release {
+  max-width: none;                 /* full content width, left-aligned with the page */
+  font-feature-settings: "kern" 1, "liga" 1, "clig" 1, "onum" 1, "pnum" 1;
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  hanging-punctuation: first allow-end last;   /* Safari: optically hang quotes/punctuation */
+}
+
+/* Body paragraphs — spaced, no first-line indent (space OR indent, never both). */
+.inc-release .inc-release__para {
+  font-size: 18px;
+  line-height: 1.62;
+  margin: 0 0 1.3em;               /* extra space between paragraphs */
+  text-wrap: pretty;               /* discourage widows / short last lines */
+  hyphens: none;
+}
+
+/* Quotation block — an epigraph or pulled quote. Italic, a shade larger, set on
+   a reading measure and left-aligned within the full-width column, with the
+   opening quotation mark hung into the left margin for an optically flush edge. */
+.inc-release .inc-release__quote {
+  margin: var(--s-8) 0 var(--s-5);
+  padding: 0;
+  border: 0;
+  max-width: 54ch;
+  color: var(--ink);
+  font-style: italic;
+  font-size: 21px;
+  line-height: 1.42;
+  text-indent: -0.46em;            /* HTML path: hang the leading “ (text is direct) */
+  text-wrap: balance;              /* even, symmetrical lines for short quotes */
+}
+.inc-release > .inc-release__quote:first-child { margin-top: 0; }
+.inc-release .inc-release__quote em { font-style: normal; }  /* emphasis flips within italic */
+
+/* Opt-in first-line indent on a body paragraph (toolbar → →¶). */
+.inc-release .inc-release__para--indent { text-indent: 1.5em; }
+
+/* Attribution — the dashed credit line beneath a quotation, set apart on its own.
+   Spans the full width so a long credit doesn't wrap awkwardly under the quote. */
+.inc-release .inc-release__attrib {
+  margin: 0 0 var(--s-10);
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+  color: var(--ink-3);
+  text-indent: 0;
+  text-wrap: pretty;
+}
+
+/* Byline / colophon — the closing credit, set apart by a hairline rule. */
+.inc-release .inc-release__byline {
+  margin: var(--s-12) 0 0;
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--hairline);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+  font-style: italic;
+  text-indent: 0;
+}
+
+@media (max-width: 640px) {
+  .inc-release .inc-release__para { font-size: 17px; }
+  .inc-release .inc-release__quote { font-size: 19px; }
+}
+
+/* Rich-text blocks inside a plain-prose context (e.g. artist bios). */
+.inc-prose .inc-prose__quote {
+  margin: var(--s-4) 0;
+  padding-left: var(--s-4);
+  border-left: 2px solid var(--hairline);
+  font-style: italic;
+  text-indent: -0.42em;
+}
+.inc-prose .inc-prose__quote em { font-style: normal; }
+.inc-prose .inc-prose__p--indent { text-indent: 1.5em; }
 
 .inc-detail__more { margin-top: var(--s-6); }
 .inc-detail__more a { font-size: 15px; }

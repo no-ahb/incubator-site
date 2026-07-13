@@ -324,6 +324,58 @@ async function handleAdminUpload(request, env, cors) {
   return json({ ok: true, path: result.path }, 200, cors);
 }
 
+// Canonical, whitelist-only sanitiser for rich text (press releases & bios).
+// The admin editor already emits a clean canonical string; this is the trust
+// boundary that also defends against a hand-crafted POST (e.g. if the admin
+// password leaks). Without a DOM we tokenise tags and re-emit *canonical
+// literals* only — attacker-controlled attribute text is never passed through,
+// so the output can only ever contain <p>/<blockquote>/<strong>/<em>/<br> plus
+// text. Allowed <p> classes: attrib, byline, indent. The public renderer
+// re-canonicalises again, so this is defence in depth.
+const RICH_BLOCK_TAGS = { p: "p", div: "p", blockquote: "blockquote", h1: "p", h2: "p", h3: "p", h4: "p", h5: "p", h6: "p", li: "p" };
+const RICH_INLINE_TAGS = { strong: "strong", b: "strong", em: "em", i: "em" };
+function richClassAttr(tagText) {
+  const m = /class\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/i.exec(tagText);
+  if (!m) return "";
+  const v = (m[2] || m[3] || m[4] || "").toLowerCase();
+  const cls = /\b(attrib|byline|indent)\b/.exec(v);
+  return cls ? ' class="' + cls[1] + '"' : "";
+}
+function sanitizeRichHtml(input) {
+  const s = String(input == null ? "" : input);
+  let out = "";
+  const re = /<[^>]*>/g;
+  let last = 0, m;
+  const emitText = (t) => { if (t) out += t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
+  while ((m = re.exec(s))) {
+    emitText(s.slice(last, m.index));
+    last = re.lastIndex;
+    const tagText = m[0];
+    const tm = /^<\s*(\/?)\s*([a-zA-Z0-9]+)/.exec(tagText);
+    if (!tm) continue; // comment / doctype / stray "<>" → drop
+    const closing = tm[1] === "/";
+    const name = tm[2].toLowerCase();
+    if (name === "br") { if (!closing) out += "<br>"; continue; }
+    if (RICH_INLINE_TAGS[name]) { out += closing ? "</" + RICH_INLINE_TAGS[name] + ">" : "<" + RICH_INLINE_TAGS[name] + ">"; continue; }
+    if (RICH_BLOCK_TAGS[name]) {
+      const tag = RICH_BLOCK_TAGS[name];
+      out += closing ? "</" + tag + ">" : "<" + tag + (tag === "p" ? richClassAttr(tagText) : "") + ">";
+      continue;
+    }
+    // any other tag (script, img, style, a, on*-bearing, …) is dropped entirely
+  }
+  emitText(s.slice(last));
+  return out.trim();
+}
+
+// Accept rich text as either the new canonical HTML string (sanitised) or the
+// legacy array of plain paragraph strings (kept as-is for un-migrated content).
+function normalizeRich(value) {
+  if (typeof value === "string") return sanitizeRichHtml(value);
+  if (Array.isArray(value)) return value.filter((p) => typeof p === "string" && p.trim()).map((p) => p.trim());
+  return "";
+}
+
 // Build a clean show entry from posted fields, preserving the field shape the
 // site reads. Unknown fields are dropped.
 function normalizeShow(input) {
@@ -337,11 +389,8 @@ function normalizeShow(input) {
   const id = slugify(input.id) || slugify(isGroup ? title : artist + " " + title);
   const artistId = isGroup ? null : (slugify(input.artistId) || slugify(artist));
 
-  let pressRelease = input.pressRelease;
-  if (typeof pressRelease === "string") {
-    pressRelease = pressRelease.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
-  }
-  if (!Array.isArray(pressRelease)) pressRelease = [];
+  // Rich text: new canonical HTML string, or legacy plain-paragraph array.
+  const pressRelease = normalizeRich(input.pressRelease);
 
   const installation = Array.isArray(input.installation)
     ? input.installation.filter((s) => typeof s === "string" && s)
@@ -389,8 +438,9 @@ async function handleAdminSaveShow(request, env, cors) {
     return json({ ok: false, error: show.isGroup ? "A group show needs a title." : "Artist and title are required." }, 400, cors);
   }
 
-  let bio = payload.artistBio;
-  if (typeof bio === "string") bio = bio.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  // Rich text: new canonical HTML string, or legacy plain-paragraph array.
+  const bio = normalizeRich(payload.artistBio);
+  const bioHasContent = !!bio && bio.length > 0; // string or array both use .length
 
   const result = await commitJsonUpdate(env, owner, repo, SHOWS_PATH, (data) => {
     data.exhibitions = Array.isArray(data.exhibitions) ? data.exhibitions : [];
@@ -415,10 +465,10 @@ async function handleAdminSaveShow(request, env, cors) {
     if (show.artistId) {
       const aIdx = data.artists.findIndex((a) => a.id === show.artistId);
       if (aIdx >= 0) {
-        if (bio && bio.length) data.artists[aIdx].bio = bio;
+        if (bioHasContent) data.artists[aIdx].bio = bio;
         if (!data.artists[aIdx].name) data.artists[aIdx].name = show.artist;
       } else {
-        data.artists.push({ id: show.artistId, name: show.artist, bio: bio && bio.length ? bio : [] });
+        data.artists.push({ id: show.artistId, name: show.artist, bio: bioHasContent ? bio : [] });
       }
     }
 

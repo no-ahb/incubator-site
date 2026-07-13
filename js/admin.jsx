@@ -164,6 +164,106 @@ function AdminImagePicker({ label, multiple, items, onChange }) {
   );
 }
 
+/* ---------- RICH TEXT EDITOR ---------------------------------------------
+   A small WYSIWYG over a single contenteditable region. It emits only the
+   canonical, whitelist-only HTML the public renderer understands (see the
+   RichText helpers in components.jsx): block <p>/<blockquote> with optional
+   attrib/byline/indent classes and inline <strong>/<em>/<br>. The editor never
+   trusts its own DOM output — every change is passed through RichText.canonicalize
+   before it reaches form state, and the Worker sanitises again on save. */
+
+// The direct child blocks of the editor that intersect the current selection.
+function rteSelectedBlocks(editor) {
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return [];
+  const range = sel.getRangeAt(0);
+  // Only consider a selection that actually sits inside this editor.
+  if (!editor.contains(range.commonAncestorContainer)) return [];
+  const kids = Array.from(editor.children);
+  const hit = kids.filter((k) => range.intersectsNode(k));
+  return hit.length ? hit : kids.slice(0, 1);
+}
+// Re-tag the selected block(s) — e.g. to <blockquote>, or <p class="attrib">.
+function rteSetBlock(editor, tag, cls) {
+  const blocks = rteSelectedBlocks(editor);
+  let last = null;
+  blocks.forEach((b) => {
+    const el = document.createElement(tag);
+    if (cls) el.className = cls;
+    while (b.firstChild) el.appendChild(b.firstChild);
+    if (!el.firstChild) el.appendChild(document.createElement("br"));
+    b.replaceWith(el);
+    last = el;
+  });
+  if (last) {
+    const r = document.createRange();
+    r.selectNodeContents(last);
+    r.collapse(false);
+    const s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+  }
+}
+function rteToggleIndent(editor) {
+  rteSelectedBlocks(editor).forEach((b) => { if (b.tagName === "P") b.classList.toggle("indent"); });
+}
+
+function RichTextEditor({ value, onChange, roles, ariaLabel }) {
+  const ref = adRef(null);
+  // Initialise the contenteditable DOM once; thereafter it is uncontrolled so
+  // the caret never jumps. Form state still holds the canonical string.
+  adEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.innerHTML = value && value.trim() ? value : "<p><br></p>";
+    try { document.execCommand("defaultParagraphSeparator", false, "p"); } catch (e) {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function emit() {
+    if (ref.current) onChange(window.RichText.canonicalize(ref.current.innerHTML));
+  }
+  function withEditor(fn) {
+    return () => { if (ref.current) { fn(ref.current); emit(); ref.current.focus(); } };
+  }
+
+  const Btn = ({ onDo, label, title }) => (
+    <button
+      type="button"
+      className="inc-rte__btn"
+      title={title}
+      // mousedown+preventDefault keeps the text selection while the button is pressed
+      onMouseDown={(e) => { e.preventDefault(); onDo(); }}
+    >
+      {label}
+    </button>
+  );
+
+  return (
+    <div className="inc-rte">
+      <div className="inc-rte__bar" role="toolbar" aria-label="Formatting">
+        <Btn title="Bold (⌘B)" label={<strong>B</strong>} onDo={() => { document.execCommand("bold"); emit(); }} />
+        <Btn title="Italic (⌘I)" label={<em>I</em>} onDo={() => { document.execCommand("italic"); emit(); }} />
+        <span className="inc-rte__sep" />
+        <Btn title="Body paragraph" label="¶" onDo={withEditor((el) => rteSetBlock(el, "p", ""))} />
+        {roles && <Btn title="Quotation block" label="“ ”" onDo={withEditor((el) => rteSetBlock(el, "blockquote", ""))} />}
+        {roles && <Btn title="Attribution (credit under a quote)" label="— Attr" onDo={withEditor((el) => rteSetBlock(el, "p", "attrib"))} />}
+        {roles && <Btn title="Byline / colophon" label="Byline" onDo={withEditor((el) => rteSetBlock(el, "p", "byline"))} />}
+        <Btn title="Indent first line" label="→¶" onDo={withEditor((el) => rteToggleIndent(el))} />
+      </div>
+      <div
+        ref={ref}
+        className="inc-rte__area inc-prose"
+        contentEditable
+        suppressContentEditableWarning
+        aria-label={ariaLabel}
+        onInput={emit}
+        onBlur={emit}
+      />
+    </div>
+  );
+}
+
 /* ---------- SHOW FORM (add / edit) ---------------------------------------- */
 function AdminShowForm({ pw, existing, onSaved, onCancel }) {
   const init = existing || {};
@@ -175,8 +275,17 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
   const [endISO, setEndISO] = adState(init.endISO || "");
   const [current, setCurrent] = adState(!!init.current);
   const [privateView, setPrivateView] = adState(init.privateView || "");
-  const [pressRelease, setPressRelease] = adState(Array.isArray(init.pressRelease) ? init.pressRelease.join("\n\n") : (init.pressRelease || ""));
-  const [artistBio, setArtistBio] = adState("");
+  // Press release & bio are edited as canonical rich-text HTML. Legacy shows
+  // (paragraph arrays) are converted up front so existing content opens already
+  // structured; the bio is prefilled from the loaded site data.
+  const [pressRelease, setPressRelease] = adState(() => window.RichText.fromRelease(init.pressRelease));
+  const [artistBio, setArtistBio] = adState(() => {
+    if (init.isGroup) return "";
+    const aid = init.artistId || slug(init.artist || "");
+    const data = (window.getSiteData && window.getSiteData()) || {};
+    const a = (data.artists || []).find((x) => x.id === aid);
+    return a && a.bio ? window.RichText.fromProse(a.bio) : "";
+  });
   const [hero, setHero] = adState(init.heroImage ? [{ key: "hero", path: init.heroImage }] : []);
   const [installs, setInstalls] = adState(
     (init.installation || [])
@@ -276,12 +385,13 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
       <AdminImagePicker label="Installation views" multiple={true} items={installs} onChange={setInstalls} />
 
       <label className="inc-report__label">Press release</label>
-      <textarea className="inc-report__textarea" rows={8} value={pressRelease} onChange={(e) => setPressRelease(e.target.value)} placeholder="One paragraph per block, separated by a blank line." />
+      <p className="inc-admin__hint">Select text, then use the toolbar for <strong>bold</strong>/<em>italic</em>, quotation blocks, attributions and the byline. Enter starts a new paragraph.</p>
+      <RichTextEditor value={pressRelease} onChange={setPressRelease} roles={true} ariaLabel="Press release" />
 
       {!isGroup && (
         <>
-          <label className="inc-report__label">Artist bio {existing ? "(leave blank to keep existing)" : "(optional)"}</label>
-          <textarea className="inc-report__textarea" rows={4} value={artistBio} onChange={(e) => setArtistBio(e.target.value)} placeholder="Short biography, blank line between paragraphs." />
+          <label className="inc-report__label">Artist bio (optional)</label>
+          <RichTextEditor value={artistBio} onChange={setArtistBio} roles={false} ariaLabel="Artist bio" />
         </>
       )}
 

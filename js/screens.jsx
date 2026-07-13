@@ -348,7 +348,7 @@ function ExhibitionDetailScreen({ id, onNav }) {
 
         <section id="release" className="container inc-detail__release">
           <h3>Press release</h3>
-          <Prose paragraphs={ex.pressRelease || []} />
+          <PressRelease paragraphs={ex.pressRelease || []} />
         </section>
 
         {!ex.isGroup && ex.artist && (
