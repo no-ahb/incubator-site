@@ -42,7 +42,7 @@ function riCaptureContext() {
   const dpr = window.devicePixelRatio || 1;
   return {
     page: window.location.href,
-    route: window.location.hash || "(home)",
+    route: window.location.pathname === "/" ? "(home)" : window.location.pathname,
     viewport: `${window.innerWidth}x${window.innerHeight}${dpr !== 1 ? ` @${dpr}x` : ""}`,
     userAgent: window.navigator.userAgent,
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",

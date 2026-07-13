@@ -1,0 +1,9 @@
+# Incubator — https://incubatorart.com
+# Search and AI crawlers are welcome; we want exhibitions to be discoverable
+# and citable. Only the admin app is off-limits.
+
+User-agent: *
+Allow: /
+Disallow: /admin
+
+Sitemap: https://incubatorart.com/sitemap.xml

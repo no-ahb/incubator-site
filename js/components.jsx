@@ -106,7 +106,7 @@ function Header({ route, onNav, onOpenMenu, compact, menuOpen }) {
     <header className={"inc-header" + (compact ? " inc-header--compact" : "")}>
       <div className="inc-header__inner container">
         <a
-          href="#/"
+          href="/"
           className="inc-header__brand"
           onClick={(e) => { e.preventDefault(); onNav && onNav("/"); }}
         >
@@ -119,7 +119,7 @@ function Header({ route, onNav, onOpenMenu, compact, menuOpen }) {
               {items.map((it) => (
                 <li key={it.id}>
                   <a
-                    href={"#/" + it.id}
+                    href={"/" + it.id}
                     className={activeId === it.id ? "is-active" : ""}
                     onClick={(e) => { e.preventDefault(); onNav && onNav("/" + it.id); }}
                   >
@@ -242,7 +242,7 @@ function ExhibitionCard({ ex, onNav, eyebrow }) {
   return (
     <a
       className="inc-card"
-      href={"#/exhibitions/" + ex.id}
+      href={"/exhibitions/" + ex.id}
       onClick={(e) => { e.preventDefault(); onNav && onNav("/exhibitions/" + ex.id); }}
     >
       <Poster ex={ex} size="card" />
@@ -265,7 +265,7 @@ function ExhibitionsListRow({ ex, onNav, onHover }) {
     <li className="inc-list__row">
       <a
         className="inc-list__link"
-        href={"#/exhibitions/" + ex.id}
+        href={"/exhibitions/" + ex.id}
         onMouseEnter={() => onHover && onHover(ex)}
         onFocus={() => onHover && onHover(ex)}
         onClick={(e) => { e.preventDefault(); onNav && onNav("/exhibitions/" + ex.id); }}

@@ -60,7 +60,7 @@ function HomeScreen({ onNav }) {
       <section className="inc-hero">
         <a
           className="inc-hero__media"
-          href={"#/exhibitions/" + current.id}
+          href={"/exhibitions/" + current.id}
           onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + current.id); }}
         >
           <Poster ex={current} size="hero" />
@@ -69,7 +69,7 @@ function HomeScreen({ onNav }) {
           <span className="inc-eyebrow">{exhibitionStatus(current, { heroFallback: true })}</span>
           <h1 className="inc-hero__title">
             <a
-              href={"#/exhibitions/" + current.id}
+              href={"/exhibitions/" + current.id}
               onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + current.id); }}
             >
               {current.isGroup ? <em>{current.title}</em> : <>{current.artist}{current.title ? <>:&nbsp;<em>{current.title}</em></> : null}</>}
@@ -78,7 +78,7 @@ function HomeScreen({ onNav }) {
           <div className="inc-meta">{current.dates}</div>
           <a
             className="inc-hero__cta"
-            href={"#/exhibitions/" + current.id}
+            href={"/exhibitions/" + current.id}
             onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + current.id); }}
           >
             Read more →
@@ -94,7 +94,7 @@ function HomeScreen({ onNav }) {
         </header>
         <div className="inc-coming">
           <a
-            href={"#/exhibitions/" + next.id}
+            href={"/exhibitions/" + next.id}
             className="inc-card"
             onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + next.id); }}
           >
@@ -108,7 +108,7 @@ function HomeScreen({ onNav }) {
             <div className="inc-meta">{next.dates}</div>
             <a
               className="inc-hero__cta"
-              href={"#/exhibitions/" + next.id}
+              href={"/exhibitions/" + next.id}
               onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + next.id); }}
             >
               Read more →
@@ -122,7 +122,7 @@ function HomeScreen({ onNav }) {
       <section className="inc-section container">
         <header className="inc-section__head">
           <h2>Past exhibitions</h2>
-          <a href="#/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>View all</a>
+          <a href="/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>View all</a>
         </header>
         <div className="inc-past">
           {past.map((ex) => (
@@ -295,7 +295,7 @@ function ExhibitionDetailScreen({ id, onNav }) {
     : [];
   const artistLink = (label) => (
     <a
-      href={"#/artists/" + ex.artistId}
+      href={"/artists/" + ex.artistId}
       onClick={(e) => { e.preventDefault(); onNav("/artists/" + ex.artistId); }}
     >
       {label}
@@ -328,7 +328,7 @@ function ExhibitionDetailScreen({ id, onNav }) {
                       {i > 0 ? ", " : ""}
                       {aid ? (
                         <a
-                          href={"#/artists/" + aid}
+                          href={"/artists/" + aid}
                           onClick={(e) => { e.preventDefault(); onNav("/artists/" + aid); }}
                         >{n}</a>
                       ) : n}
@@ -364,7 +364,7 @@ function ExhibitionDetailScreen({ id, onNav }) {
                 <div key={o.id} className="inc-related__row">
                   <a
                     className="inc-related__link"
-                    href={"#/exhibitions/" + o.id}
+                    href={"/exhibitions/" + o.id}
                     onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + o.id); }}
                   >
                     <span className="inc-related__title">
@@ -380,7 +380,7 @@ function ExhibitionDetailScreen({ id, onNav }) {
         )}
 
         <p className="container inc-back">
-          <a href="#/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>← Back to exhibitions</a>
+          <a href="/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>← Back to exhibitions</a>
         </p>
       </article>
     </main>
@@ -440,7 +440,7 @@ function ArtistScreen({ id, onNav }) {
               {ex.title ? <h2><em>{ex.title}</em></h2> : null}
               <div className="inc-detail__show-meta">
                 {ex.isGroup ? "Group show" : "Solo show"} · {ex.dates} ·{" "}
-                <a href={"#/exhibitions/" + ex.id} onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + ex.id); }}>View exhibition →</a>
+                <a href={"/exhibitions/" + ex.id} onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + ex.id); }}>View exhibition →</a>
               </div>
             </header>
 
@@ -461,7 +461,7 @@ function ArtistScreen({ id, onNav }) {
         </p>
 
         <p className="container inc-back">
-          <a href="#/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>← Back to exhibitions</a>
+          <a href="/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>← Back to exhibitions</a>
         </p>
       </article>
     </main>
