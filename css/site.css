@@ -259,6 +259,14 @@ ul { list-style: none; padding: 0; margin: 0; }
 .inc-prose em { font-style: italic; }
 .inc-prose strong { font-weight: 600; }
 
+/* Press release fills the full content width. On wide viewports it flows as two
+   balanced columns rather than one narrow measure-limited column, keeping a
+   readable line length while using the whole width (#91). */
+.inc-detail__release .inc-prose { max-width: none; }
+@media (min-width: 900px) {
+  .inc-detail__release .inc-prose { columns: 2; column-gap: var(--s-16); }
+}
+
 .inc-detail__more { margin-top: var(--s-6); }
 .inc-detail__more a { font-size: 15px; }
 
@@ -355,7 +363,9 @@ ul { list-style: none; padding: 0; margin: 0; }
   margin-top: 8px; border-radius: 0;
   transition: background var(--dur-fast) var(--ease);
 }
-.inc-btn:hover { background: var(--green); }
+/* Keep the label light on hover: the global `a:hover` turns links green, which
+   on the green hover background left the text invisible (#94). */
+.inc-btn:hover { background: var(--green-hover); color: var(--paper); }
 
 /* Zoomable lead image — reset the wrapping button to render like the poster. */
 .inc-poster-zoom {
@@ -380,8 +390,9 @@ ul { list-style: none; padding: 0; margin: 0; }
   align-items: start;
   font-family: var(--font-serif); font-size: 14px; line-height: 1.55;
 }
-/* Both columns are left-justified within their grid cell (#81). */
-.inc-footer__contact { justify-self: start; text-align: left; }
+/* Contact column hugs the right edge of the browser (#93); the brand column
+   stays left, giving the footer a balanced left/right split. */
+.inc-footer__contact { justify-self: end; text-align: right; }
 .inc-footer p { margin: var(--s-3) 0 0; }
 .inc-footer a { color: var(--ink); border-bottom: 1px solid transparent; }
 .inc-footer a:hover { color: var(--green); border-bottom-color: currentColor; }

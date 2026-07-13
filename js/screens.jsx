@@ -1,17 +1,19 @@
 // Incubator mockup — page-type screens.
 // Each screen is the full body for one route, with header + footer outside.
 
-const { useState: msState, useMemo: msMemo } = React;
+const { useState: msState, useMemo: msMemo, useEffect: msEffect } = React;
 
-// Eyebrow label for a show's status, based on the real current date. A show
-// still flagged "current" whose end date has passed reads "Most recent
-// exhibition" until the next show is published, rather than "Current".
-// heroFallback: on the home hero, an unflagged fallback show is the most
-// recent one (not a "past" one).
+// Eyebrow label for a show's status, decided purely by the real current date
+// rather than the admin "current" flag (which goes stale once a later show
+// opens — see #90). A show whose date range spans today is "Current"; one that
+// hasn't opened yet is "Forthcoming"; anything else is past. heroFallback: on
+// the home hero, a past fallback show reads as the "Most recent exhibition".
 function exhibitionStatus(ex, { heroFallback = false } = {}) {
   const todayISO = new Date().toISOString().slice(0, 10);
+  const started = ex.startISO && ex.startISO <= todayISO;
   const ended = ex.endISO && ex.endISO < todayISO;
-  if (ex.current) return ended ? "Most recent exhibition" : "Current exhibition";
+  if (started && !ended) return "Current exhibition";
+  if (ex.startISO && ex.startISO > todayISO) return "Forthcoming";
   return heroFallback ? "Most recent exhibition" : "Past exhibition";
 }
 
@@ -21,7 +23,15 @@ function exhibitionStatus(ex, { heroFallback = false } = {}) {
 function HomeScreen({ onNav }) {
   const TODAY = new Date().toISOString().slice(0, 10);
   const all = [...EXHIBITIONS, ...EXHIBITION_ARCHIVE];
-  const current = EXHIBITIONS.find((e) => e.current) || EXHIBITIONS[0];
+  // Pick the lead show: an admin-pinned show only while it's genuinely on view,
+  // otherwise whatever is on view now, otherwise the most recently opened show.
+  // The "current" flag is honoured only among on-view shows so a stale flag left
+  // on an ended show can't outrank a newer one (#90).
+  const started = EXHIBITIONS
+    .filter((e) => (e.startISO || "") <= TODAY)
+    .sort((a, b) => (b.startISO || "").localeCompare(a.startISO || ""));
+  const onView = started.filter((e) => !e.endISO || e.endISO >= TODAY);
+  const current = onView.find((e) => e.current) || onView[0] || started[0] || EXHIBITIONS[0];
 
   // No visible exhibitions (e.g. all hidden, or a brand-new gallery). Render a
   // calm placeholder rather than dereferencing an undefined `current`.
@@ -38,10 +48,10 @@ function HomeScreen({ onNav }) {
     );
   }
   const next = EXHIBITIONS
-    .filter((e) => !e.current && e.startISO > TODAY)
+    .filter((e) => e.id !== current.id && (e.startISO || "") > TODAY)
     .sort((a, b) => (a.startISO || "").localeCompare(b.startISO || ""))[0];
   const past = all
-    .filter((e) => !e.current && (!next || e.id !== next.id))
+    .filter((e) => e.id !== current.id && (!next || e.id !== next.id))
     .sort((a, b) => (b.startISO || "").localeCompare(a.startISO || ""))
     .slice(0, 8);
 
@@ -146,7 +156,11 @@ function ExhibitionsListScreen({ onNav }) {
     if (q) {
       xs = xs.filter((e) =>
         (e.artist || "").toLowerCase().includes(q) ||
-        (e.title || "").toLowerCase().includes(q)
+        (e.title || "").toLowerCase().includes(q) ||
+        // Group-show participants are listed only in the show's cast, and many
+        // have no artist page of their own — match them so a search still
+        // surfaces the group show they're in (#96).
+        (e.groupArtists || []).some((n) => n.toLowerCase().includes(q))
       );
     }
     xs.sort((a, b) =>
@@ -160,6 +174,20 @@ function ExhibitionsListScreen({ onNav }) {
   const [hovered, setHovered] = msState(sorted[0]);
   // keep hovered in sync if filter empties the list
   const preview = hovered && sorted.find((e) => e.id === hovered.id) ? hovered : sorted[0];
+
+  // Warm the browser cache for the hover preview posters during idle time so the
+  // image is already loaded on first hover instead of fetching on demand (#95).
+  // Skipped on data-saver / slow connections to avoid a heavy background load.
+  msEffect(() => {
+    const conn = navigator.connection;
+    if (conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || ""))) return;
+    const urls = all.map((e) => e.heroImage).filter(Boolean);
+    const warm = () => urls.forEach((src) => { const img = new Image(); img.src = src; });
+    const ric = window.requestIdleCallback;
+    if (ric) { const h = ric(warm); return () => window.cancelIdleCallback && window.cancelIdleCallback(h); }
+    const t = setTimeout(warm, 200);
+    return () => clearTimeout(t);
+  }, [all]);
 
   return (
     <main className="inc-main">
@@ -383,10 +411,13 @@ function ArtistScreen({ id, onNav }) {
   if (!artist || shows.length === 0) {
     return <div className="container" style={{padding:"80px 0"}}>Not found.</div>;
   }
+  // Header image comes from the artist's own (most recent) solo show, not from a
+  // group show they merely appeared in — those images aren't theirs (#97).
+  const heroShow = shows.find((e) => !e.isGroup) || shows[0];
   return (
     <main className="inc-main">
       <article className="inc-detail">
-        <Poster ex={shows[0]} size="hero" />
+        <Poster ex={heroShow} size="hero" />
         <div className="container inc-detail__head">
           <span className="inc-eyebrow">Artist</span>
           <h1>{artist.name}</h1>
@@ -482,9 +513,9 @@ function AboutScreen() {
         </div>
 
         <section className="container inc-detail__bio" style={{ paddingInline: 0, marginTop: "var(--s-16)" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "var(--s-3) var(--s-10)", fontSize: 16, maxWidth: 720 }}>
-            <span><strong>Angelica Jopling</strong></span><span>Founding Director</span>
-            <span><strong>Isabella Mackintosh</strong></span><span>Gallery Manager</span>
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--s-3)", fontSize: 16 }}>
+            <p style={{ margin: 0 }}><strong>Angelica Jopling</strong> — <strong>Founding Director</strong></p>
+            <p style={{ margin: 0 }}><strong>Isabella Mackintosh</strong> — <strong>Gallery Manager</strong></p>
           </div>
         </section>
       </article>
