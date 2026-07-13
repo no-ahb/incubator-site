@@ -428,12 +428,8 @@ function ArtistScreen({ id, onNav }) {
             <header className="container inc-detail__show-head">
               {ex.title ? <h2><em>{ex.title}</em></h2> : null}
               <div className="inc-detail__show-meta">
-                {ex.isGroup ? (
-                  <>
-                    Group show · {ex.dates} ·{" "}
-                    <a href={"#/exhibitions/" + ex.id} onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + ex.id); }}>View exhibition →</a>
-                  </>
-                ) : ex.dates}
+                {ex.isGroup ? "Group show" : "Solo show"} · {ex.dates} ·{" "}
+                <a href={"#/exhibitions/" + ex.id} onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + ex.id); }}>View exhibition →</a>
               </div>
             </header>
 
@@ -513,9 +509,9 @@ function AboutScreen() {
         </div>
 
         <section className="container inc-detail__bio" style={{ paddingInline: 0, marginTop: "var(--s-16)" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--s-3)", fontSize: 16 }}>
-            <p style={{ margin: 0 }}><strong>Angelica Jopling</strong> — <strong>Founding Director</strong></p>
-            <p style={{ margin: 0 }}><strong>Isabella Mackintosh</strong> — <strong>Gallery Manager</strong></p>
+          <div style={{ display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "start", columnGap: "0.5em", rowGap: "var(--s-3)", fontSize: 16 }}>
+            <strong style={{ textAlign: "right" }}>Angelica Jopling</strong><span style={{ textAlign: "center" }}>—</span><strong>Founding Director</strong>
+            <strong style={{ textAlign: "right" }}>Isabella Mackintosh</strong><span style={{ textAlign: "center" }}>—</span><strong>Gallery Manager</strong>
           </div>
         </section>
       </article>
@@ -546,7 +542,7 @@ function ContactScreen() {
             <p>
               2 Chiltern street<br/>
               Marylebone, W1U 7PR<br/>
-              <a href={MAPS_URL} target="_blank" rel="noopener">View on Google Maps ↗</a>
+              <a href={MAPS_URL} target="_blank" rel="noopener">View on Google Maps</a>
             </p>
 
             <h3>Hours</h3>
