@@ -68,10 +68,18 @@ function MobileMenu({ open, onNav, onClose }) {
       </nav>
 
       <div className="inc-overlay__foot container">
-        <span>2 Chiltern Street, Marylebone W1U 7PR</span>
-        <a href="https://www.instagram.com/__incubator__/" target="_blank" rel="noopener">
-          @__incubator__
-        </a>
+        {(() => {
+          // Same admin-editable contact data as the footer / Contact page.
+          const c = (typeof resolveContact === "function") ? resolveContact() : {};
+          return (
+            <>
+              <span>{(c.addressLines || []).join(", ")}</span>
+              <a href={c.instagramUrl} target="_blank" rel="noopener">
+                {c.instagramHandle}
+              </a>
+            </>
+          );
+        })()}
       </div>
     </div>
   );

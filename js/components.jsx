@@ -3,9 +3,6 @@
 
 const { useState, useEffect, useRef } = React;
 
-// Gallery location on Google Maps — shared by the footer and the contact page.
-const MAPS_URL = "https://www.google.com/maps/search/?api=1&query=Incubator+2+Chiltern+Street+London+W1U+7PR";
-
 /* ---------- TILE ----------------------------------------------------------
    Coloured placeholder standing in for installation / hero photography.
    Variants approximate the warm-neutral palette of the gallery's photography. */
@@ -394,20 +391,23 @@ function PressItem({ item }) {
    Text-only — no logo image, no seal, no Artlogic credit.
    Instagram is a single line: @__incubator__, clickable. */
 function Footer({ onNav }) {
+  // Address / map / email / Instagram come from the same admin-editable contact
+  // data as the Contact page (resolveContact lives in screens.jsx, global scope).
+  const c = (typeof resolveContact === "function") ? resolveContact() : {};
+  const mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(c.mapQuery || "Incubator London");
   return (
     <footer className="inc-footer">
       <div className="container inc-footer__inner">
         <div className="inc-footer__brand">
           <p>
-            2 Chiltern street<br/>
-            Marylebone, W1U 7PR<br/>
-            <a href={MAPS_URL} target="_blank" rel="noopener">View map</a>
+            {(c.addressLines || []).map((line, i) => <React.Fragment key={i}>{line}<br/></React.Fragment>)}
+            <a href={mapsUrl} target="_blank" rel="noopener">View map</a>
           </p>
         </div>
         <div className="inc-footer__contact">
           <p>
-            <a href="mailto:incubator.enquiries@gmail.com">incubator.enquiries@gmail.com</a><br/>
-            <a href="https://www.instagram.com/__incubator__/" target="_blank" rel="noopener">@__incubator__</a><br/>
+            <a href={"mailto:" + c.enquiriesEmail}>{c.enquiriesEmail}</a><br/>
+            <a href={c.instagramUrl} target="_blank" rel="noopener">{c.instagramHandle}</a><br/>
             <a href="#" onClick={(e)=>{e.preventDefault(); onNav && onNav("/contact");}}>Subscribe to mailing list</a>
           </p>
           <div className="inc-footer__legal">&copy; 2026 Incubator</div>

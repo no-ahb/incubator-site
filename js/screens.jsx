@@ -23,15 +23,14 @@ function exhibitionStatus(ex, { heroFallback = false } = {}) {
 function HomeScreen({ onNav }) {
   const TODAY = new Date().toISOString().slice(0, 10);
   const all = [...EXHIBITIONS, ...EXHIBITION_ARCHIVE];
-  // Pick the lead show: an admin-pinned show only while it's genuinely on view,
-  // otherwise whatever is on view now, otherwise the most recently opened show.
-  // The "current" flag is honoured only among on-view shows so a stale flag left
-  // on an ended show can't outrank a newer one (#90).
+  // Pick the lead show purely by date: whatever is on view now (most recently
+  // opened wins), else the most recently opened show overall. There's no admin
+  // "current" pin anymore — dates decide, so a stale flag can never mislead (#90).
   const started = EXHIBITIONS
     .filter((e) => (e.startISO || "") <= TODAY)
     .sort((a, b) => (b.startISO || "").localeCompare(a.startISO || ""));
   const onView = started.filter((e) => !e.endISO || e.endISO >= TODAY);
-  const current = onView.find((e) => e.current) || onView[0] || started[0] || EXHIBITIONS[0];
+  const current = onView[0] || started[0] || EXHIBITIONS[0];
 
   // No visible exhibitions (e.g. all hidden, or a brand-new gallery). Render a
   // calm placeholder rather than dereferencing an undefined `current`.
@@ -500,9 +499,26 @@ function PressScreen() {
 }
 
 /* =====================================================================
-   ABOUT
+   ABOUT — content is admin-editable (data.about); these are the fallbacks
+   used until the keys are populated, or if the data fails to load.
    ===================================================================== */
+const DEFAULT_ABOUT = {
+  paragraphs: [
+    "Incubator is a London-based gallery dedicated to championing exceptional emerging artists. Since its founding in 2021, the gallery has established itself as a platform for ambitious, innovative voices in contemporary art.",
+    "Incubator presented the work of 42 artists in its first three years, earning a reputation for identifying and championing compelling new voices. Today, the gallery continues to provide a platform for emerging artists to engage new audiences and advance their artistic practices.",
+    "As a carbon-neutral organisation and member of the Gallery Climate Coalition, Incubator is committed to embedding sustainability across its operations. The gallery continually reviews its practices to minimise environmental impact and contribute to a more sustainable future for the arts."
+  ],
+  image: "assets/about-image.jpg",
+  team: [
+    { name: "Angelica Jopling", role: "Founding Director" },
+    { name: "Isabella Mackintosh", role: "Gallery Manager" },
+  ],
+};
 function AboutScreen() {
+  const about = (typeof ABOUT !== "undefined" && ABOUT) || DEFAULT_ABOUT;
+  const paragraphs = (Array.isArray(about.paragraphs) && about.paragraphs.length) ? about.paragraphs : DEFAULT_ABOUT.paragraphs;
+  const image = about.image || DEFAULT_ABOUT.image;
+  const team = (Array.isArray(about.team) ? about.team : []).filter((m) => m && m.name);
   return (
     <main className="inc-main">
       <article className="container inc-detail">
@@ -510,39 +526,75 @@ function AboutScreen() {
           <h1>About</h1>
         </header>
         <div className="inc-about__intro">
-          <Prose
-            paragraphs={[
-              "Incubator is a London-based gallery dedicated to championing exceptional emerging artists. Since its founding in 2021, the gallery has established itself as a platform for ambitious, innovative voices in contemporary art.",
-              "Incubator presented the work of 42 artists in its first three years, earning a reputation for identifying and championing compelling new voices. Today, the gallery continues to provide a platform for emerging artists to engage new audiences and advance their artistic practices.",
-              "As a carbon-neutral organisation and member of the Gallery Climate Coalition, Incubator is committed to embedding sustainability across its operations. The gallery continually reviews its practices to minimise environmental impact and contribute to a more sustainable future for the arts."
-            ]}
-          />
-          <img className="inc-about__img" src="assets/about-image.jpg" alt="Inside the Incubator gallery on Chiltern Street" loading="lazy" />
+          <Prose paragraphs={paragraphs} />
+          <img className="inc-about__img" src={image} alt="Inside the Incubator gallery on Chiltern Street" loading="lazy" />
         </div>
 
-        <section className="container inc-detail__bio" style={{ paddingInline: 0, marginTop: "var(--s-16)" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "start", columnGap: "0.6em", rowGap: "var(--s-3)", fontSize: 16, fontWeight: 700 }}>
-            <span style={{ textAlign: "left" }}>Angelica Jopling</span><span style={{ textAlign: "center" }}>—</span><span>Founding Director</span>
-            <span style={{ textAlign: "left" }}>Isabella Mackintosh</span><span style={{ textAlign: "center" }}>—</span><span>Gallery Manager</span>
-          </div>
-        </section>
+        {team.length > 0 && (
+          <section className="container inc-detail__bio" style={{ paddingInline: 0, marginTop: "var(--s-16)" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "start", columnGap: "0.6em", rowGap: "var(--s-3)", fontSize: 16, fontWeight: 700 }}>
+              {team.map((m, i) => (
+                <React.Fragment key={i}>
+                  <span style={{ textAlign: "left" }}>{m.name}</span>
+                  <span style={{ textAlign: "center" }}>—</span>
+                  <span>{m.role}</span>
+                </React.Fragment>
+              ))}
+            </div>
+          </section>
+        )}
       </article>
     </main>
   );
 }
 
 /* =====================================================================
-   CONTACT  (new page)
+   CONTACT — content is admin-editable (data.contact); DEFAULT_CONTACT is the
+   fallback used until the keys are populated, or if the data fails to load.
+   Also feeds the footer + mobile menu via resolveContact() (components.jsx).
    ===================================================================== */
-const SUBSCRIBE_URL  = "https://first-thursday.typeform.com/incubator";
-const MAPS_EMBED_URL = "https://maps.google.com/maps?q=2+Chiltern+Street+London+W1U+7PR&z=16&output=embed";
-// Open the First Thursday subscription form in a popup; fall back to the plain
-// target="_blank" link if the browser blocks the popup.
-function openSubscribe(e) {
-  const w = window.open(SUBSCRIBE_URL, "incubator-subscribe", "width=540,height=720");
-  if (w) e.preventDefault();
+const DEFAULT_CONTACT = {
+  addressLines: ["2 Chiltern street", "Marylebone, W1U 7PR"],
+  hours: ["Mon – Wed, appointment only", "Thur – Sat, 11am – 6pm", "Sun, 11am – 5pm"],
+  enquiriesEmail: "incubator.enquiries@gmail.com",
+  pressEmail: "fabian@strobellall.com",
+  internshipText: "Incubator is unable to accept unsolicited artist submissions. We offer a number of internship opportunities throughout the year. Please send your resume and a cover letter to incubator.enquiries@gmail.com.",
+  instagramUrl: "https://www.instagram.com/__incubator__/",
+  instagramHandle: "@__incubator__",
+  mailingListUrl: "https://first-thursday.typeform.com/incubator",
+  mapQuery: "2 Chiltern Street London W1U 7PR",
+  mapCaption: "Nearest tube — Baker Street (5 minutes' walk) · Marylebone (8 minutes)",
+};
+// Merge stored contact data over the defaults so a missing single field still
+// renders. Shared by the Contact page, footer and mobile menu.
+function resolveContact() {
+  const c = (typeof CONTACT !== "undefined" && CONTACT) || {};
+  const pick = (v, d) => (v === undefined || v === null || v === "" ? d : v);
+  const arr = (v, d) => (Array.isArray(v) && v.length ? v : d);
+  return {
+    addressLines: arr(c.addressLines, DEFAULT_CONTACT.addressLines),
+    hours: arr(c.hours, DEFAULT_CONTACT.hours),
+    enquiriesEmail: pick(c.enquiriesEmail, DEFAULT_CONTACT.enquiriesEmail),
+    pressEmail: pick(c.pressEmail, DEFAULT_CONTACT.pressEmail),
+    internshipText: pick(c.internshipText, DEFAULT_CONTACT.internshipText),
+    instagramUrl: pick(c.instagramUrl, DEFAULT_CONTACT.instagramUrl),
+    instagramHandle: pick(c.instagramHandle, DEFAULT_CONTACT.instagramHandle),
+    mailingListUrl: pick(c.mailingListUrl, DEFAULT_CONTACT.mailingListUrl),
+    mapQuery: pick(c.mapQuery, DEFAULT_CONTACT.mapQuery),
+    mapCaption: pick(c.mapCaption, DEFAULT_CONTACT.mapCaption),
+  };
 }
 function ContactScreen() {
+  const c = resolveContact();
+  const enc = encodeURIComponent(c.mapQuery);
+  const mapsSearch = "https://www.google.com/maps/search/?api=1&query=" + enc;
+  const mapsEmbed = "https://maps.google.com/maps?q=" + enc + "&z=16&output=embed";
+  // Open the mailing-list form in a popup; fall back to the plain target=_blank
+  // link if the browser blocks the popup.
+  const openSubscribe = (e) => {
+    const w = window.open(c.mailingListUrl, "incubator-subscribe", "width=540,height=720");
+    if (w) e.preventDefault();
+  };
   return (
     <main className="inc-main">
       <div className="container inc-contact">
@@ -552,39 +604,36 @@ function ContactScreen() {
           <section>
             <h3>Visit</h3>
             <p>
-              2 Chiltern street<br/>
-              Marylebone, W1U 7PR<br/>
-              <a href={MAPS_URL} target="_blank" rel="noopener">View on Google Maps</a>
+              {c.addressLines.map((line, i) => <React.Fragment key={i}>{line}<br/></React.Fragment>)}
+              <a href={mapsSearch} target="_blank" rel="noopener">View on Google Maps</a>
             </p>
 
             <h3>Hours</h3>
             <p>
-              Mon – Wed, appointment only<br/>
-              Thur – Sat, 11am – 6pm<br/>
-              Sun, 11am – 5pm
+              {c.hours.map((line, i) => (
+                <React.Fragment key={i}>{line}{i < c.hours.length - 1 ? <br/> : null}</React.Fragment>
+              ))}
             </p>
 
             <h3>Enquiries</h3>
             <p>
               For general enquiries, please reach out to:<br/>
-              <a href="mailto:incubator.enquiries@gmail.com">incubator.enquiries@gmail.com</a>
+              <a href={"mailto:" + c.enquiriesEmail}>{c.enquiriesEmail}</a>
             </p>
             <p>
               For press enquiries, please reach out to:<br/>
-              <a href="mailto:fabian@strobellall.com">fabian@strobellall.com</a>
+              <a href={"mailto:" + c.pressEmail}>{c.pressEmail}</a>
             </p>
-            <p>
-              Incubator is unable to accept unsolicited artist submissions. We offer a number of internship opportunities throughout the year. Please send your resume and a cover letter to <a href="mailto:incubator.enquiries@gmail.com">incubator.enquiries@gmail.com</a>.
-            </p>
+            {c.internshipText ? <p>{c.internshipText}</p> : null}
 
             <h3>Follow</h3>
             <p>
-              <a href="https://www.instagram.com/__incubator__/" target="_blank" rel="noopener">@__incubator__</a>
+              <a href={c.instagramUrl} target="_blank" rel="noopener">{c.instagramHandle}</a>
             </p>
 
             <h3>Mailing list</h3>
             <p>
-              <a className="inc-btn" href={SUBSCRIBE_URL} target="_blank" rel="noopener" onClick={openSubscribe}>
+              <a className="inc-btn" href={c.mailingListUrl} target="_blank" rel="noopener" onClick={openSubscribe}>
                 Subscribe
               </a>
             </p>
@@ -594,14 +643,12 @@ function ContactScreen() {
             <h3>Find us</h3>
             <iframe
               className="inc-map"
-              src={MAPS_EMBED_URL}
-              title="Map showing Incubator, 2 Chiltern Street, London W1U 7PR"
+              src={mapsEmbed}
+              title="Map showing Incubator"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
             />
-            <div className="inc-map__caption">
-              Nearest tube — Baker Street (5 minutes' walk) · Marylebone (8 minutes)
-            </div>
+            {c.mapCaption ? <div className="inc-map__caption">{c.mapCaption}</div> : null}
           </section>
         </div>
       </div>

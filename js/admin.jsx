@@ -173,10 +173,17 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
   const [groupArtists, setGroupArtists] = adState(Array.isArray(init.groupArtists) ? init.groupArtists.join("\n") : "");
   const [startISO, setStartISO] = adState(init.startISO || "");
   const [endISO, setEndISO] = adState(init.endISO || "");
-  const [current, setCurrent] = adState(!!init.current);
   const [privateView, setPrivateView] = adState(init.privateView || "");
   const [pressRelease, setPressRelease] = adState(Array.isArray(init.pressRelease) ? init.pressRelease.join("\n\n") : (init.pressRelease || ""));
-  const [artistBio, setArtistBio] = adState("");
+  // Pre-fill the artist bio from the stored artist record so staff can see and
+  // edit the current text, rather than facing a blank "leave blank to keep" box.
+  const [artistBio, setArtistBio] = adState(() => {
+    const aid = init.artistId || (init.artist ? slug(init.artist) : "");
+    const d = (window.getSiteData && window.getSiteData()) || {};
+    const rec = Array.isArray(d.artists) ? d.artists.find((a) => a.id === aid) : null;
+    const bio = rec && rec.bio;
+    return Array.isArray(bio) ? bio.join("\n\n") : (bio || "");
+  });
   const [hero, setHero] = adState(init.heroImage ? [{ key: "hero", path: init.heroImage }] : []);
   const [installs, setInstalls] = adState(
     (init.installation || [])
@@ -230,7 +237,6 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
         dates: adFormatDates(startISO, endISO) || init.dates || "",
         startISO: startISO.trim(),
         endISO: endISO.trim(),
-        current,
         privateView: privateView.trim(),
         pressRelease,
         heroImage: heroPath,
@@ -262,7 +268,6 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
         <label>Start date<input type="date" className="inc-report__input" value={startISO} onChange={(e) => setStartISO(e.target.value)} /></label>
         <label>End date<input type="date" className="inc-report__input" value={endISO} onChange={(e) => setEndISO(e.target.value)} /></label>
         <label>Private view link<input className="inc-report__input" value={privateView} onChange={(e) => setPrivateView(e.target.value)} placeholder="https://…" /></label>
-        <label className="inc-admin__check"><input type="checkbox" checked={current} onChange={(e) => setCurrent(e.target.checked)} /> Current exhibition (featured on home)</label>
       </div>
 
       {isGroup && (
@@ -280,8 +285,8 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
 
       {!isGroup && (
         <>
-          <label className="inc-report__label">Artist bio {existing ? "(leave blank to keep existing)" : "(optional)"}</label>
-          <textarea className="inc-report__textarea" rows={4} value={artistBio} onChange={(e) => setArtistBio(e.target.value)} placeholder="Short biography, blank line between paragraphs." />
+          <label className="inc-report__label">Artist bio</label>
+          <textarea className="inc-report__textarea" rows={6} value={artistBio} onChange={(e) => setArtistBio(e.target.value)} placeholder="Short biography, blank line between paragraphs." />
         </>
       )}
 
@@ -384,6 +389,235 @@ function AdminIssues({ pw }) {
   );
 }
 
+/* ---------- PAGE-CONTENT FORMS (About / Contact / Press) ------------------ */
+// Upload one picked image entry (reuses the show-image flow). Returns its path,
+// or the already-committed path when the entry wasn't re-picked.
+async function adUploadContentImage(pw, entry, dir) {
+  if (!entry) return "";
+  if (entry.path && !entry.file) return entry.path;
+  const dataUrl = await adResizeImage(entry.file);
+  const res = await adAuthFetch("/admin/upload", pw, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ image: dataUrl, name: entry.file.name, showId: dir }),
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || "Image upload failed.");
+  return data.path;
+}
+
+function adSiteData() {
+  return (window.getSiteData && window.getSiteData()) || {};
+}
+
+/* ABOUT --------------------------------------------------------------------- */
+function AdminAboutForm({ pw, onSaved }) {
+  const fallback = (typeof DEFAULT_ABOUT !== "undefined" && DEFAULT_ABOUT) || { paragraphs: [], image: "", team: [] };
+  const init = adSiteData().about || fallback;
+  const [paragraphs, setParagraphs] = adState(Array.isArray(init.paragraphs) ? init.paragraphs.join("\n\n") : "");
+  const [image, setImage] = adState(init.image ? [{ key: "about", path: init.image }] : []);
+  const [team, setTeam] = adState(Array.isArray(init.team) && init.team.length ? init.team.map((m) => ({ ...m })) : [{ name: "", role: "" }]);
+  const [busy, setBusy] = adState(false);
+  const [status, setStatus] = adState("");
+  const [error, setError] = adState("");
+
+  function setMember(i, key, val) { setTeam((t) => t.map((m, j) => (j === i ? { ...m, [key]: val } : m))); }
+  function addMember() { setTeam((t) => [...t, { name: "", role: "" }]); }
+  function removeMember(i) { setTeam((t) => t.filter((_, j) => j !== i)); }
+
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true); setError(""); setStatus("");
+    try {
+      if (image.length && image[0].file) setStatus("Optimising & uploading image…");
+      const imagePath = image.length ? await adUploadContentImage(pw, image[0], "about") : "";
+      setStatus("Saving…");
+      const about = {
+        paragraphs: paragraphs.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean),
+        image: imagePath,
+        team: team.map((m) => ({ name: m.name.trim(), role: m.role.trim() })).filter((m) => m.name || m.role),
+      };
+      const res = await adAuthFetch("/admin/save-content", pw, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ about }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || "Save failed.");
+      onSaved();
+    } catch (err) {
+      setError(err.message || "Save failed."); setBusy(false); setStatus("");
+    }
+  }
+
+  return (
+    <form className="inc-admin__form" onSubmit={submit}>
+      <label className="inc-report__label">Intro paragraphs</label>
+      <textarea className="inc-report__textarea" rows={8} value={paragraphs} onChange={(e) => setParagraphs(e.target.value)} placeholder="One paragraph per block, separated by a blank line." />
+
+      <AdminImagePicker label="Gallery photo" multiple={false} items={image} onChange={setImage} />
+
+      <label className="inc-report__label">Team</label>
+      {team.map((m, i) => (
+        <div key={i} className="inc-admin__formgrid" style={{ alignItems: "end" }}>
+          <label>Name<input className="inc-report__input" value={m.name} onChange={(e) => setMember(i, "name", e.target.value)} /></label>
+          <label>Role<input className="inc-report__input" value={m.role} onChange={(e) => setMember(i, "role", e.target.value)} /></label>
+          <button type="button" className="inc-admin__btn-ghost" onClick={() => removeMember(i)}>Remove</button>
+        </div>
+      ))}
+      <div><button type="button" className="inc-admin__btn-ghost" onClick={addMember}>+ Add person</button></div>
+
+      {error ? <p className="inc-report__error">{error}</p> : null}
+      {status ? <p className="inc-admin__muted">{status}</p> : null}
+      <div className="inc-admin__actions">
+        <button type="submit" className="inc-report__btn" disabled={busy}>{busy ? "Working…" : "Save About page"}</button>
+      </div>
+    </form>
+  );
+}
+
+/* CONTACT ------------------------------------------------------------------- */
+function AdminContactForm({ pw, onSaved }) {
+  const fallback = (typeof DEFAULT_CONTACT !== "undefined" && DEFAULT_CONTACT) || {};
+  const init = { ...fallback, ...(adSiteData().contact || {}) };
+  const [f, setF] = adState({
+    addressLines: (init.addressLines || []).join("\n"),
+    hours: (init.hours || []).join("\n"),
+    enquiriesEmail: init.enquiriesEmail || "",
+    pressEmail: init.pressEmail || "",
+    internshipText: init.internshipText || "",
+    instagramUrl: init.instagramUrl || "",
+    instagramHandle: init.instagramHandle || "",
+    mailingListUrl: init.mailingListUrl || "",
+    mapQuery: init.mapQuery || "",
+    mapCaption: init.mapCaption || "",
+  });
+  const [busy, setBusy] = adState(false);
+  const [error, setError] = adState("");
+  const set = (k) => (e) => setF((prev) => ({ ...prev, [k]: e.target.value }));
+
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true); setError("");
+    try {
+      const splitLines = (s) => s.split(/\n+/).map((x) => x.trim()).filter(Boolean);
+      const contact = {
+        ...f,
+        addressLines: splitLines(f.addressLines),
+        hours: splitLines(f.hours),
+      };
+      const res = await adAuthFetch("/admin/save-content", pw, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contact }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || "Save failed.");
+      onSaved();
+    } catch (err) {
+      setError(err.message || "Save failed."); setBusy(false);
+    }
+  }
+
+  return (
+    <form className="inc-admin__form" onSubmit={submit}>
+      <label className="inc-report__label">Address (one line per row)</label>
+      <textarea className="inc-report__textarea" rows={3} value={f.addressLines} onChange={set("addressLines")} />
+
+      <label className="inc-report__label">Opening hours (one line per row)</label>
+      <textarea className="inc-report__textarea" rows={3} value={f.hours} onChange={set("hours")} />
+
+      <div className="inc-admin__formgrid">
+        <label>General enquiries email<input className="inc-report__input" value={f.enquiriesEmail} onChange={set("enquiriesEmail")} /></label>
+        <label>Press enquiries email<input className="inc-report__input" value={f.pressEmail} onChange={set("pressEmail")} /></label>
+        <label>Instagram handle<input className="inc-report__input" value={f.instagramHandle} onChange={set("instagramHandle")} placeholder="@…" /></label>
+        <label>Instagram link<input className="inc-report__input" value={f.instagramUrl} onChange={set("instagramUrl")} placeholder="https://…" /></label>
+        <label>Mailing-list link<input className="inc-report__input" value={f.mailingListUrl} onChange={set("mailingListUrl")} placeholder="https://…" /></label>
+        <label>Map search location<input className="inc-report__input" value={f.mapQuery} onChange={set("mapQuery")} placeholder="Address for Google Maps" /></label>
+      </div>
+
+      <label className="inc-report__label">Internship / submissions note</label>
+      <textarea className="inc-report__textarea" rows={3} value={f.internshipText} onChange={set("internshipText")} />
+
+      <label className="inc-report__label">Map caption</label>
+      <input className="inc-report__input" value={f.mapCaption} onChange={set("mapCaption")} placeholder="e.g. Nearest tube — Baker Street…" />
+
+      {error ? <p className="inc-report__error">{error}</p> : null}
+      <div className="inc-admin__actions">
+        <button type="submit" className="inc-report__btn" disabled={busy}>{busy ? "Working…" : "Save Contact page"}</button>
+      </div>
+    </form>
+  );
+}
+
+/* PRESS --------------------------------------------------------------------- */
+function AdminPressForm({ pw, onSaved }) {
+  const init = Array.isArray(adSiteData().press) ? adSiteData().press : [];
+  const [groups, setGroups] = adState(
+    init.length
+      ? init.map((g) => ({ year: String(g.year || ""), items: (g.items || []).map((it) => ({ date: it.date || "", pub: it.pub || "", title: it.title || "", href: it.href || "" })) }))
+      : []
+  );
+  const [busy, setBusy] = adState(false);
+  const [error, setError] = adState("");
+
+  const mutate = (fn) => setGroups((gs) => fn(gs.map((g) => ({ ...g, items: g.items.map((it) => ({ ...it })) }))));
+  function addYear() { mutate((gs) => [...gs, { year: "", items: [{ date: "", pub: "", title: "", href: "" }] }]); }
+  function removeYear(gi) { mutate((gs) => gs.filter((_, i) => i !== gi)); }
+  function setYear(gi, val) { mutate((gs) => { gs[gi].year = val; return gs; }); }
+  function addItem(gi) { mutate((gs) => { gs[gi].items.push({ date: "", pub: "", title: "", href: "" }); return gs; }); }
+  function removeItem(gi, ii) { mutate((gs) => { gs[gi].items = gs[gi].items.filter((_, j) => j !== ii); return gs; }); }
+  function setItem(gi, ii, key, val) { mutate((gs) => { gs[gi].items[ii][key] = val; return gs; }); }
+
+  async function submit(e) {
+    e.preventDefault();
+    setBusy(true); setError("");
+    try {
+      const press = groups.map((g) => ({
+        year: parseInt(g.year, 10) || 0,
+        items: g.items.map((it) => ({ date: it.date.trim(), pub: it.pub.trim(), title: it.title.trim(), href: it.href.trim() })).filter((it) => it.title || it.pub || it.href),
+      })).filter((g) => g.year && g.items.length);
+      const res = await adAuthFetch("/admin/save-content", pw, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ press }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || "Save failed.");
+      onSaved();
+    } catch (err) {
+      setError(err.message || "Save failed."); setBusy(false);
+    }
+  }
+
+  return (
+    <form className="inc-admin__form" onSubmit={submit}>
+      {groups.length === 0 && <p className="inc-admin__muted">No press items yet. Add a year to begin.</p>}
+      {groups.map((g, gi) => (
+        <div key={gi} className="inc-admin__pressyear" style={{ borderTop: "1px solid var(--line, #ddd)", paddingTop: "var(--s-4)", marginTop: "var(--s-4)" }}>
+          <div className="inc-admin__formgrid" style={{ alignItems: "end" }}>
+            <label>Year<input className="inc-report__input" value={g.year} onChange={(e) => setYear(gi, e.target.value)} placeholder="2026" /></label>
+            <button type="button" className="inc-admin__btn-ghost" onClick={() => removeYear(gi)}>Remove year</button>
+          </div>
+          {g.items.map((it, ii) => (
+            <div key={ii} className="inc-admin__formgrid" style={{ alignItems: "end" }}>
+              <label>Date<input className="inc-report__input" value={it.date} onChange={(e) => setItem(gi, ii, "date", e.target.value)} placeholder="e.g. March 2026" /></label>
+              <label>Publication<input className="inc-report__input" value={it.pub} onChange={(e) => setItem(gi, ii, "pub", e.target.value)} /></label>
+              <label>Title<input className="inc-report__input" value={it.title} onChange={(e) => setItem(gi, ii, "title", e.target.value)} /></label>
+              <label>Link<input className="inc-report__input" value={it.href} onChange={(e) => setItem(gi, ii, "href", e.target.value)} placeholder="https://…" /></label>
+              <button type="button" className="inc-admin__btn-ghost" onClick={() => removeItem(gi, ii)}>Remove</button>
+            </div>
+          ))}
+          <div><button type="button" className="inc-admin__btn-ghost" onClick={() => addItem(gi)}>+ Add article</button></div>
+        </div>
+      ))}
+      <div style={{ marginTop: "var(--s-4)" }}><button type="button" className="inc-report__btn" onClick={addYear}>+ Add year</button></div>
+
+      {error ? <p className="inc-report__error">{error}</p> : null}
+      <div className="inc-admin__actions">
+        <button type="submit" className="inc-report__btn" disabled={busy}>{busy ? "Working…" : "Save Press page"}</button>
+      </div>
+    </form>
+  );
+}
+
 /* ---------- SCREEN -------------------------------------------------------- */
 function AdminScreen() {
   const [pw, setPw] = adState(sessionStorage.getItem(ADMIN_PW_KEY) || "");
@@ -438,6 +672,10 @@ function AdminScreen() {
     setFlash((hidden ? "Hidden" : "Unhidden") + ". Live in about a minute.");
   }
 
+  function afterContentSave() {
+    setFlash("Saved. The live site updates in about a minute, once it rebuilds.");
+  }
+
   return (
     <main className="inc-main">
       <div className="container inc-admin">
@@ -449,6 +687,9 @@ function AdminScreen() {
         <nav className="inc-admin__tabs" aria-label="Admin sections">
           <button className={tab === "shows" ? "is-active" : ""} onClick={() => { setTab("shows"); setEditing(null); }}>Shows</button>
           <button className={tab === "form" ? "is-active" : ""} onClick={startAdd}>{editing ? "Edit show" : "Add show"}</button>
+          <button className={tab === "about" ? "is-active" : ""} onClick={() => { setTab("about"); setEditing(null); }}>About</button>
+          <button className={tab === "contact" ? "is-active" : ""} onClick={() => { setTab("contact"); setEditing(null); }}>Contact</button>
+          <button className={tab === "press" ? "is-active" : ""} onClick={() => { setTab("press"); setEditing(null); }}>Press</button>
           <button className={tab === "issues" ? "is-active" : ""} onClick={() => setTab("issues")}>Issues</button>
         </nav>
 
@@ -472,6 +713,10 @@ function AdminScreen() {
             onCancel={() => { setTab("shows"); setEditing(null); }}
           />
         )}
+
+        {tab === "about" && <AdminAboutForm pw={pw} onSaved={afterContentSave} />}
+        {tab === "contact" && <AdminContactForm pw={pw} onSaved={afterContentSave} />}
+        {tab === "press" && <AdminPressForm pw={pw} onSaved={afterContentSave} />}
 
         {tab === "issues" && <AdminIssues pw={pw} />}
       </div>

@@ -12,6 +12,10 @@ let EXHIBITIONS = [];
 let ARTISTS = [];
 let PRESS = [];
 let EXHIBITION_ARCHIVE = [];
+// Singleton page content (About / Contact). Null until loaded; screens fall back
+// to their built-in defaults so the site renders before these keys are populated.
+let ABOUT = null;
+let CONTACT = null;
 
 // Full parsed payload INCLUDING hidden shows. Public arrays above are filtered;
 // the admin screen reads this to manage everything.
@@ -30,8 +34,10 @@ async function loadSiteData() {
   PRESS = Array.isArray(data.press) ? data.press : [];
   EXHIBITION_ARCHIVE = (Array.isArray(data.archive) ? data.archive : []).filter((e) => !e.hidden);
   EXHIBITIONS = (Array.isArray(data.exhibitions) ? data.exhibitions : []).filter((e) => !e.hidden);
+  ABOUT = (data.about && typeof data.about === "object") ? data.about : null;
+  CONTACT = (data.contact && typeof data.contact === "object") ? data.contact : null;
 
-  Object.assign(window, { EXHIBITIONS, ARTISTS, PRESS, EXHIBITION_ARCHIVE, SITE_DATA });
+  Object.assign(window, { EXHIBITIONS, ARTISTS, PRESS, EXHIBITION_ARCHIVE, ABOUT, CONTACT, SITE_DATA });
   return data;
 }
 
@@ -40,6 +46,8 @@ Object.assign(window, {
   ARTISTS,
   PRESS,
   EXHIBITION_ARCHIVE,
+  ABOUT,
+  CONTACT,
   loadSiteData,
   getSiteData: () => SITE_DATA,
 });

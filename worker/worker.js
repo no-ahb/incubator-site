@@ -355,7 +355,8 @@ function normalizeShow(input) {
     dates: String(input.dates || "").trim(),
     startISO: String(input.startISO || "").trim(),
     endISO: String(input.endISO || "").trim(),
-    current: !!input.current,
+    // No "current" pin: the home page now picks the lead show purely by date, so
+    // the flag is obsolete and deliberately not stored (#90).
     palette: String(input.palette || "sap").trim() || "sap",
     pressRelease,
     installation,
@@ -435,6 +436,102 @@ async function handleAdminSaveShow(request, env, cors) {
 
   if (result.error) return json({ ok: false, error: result.error }, result.status, cors);
   return json({ ok: true, id: show.id }, 200, cors);
+}
+
+/* ---------------------------------------------------------------------------
+   PAGE CONTENT (About / Contact / Press) — admin-editable singletons + list.
+   Each normaliser keeps only the fields the site reads and coerces types, so a
+   malformed post can't corrupt shows.json. Mirrors normalizeShow().
+   ------------------------------------------------------------------------- */
+function strArray(v) {
+  if (Array.isArray(v)) return v.map((s) => String(s).trim()).filter(Boolean);
+  if (typeof v === "string") return v.split(/\n+/).map((s) => s.trim()).filter(Boolean);
+  return [];
+}
+
+function normalizeAbout(input) {
+  const src = input && typeof input === "object" ? input : {};
+  const team = Array.isArray(src.team)
+    ? src.team
+        .map((m) => ({ name: String((m && m.name) || "").trim(), role: String((m && m.role) || "").trim() }))
+        .filter((m) => m.name || m.role)
+    : [];
+  return {
+    // Paragraphs may arrive as an array or a blank-line-separated string.
+    paragraphs: typeof src.paragraphs === "string"
+      ? src.paragraphs.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean)
+      : strArray(src.paragraphs),
+    image: String(src.image || "").trim(),
+    team,
+  };
+}
+
+function normalizeContact(input) {
+  const src = input && typeof input === "object" ? input : {};
+  const s = (k) => String(src[k] || "").trim();
+  return {
+    addressLines: strArray(src.addressLines),
+    hours: strArray(src.hours),
+    enquiriesEmail: s("enquiriesEmail"),
+    pressEmail: s("pressEmail"),
+    internshipText: s("internshipText"),
+    instagramUrl: s("instagramUrl"),
+    instagramHandle: s("instagramHandle"),
+    mailingListUrl: s("mailingListUrl"),
+    mapQuery: s("mapQuery"),
+    mapCaption: s("mapCaption"),
+  };
+}
+
+function normalizePress(input) {
+  if (!Array.isArray(input)) return [];
+  return input
+    .map((group) => {
+      const year = parseInt((group && group.year) || 0, 10) || 0;
+      const items = Array.isArray(group && group.items)
+        ? group.items
+            .map((it) => ({
+              date: String((it && it.date) || "").trim(),
+              pub: String((it && it.pub) || "").trim(),
+              title: String((it && it.title) || "").trim(),
+              href: String((it && it.href) || "").trim(),
+            }))
+            .filter((it) => it.title || it.pub || it.href)
+        : [];
+      return { year, items };
+    })
+    .filter((g) => g.year && g.items.length)
+    .sort((a, b) => b.year - a.year);
+}
+
+// POST /admin/save-content — update any of { about, contact, press } in one
+// commit. Only the keys present in the body are written.
+async function handleAdminSaveContent(request, env, cors) {
+  const gate = adminGate(request, env, cors);
+  if (gate.error) return gate.error;
+  const { owner, repo } = gate;
+
+  const body = await readJsonBody(request, cors);
+  if (body.error) return body.error;
+  const payload = body.payload || {};
+
+  const hasAbout = Object.prototype.hasOwnProperty.call(payload, "about");
+  const hasContact = Object.prototype.hasOwnProperty.call(payload, "contact");
+  const hasPress = Object.prototype.hasOwnProperty.call(payload, "press");
+  if (!hasAbout && !hasContact && !hasPress) {
+    return json({ ok: false, error: "Nothing to save." }, 400, cors);
+  }
+
+  const result = await commitJsonUpdate(env, owner, repo, SHOWS_PATH, (data) => {
+    const sections = [];
+    if (hasAbout) { data.about = normalizeAbout(payload.about); sections.push("about"); }
+    if (hasContact) { data.contact = normalizeContact(payload.contact); sections.push("contact"); }
+    if (hasPress) { data.press = normalizePress(payload.press); sections.push("press"); }
+    return { message: `Admin: update ${sections.join(", ")}` };
+  });
+
+  if (result.error) return json({ ok: false, error: result.error }, result.status, cors);
+  return json({ ok: true }, 200, cors);
 }
 
 // POST /admin/visibility — { id, hidden:boolean }.
@@ -597,6 +694,7 @@ export default {
       if (path === "/admin/login" && request.method === "POST") return await handleAdminLogin(request, env, cors);
       if (path === "/admin/upload" && request.method === "POST") return await handleAdminUpload(request, env, cors);
       if (path === "/admin/save-show" && request.method === "POST") return await handleAdminSaveShow(request, env, cors);
+      if (path === "/admin/save-content" && request.method === "POST") return await handleAdminSaveContent(request, env, cors);
       if (path === "/admin/visibility" && request.method === "POST") return await handleAdminVisibility(request, env, cors);
       if (path === "/admin/issues" && request.method === "GET") return await handleAdminIssues(request, env, cors);
 
