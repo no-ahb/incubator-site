@@ -454,7 +454,18 @@ function richInline(node) {
     if (tag === "BR") { out += "<br>"; return; }
     if (tag === "STRONG" || tag === "B") { out += "<strong>" + richInline(n) + "</strong>"; return; }
     if (tag === "EM" || tag === "I") { out += "<em>" + richInline(n) + "</em>"; return; }
-    out += richInline(n); // unknown inline element: keep its text, drop the tag
+    // Bold/italic conveyed via inline style rather than a semantic tag — e.g.
+    // execCommand's <span style="font-weight:bold"> or pasted content — is mapped
+    // to <strong>/<em> so the formatting survives canonicalisation. Only the
+    // decision is read from the style; the style itself is never emitted.
+    const st = n.style || {};
+    const fw = String(st.fontWeight || "");
+    const bold = fw === "bold" || fw === "bolder" || (/^\d+$/.test(fw) && parseInt(fw, 10) >= 600);
+    const italic = st.fontStyle === "italic" || st.fontStyle === "oblique";
+    let inner = richInline(n); // unknown element: keep its text, drop the tag
+    if (italic) inner = "<em>" + inner + "</em>";
+    if (bold) inner = "<strong>" + inner + "</strong>";
+    out += inner;
   });
   return out;
 }

@@ -584,6 +584,23 @@ function resolveContact() {
     mapCaption: pick(c.mapCaption, DEFAULT_CONTACT.mapCaption),
   };
 }
+// Render a plain string with any email addresses turned into mailto links, so
+// emails embedded in free-text (e.g. the internship blurb) are clickable.
+const EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
+function linkifyEmails(text) {
+  const str = String(text || "");
+  const out = [];
+  let last = 0;
+  let m;
+  EMAIL_RE.lastIndex = 0;
+  while ((m = EMAIL_RE.exec(str))) {
+    if (m.index > last) out.push(str.slice(last, m.index));
+    out.push(<a key={m.index} href={"mailto:" + m[0]}>{m[0]}</a>);
+    last = m.index + m[0].length;
+  }
+  if (last < str.length) out.push(str.slice(last));
+  return out;
+}
 function ContactScreen() {
   const c = resolveContact();
   const enc = encodeURIComponent(c.mapQuery);
@@ -624,7 +641,7 @@ function ContactScreen() {
               For press enquiries, please reach out to:<br/>
               <a href={"mailto:" + c.pressEmail}>{c.pressEmail}</a>
             </p>
-            {c.internshipText ? <p>{c.internshipText}</p> : null}
+            {c.internshipText ? <p>{linkifyEmails(c.internshipText)}</p> : null}
 
             <h3>Follow</h3>
             <p>
