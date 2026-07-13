@@ -426,23 +426,242 @@ const PROSE_ESCAPE = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" };
 function escapeHtml(s) {
   return String(s).replace(/[&<>"]/g, (c) => PROSE_ESCAPE[c]);
 }
+function proseHtml(p) {
+  return escapeHtml(p).replace(/\*([^*]+)\*/g, "<em>$1</em>");
+}
+
+/* ---------- RICH TEXT (press releases & bios) -----------------------------
+   Staff edit these in a small WYSIWYG (see admin.jsx) whose only output is a
+   canonical, whitelist-only HTML string: block elements <p> (optionally carrying
+   one of the classes attrib / byline / indent) and <blockquote>, containing only
+   inline <strong>, <em>, <br> and text. Everything else is discarded. This
+   renderer AND the Worker independently canonicalise the stored value, so nothing
+   executable can reach the public DOM even if the admin password leaks or a
+   hand-crafted payload is POSTed directly.
+
+   Data is backward compatible: older shows still store an ARRAY of plain
+   paragraph strings (rendered via the inference path below); newly-saved shows
+   store the canonical HTML STRING. */
+const RICH_BLOCK_CLASSES = ["attrib", "byline", "indent"];
+
+// Serialise a node's inline content to canonical HTML — text + <strong>/<em>/<br>.
+function richInline(node) {
+  let out = "";
+  node.childNodes.forEach((n) => {
+    if (n.nodeType === 3) { out += escapeHtml(n.nodeValue); return; }
+    if (n.nodeType !== 1) return;
+    const tag = n.tagName;
+    if (tag === "BR") { out += "<br>"; return; }
+    if (tag === "STRONG" || tag === "B") { out += "<strong>" + richInline(n) + "</strong>"; return; }
+    if (tag === "EM" || tag === "I") { out += "<em>" + richInline(n) + "</em>"; return; }
+    out += richInline(n); // unknown inline element: keep its text, drop the tag
+  });
+  return out;
+}
+
+// Parse a stored value (canonical or messy HTML) into [{ role, cls, html }].
+// role ∈ {para, quote}; cls ∈ {"", attrib, byline, indent}; html is safe inline.
+function richBlocks(html) {
+  const doc = new DOMParser().parseFromString(String(html || ""), "text/html");
+  const blocks = [];
+  let pending = "";
+  // A block with only <br>/whitespace (e.g. the empty contenteditable's
+  // "<p><br></p>") carries no content and is dropped, so an empty editor
+  // canonicalises to "" rather than a junk empty paragraph.
+  const isBlank = (s) => !s.replace(/<br\s*\/?>/gi, "").trim();
+  const flush = () => {
+    if (!isBlank(pending)) blocks.push({ role: "para", cls: "", html: pending.trim() });
+    pending = "";
+  };
+  doc.body.childNodes.forEach((n) => {
+    if (n.nodeType === 3) { pending += escapeHtml(n.nodeValue); return; }
+    if (n.nodeType !== 1) return;
+    const tag = n.tagName;
+    const isBlock = tag === "P" || tag === "DIV" || tag === "BLOCKQUOTE" ||
+      tag === "LI" || /^H[1-6]$/.test(tag);
+    if (!isBlock) { pending += tag === "BR" ? "<br>" : richInline(n); return; }
+    flush();
+    const role = tag === "BLOCKQUOTE" ? "quote" : "para";
+    let cls = "";
+    if (role === "para" && n.classList) {
+      cls = RICH_BLOCK_CLASSES.find((c) => n.classList.contains(c)) || "";
+    }
+    const inner = richInline(n).trim();
+    if (!isBlank(inner)) blocks.push({ role, cls, html: inner });
+  });
+  flush();
+  return blocks;
+}
+
+// Re-emit the canonical HTML string for storage / comparison.
+function canonicalizeRichHtml(html) {
+  return richBlocks(html)
+    .map((b) =>
+      b.role === "quote"
+        ? "<blockquote>" + b.html + "</blockquote>"
+        : "<p" + (b.cls ? ' class="' + b.cls + '"' : "") + ">" + b.html + "</p>"
+    )
+    .join("");
+}
+
+// Maps a block's optional class to the concrete CSS class per variant.
+const RELEASE_PARA_CLASS = {
+  attrib: "inc-release__attrib",
+  byline: "inc-release__byline",
+  indent: "inc-release__para inc-release__para--indent",
+  "": "inc-release__para",
+};
+const PROSE_PARA_CLASS = { indent: "inc-prose__p--indent" };
+
+// Render a stored value as React. variant "release" applies the press-release
+// role styling; "prose" is plain body prose (bios, etc.).
+function RichContent({ value, variant }) {
+  const blocks = richBlocks(value);
+  const release = variant === "release";
+  return (
+    <div className={release ? "inc-prose inc-release" : "inc-prose"}>
+      {blocks.map((b, i) => {
+        if (b.role === "quote") {
+          const qc = release ? "inc-release__quote" : "inc-prose__quote";
+          return <blockquote key={i} className={qc} dangerouslySetInnerHTML={{ __html: b.html }} />;
+        }
+        const cls = release
+          ? RELEASE_PARA_CLASS[b.cls] || RELEASE_PARA_CLASS[""]
+          : PROSE_PARA_CLASS[b.cls] || null;
+        return <p key={i} className={cls} dangerouslySetInnerHTML={{ __html: b.html }} />;
+      })}
+    </div>
+  );
+}
+
 function Prose({ paragraphs, max }) {
+  // Newly-saved bios are a canonical HTML string; legacy bios are string arrays.
+  if (typeof paragraphs === "string") {
+    return <RichContent value={paragraphs} variant="prose" />;
+  }
   return (
     <div className="inc-prose" style={max ? { maxWidth: max } : null}>
-      {paragraphs.map((p, i) => (
-        <p
-          key={i}
-          dangerouslySetInnerHTML={{
-            __html: escapeHtml(p).replace(/\*([^*]+)\*/g, "<em>$1</em>"),
-          }}
-        />
+      {(paragraphs || []).map((p, i) => (
+        <p key={i} dangerouslySetInnerHTML={{ __html: proseHtml(p) }} />
       ))}
     </div>
   );
 }
 
+/* ---------- PRESS RELEASE -------------------------------------------------
+   A press release is set like published editorial text rather than a flat run
+   of paragraphs. Each source paragraph carries a typographic role that we infer
+   from its shape, so the same plain-text data renders with proper quote blocks,
+   attributions and a colophon byline:
+
+     • quote   — a paragraph wholly enclosed in quotation marks (an epigraph or
+                 pulled quotation). Set as a <blockquote> with a hung opening
+                 mark and italic face.
+     • attrib  — a dash-led line ("– Name, source") that credits a quote.
+     • byline  — the closing "Written by …" credit, set off with a rule.
+     • body    — ordinary prose, set with novel-style first-line indents.
+
+   Roles are presentation only; classification is deliberately conservative so a
+   normal paragraph is never mistaken for a quote. */
+const OPEN_QUOTES = "“„«‘‚\"'"; // “ „ « ‘ ‚ " '
+const CLOSE_QUOTES = "”»’\"'"; //          ” » ’ " '
+const ATTRIB_START = /^[‒–—―−-]\s+\S/; // ‒ – — ― − - + space
+function classifyPara(p) {
+  const t = String(p).trim();
+  if (!t) return "body";
+  if (/^(?:written|words|text|curated|edited)\s+by\b/i.test(t)) return "byline";
+  if (ATTRIB_START.test(t)) return "attrib";
+  const first = t.charAt(0);
+  const last = t.charAt(t.length - 1);
+  // A "quote" is a paragraph fully wrapped in matching quotation marks — a
+  // stray inline quote inside running prose must not trigger it.
+  if (OPEN_QUOTES.includes(first) && CLOSE_QUOTES.includes(last) && t.length > 1)
+    return "quote";
+  return "body";
+}
+// Second pass over the whole release: a run of consecutive lines that opens with
+// a quotation mark and closes with one, capped by an attribution, is a single
+// (possibly multi-line / verse) quotation even though no individual line is
+// wholly wrapped. This lets a broken-across-lines epigraph set as one block.
+function classifyParagraphs(paragraphs) {
+  const roles = paragraphs.map(classifyPara);
+  const startsOpen = (p) => { const t = String(p).trim(); return !!t && OPEN_QUOTES.includes(t.charAt(0)); };
+  const endsClose = (p) => { const t = String(p).trim(); return !!t && CLOSE_QUOTES.includes(t.charAt(t.length - 1)); };
+  for (let i = 0; i < roles.length; i++) {
+    if (roles[i] !== "attrib") continue;
+    // The quote ends on the body line just above the attribution and must close
+    // with a quotation mark.
+    const end = i - 1;
+    if (end < 0 || roles[end] !== "body" || !endsClose(paragraphs[end])) continue;
+    // Walk back only until the line that OPENS the quote — don't swallow the
+    // unrelated body paragraphs that precede it.
+    let start = end;
+    while (start >= 0 && roles[start] === "body" && !startsOpen(paragraphs[start])) start--;
+    if (start < 0 || roles[start] !== "body" || !startsOpen(paragraphs[start])) continue;
+    for (let j = start; j <= end; j++) roles[j] = "quote";
+  }
+  return roles;
+}
+// Some legacy releases glue the byline onto the end of the final paragraph
+// (e.g. "…their loss, not ours.” Written by Orla Brennan") instead of giving it
+// its own line. Split a trailing credit off so it can be set as a byline. The
+// match is deliberately strict — a capitalised credit form, a short name with no
+// full stop, at the very end, after sentence-ending punctuation — so a phrase
+// like "a list written by your mum" mid-sentence is never split.
+const TRAILING_BYLINE = /^([\s\S]*[.!?”"’')\]])\s+((?:Written|Words|Text|Photography|Curated|Edited)\s+by\s+[^.]{1,60})\s*$/;
+function splitTrailingByline(paras) {
+  if (!paras || !paras.length) return paras || [];
+  const last = String(paras[paras.length - 1]);
+  const m = last.match(TRAILING_BYLINE);
+  if (!m) return paras;
+  const out = paras.slice(0, -1);
+  if (m[1].trim()) out.push(m[1].trim());
+  out.push(m[2].trim());
+  return out;
+}
+
+// Convert a legacy paragraph-array press release to canonical rich HTML, reusing
+// the inference above so existing content opens in the editor already structured.
+function releaseArrayToRichHtml(input) {
+  const paras = splitTrailingByline(input);
+  const roles = classifyParagraphs(paras);
+  let out = "";
+  for (let i = 0; i < paras.length; i++) {
+    if (roles[i] === "quote") {
+      const lines = [];
+      while (i < paras.length && roles[i] === "quote") { lines.push(proseHtml(paras[i])); i++; }
+      i--;
+      out += "<blockquote>" + lines.join("<br>") + "</blockquote>";
+      continue;
+    }
+    const cls = roles[i] === "attrib" ? ' class="attrib"' : roles[i] === "byline" ? ' class="byline"' : "";
+    out += "<p" + cls + ">" + proseHtml(paras[i]) + "</p>";
+  }
+  return out;
+}
+// Legacy bios have no quotes/attributions — straight paragraphs only.
+function proseArrayToRichHtml(paras) {
+  return (paras || []).map((p) => "<p>" + proseHtml(p) + "</p>").join("");
+}
+
+function PressRelease({ paragraphs }) {
+  // Both shapes render through one path: a canonical HTML string renders directly;
+  // a legacy paragraph array is first converted (inferring quotes/attributions/
+  // byline) to the same canonical HTML.
+  const html = typeof paragraphs === "string"
+    ? paragraphs
+    : releaseArrayToRichHtml(paragraphs || []);
+  return <RichContent value={html} variant="release" />;
+}
+
 Object.assign(window, {
   Tile, Wordmark, Header, Poster, HeroPoster, EnquireButton, isImageRef,
   ExhibitionCard, ExhibitionsListRow,
-  InstallationStrip, PressItem, Footer, Prose,
+  InstallationStrip, PressItem, Footer, Prose, PressRelease, RichContent,
 });
+// Rich-text helpers shared with the admin editor (admin.jsx loads after this).
+window.RichText = {
+  canonicalize: canonicalizeRichHtml,
+  fromRelease: (v) => (typeof v === "string" ? canonicalizeRichHtml(v) : releaseArrayToRichHtml(v || [])),
+  fromProse: (v) => (typeof v === "string" ? canonicalizeRichHtml(v) : proseArrayToRichHtml(v || [])),
+};
