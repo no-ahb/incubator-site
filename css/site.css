@@ -67,52 +67,41 @@ ul { list-style: none; padding: 0; margin: 0; }
 }
 
 /* ---------- Menu overlay -------------------------------------------------- */
-/* Kept in the DOM at all times; the .is-open class drives a circular reveal
-   that grows from the hamburger in the top-right corner, with the nav links
-   staggering in behind it. Collapses back the same way on close. */
+/* Kept in the DOM at all times. The panel is anchored directly beneath the
+   sticky header and the .is-open class unfolds it downward like a white blind
+   (clip-path inset from the top edge). Because it starts below the header, the
+   INCUBATOR sign is never covered or redrawn — no flash — and the header
+   hamburger (morphing to ✕) is the close control. Rolls back up on close. */
 .inc-overlay {
-  position: fixed; inset: 0; z-index: var(--z-overlay);
+  position: fixed; top: var(--header-h); left: 0; right: 0; bottom: 0;
+  z-index: var(--z-overlay);
   background: var(--paper);
   display: flex; flex-direction: column;
-  clip-path: circle(0% at calc(100% - 34px) 32px);
+  clip-path: inset(0 0 100% 0);          /* rolled up against the header edge */
   visibility: hidden;
   pointer-events: none;
-  transition: clip-path 480ms cubic-bezier(0.7, 0, 0.3, 1),
-              visibility 0s linear 480ms;
+  transition: clip-path 420ms var(--ease), visibility 0s linear 420ms;
   will-change: clip-path;
 }
 .inc-overlay.is-open {
-  clip-path: circle(150% at calc(100% - 34px) 32px);
+  clip-path: inset(0 0 0 0);             /* unfolds down to full height */
   visibility: visible;
   pointer-events: auto;
-  transition: clip-path 620ms cubic-bezier(0.16, 1, 0.3, 1),
-              visibility 0s;
+  transition: clip-path 460ms var(--ease-out), visibility 0s;
 }
-.inc-overlay__head {
-  height: var(--header-h);
-  display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--hairline);
-  opacity: 0; transition: opacity 320ms var(--ease-out);
-}
-.inc-overlay.is-open .inc-overlay__head { opacity: 1; transition-delay: 120ms; }
-.inc-overlay__close {
-  background: none; border: 0; padding: 6px; cursor: pointer; color: var(--ink);
-  transition: transform var(--dur) var(--ease), color var(--dur) var(--ease);
-}
-.inc-overlay__close:hover { color: var(--green); transform: rotate(90deg); }
 .inc-overlay__nav {
   flex: 1; padding-top: var(--s-12);
 }
 .inc-overlay__nav ul { display: flex; flex-direction: column; gap: 18px; }
 .inc-overlay__nav li {
-  opacity: 0; transform: translateY(20px);
-  transition: opacity 420ms var(--ease-out), transform 480ms cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0; transform: translateY(16px);
+  transition: opacity 380ms var(--ease-out), transform 420ms var(--ease-out);
 }
 .inc-overlay.is-open .inc-overlay__nav li { opacity: 1; transform: none; }
-.inc-overlay.is-open .inc-overlay__nav li:nth-child(1) { transition-delay: 150ms; }
-.inc-overlay.is-open .inc-overlay__nav li:nth-child(2) { transition-delay: 205ms; }
-.inc-overlay.is-open .inc-overlay__nav li:nth-child(3) { transition-delay: 260ms; }
-.inc-overlay.is-open .inc-overlay__nav li:nth-child(4) { transition-delay: 315ms; }
+.inc-overlay.is-open .inc-overlay__nav li:nth-child(1) { transition-delay: 140ms; }
+.inc-overlay.is-open .inc-overlay__nav li:nth-child(2) { transition-delay: 190ms; }
+.inc-overlay.is-open .inc-overlay__nav li:nth-child(3) { transition-delay: 240ms; }
+.inc-overlay.is-open .inc-overlay__nav li:nth-child(4) { transition-delay: 290ms; }
 .inc-overlay__nav a {
   font-family: var(--font-serif);
   font-size: clamp(34px, 11vw, 44px);
@@ -134,9 +123,26 @@ ul { list-style: none; padding: 0; margin: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   .inc-overlay, .inc-overlay.is-open { transition: visibility 0s; clip-path: none; }
-  .inc-overlay__head, .inc-overlay__foot, .inc-overlay__nav li,
+  .inc-overlay__foot, .inc-overlay__nav li,
   .inc-menu-btn__ic span { transition: none !important; }
 }
+
+/* ---------- Route enter + scroll reveal ---------------------------------- */
+/* Each navigation re-keys .mock__view, replaying a soft fade-up of the new
+   page. The reduced-motion kill-switch in ds.css neutralises the animation. */
+.mock__view { animation: inc-view-enter var(--dur-slow) var(--ease-out); }
+@keyframes inc-view-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+/* Grid/list items below the fold start hidden (class added by JS only when
+   motion is allowed) and ease in when scrolled into view. */
+.inc-reveal {
+  opacity: 0; transform: translateY(14px);
+  transition: opacity var(--dur-slow) var(--ease-out),
+              transform var(--dur-slow) var(--ease-out);
+}
+.inc-reveal--in { opacity: 1; transform: none; }
 
 /* ---------- Main / sections ---------------------------------------------- */
 .inc-main { padding-bottom: var(--s-24); }
@@ -305,7 +311,7 @@ ul { list-style: none; padding: 0; margin: 0; }
 
 /* Prose: no negative space alongside */
 .inc-prose { max-width: var(--measure); }
-.inc-prose p { font-size: 17px; line-height: 1.6; margin: 0 0 1em; }
+.inc-prose p { font-size: 17px; line-height: 1.6; margin: 0 0 1em; text-wrap: pretty; }
 .inc-prose em { font-style: italic; }
 .inc-prose strong { font-weight: 600; }
 
@@ -355,12 +361,16 @@ ul { list-style: none; padding: 0; margin: 0; }
   border-bottom: 1px solid var(--hairline);
   border-radius: 0;
   align-items: baseline;
+  transition: color var(--dur-fast) var(--ease);
 }
 .inc-press-item:hover { color: var(--green); }
 .inc-press-item:hover .inc-press-item__title { border-bottom-color: currentColor; }
 .inc-press-item__date { font-size: 14px; color: var(--ink-3); }
 .inc-press-item__pub { font-size: 15px; font-style: italic; }
-.inc-press-item__title { font-size: 17px; border-bottom: 1px solid transparent; }
+.inc-press-item__title {
+  font-size: 17px; border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-fast) var(--ease);
+}
 .inc-press-item__cta { font-size: 14px; color: var(--ink-3); text-align: right; }
 @media (max-width: 720px) {
   .inc-press-item { grid-template-columns: 1fr; gap: 4px; padding: var(--s-5) 0; }
@@ -370,12 +380,21 @@ ul { list-style: none; padding: 0; margin: 0; }
 /* ---------- Sort toggle --------------------------------------------------- */
 .inc-toggle { display: flex; gap: 18px; }
 .inc-toggle button {
-  background: none; border: 0; padding: 2px 0; cursor: pointer;
+  position: relative;
+  background: none; border: 0; padding: 2px 0 4px; cursor: pointer;
   font-family: var(--font-serif); font-size: 14px;
   color: var(--ink-3);
-  border-bottom: 1px solid transparent;
+  transition: color var(--dur-fast) var(--ease);
 }
-.inc-toggle button.is-active { color: var(--ink); border-bottom-color: var(--ink); }
+/* The active underline grows in from the left rather than blinking on. */
+.inc-toggle button::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: currentColor;
+  transform: scaleX(0); transform-origin: left center;
+  transition: transform var(--dur) var(--ease);
+}
+.inc-toggle button.is-active { color: var(--ink); }
+.inc-toggle button.is-active::after { transform: scaleX(1); }
 .inc-toggle button:hover { color: var(--green); }
 
 /* ---------- Contact ------------------------------------------------------- */
@@ -408,12 +427,17 @@ ul { list-style: none; padding: 0; margin: 0; }
   font-family: var(--font-serif); font-size: 14px;
   padding: 12px 22px; cursor: pointer; align-self: flex-start;
   margin-top: 8px; border-radius: 0;
-  transition: background var(--dur-fast) var(--ease);
+  transition: background var(--dur-fast) var(--ease),
+              transform var(--dur-fast) var(--ease);
 }
 /* Incubator green by default, a darker green on hover/click. The label is
    pinned light because the global `a:hover` turns links green, which on the
    green background would otherwise make the text invisible (#94). */
 .inc-btn:hover, .inc-btn:active { background: var(--green-hover); color: var(--paper); }
+.inc-btn:active { transform: translateY(1px); }             /* tactile press */
+/* Explicit ring: .inc-btn is sometimes an <a>, sometimes a <button>, so give
+   both a consistent, visible focus indicator on the green field. */
+.inc-btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 
 /* Zoomable lead image — reset the wrapping button to render like the poster. */
 .inc-poster-zoom {

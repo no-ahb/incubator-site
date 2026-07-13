@@ -351,14 +351,17 @@ function InstallationStrip({ frames }) {
             >‹</button>
           )}
           <figure className="inc-lightbox__stage" onClick={(e) => e.stopPropagation()}>
+            {/* key={open} remounts the media each step so it cross-fades
+                between frames rather than hard-cutting (see .inc-lightbox__img). */}
             {isImageRef(frames[open]) ? (
               <img
+                key={open}
                 className="inc-lightbox__img inc-lightbox__img--photo"
                 src={frames[open]}
                 alt={"Installation view " + (open + 1)}
               />
             ) : (
-              <Tile kind={frames[open]} aspect="3/2" className="inc-lightbox__img" />
+              <Tile key={open} kind={frames[open]} aspect="3/2" className="inc-lightbox__img" />
             )}
             <figcaption className="inc-lightbox__caption">{(open + 1) + " / " + count}</figcaption>
           </figure>

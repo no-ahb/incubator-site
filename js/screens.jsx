@@ -337,16 +337,16 @@ function ExhibitionDetailScreen({ id, onNav }) {
           <InstallationStrip frames={ex.installation || ["a","b","c","d","e","f"]} />
         </section>
 
+        <section id="release" className="container inc-detail__release">
+          <h3>Press release</h3>
+          <Prose paragraphs={ex.pressRelease || []} />
+        </section>
+
         {!ex.isGroup && ex.artist && (
           <p className="container inc-detail__enquire">
             <EnquireButton name={ex.artist} />
           </p>
         )}
-
-        <section id="release" className="container inc-detail__release">
-          <h3>Press release</h3>
-          <Prose paragraphs={ex.pressRelease || []} />
-        </section>
 
         {otherShows.length > 0 && (
           <section className="container inc-related">
@@ -440,14 +440,14 @@ function ArtistScreen({ id, onNav }) {
           </div>
         ))}
 
-        <p className="container inc-detail__enquire">
-          <EnquireButton name={artist.name} />
-        </p>
-
         <section id="biography" className="container inc-detail__bio">
           <h3>Biography</h3>
           <Prose paragraphs={artist.bio} />
         </section>
+
+        <p className="container inc-detail__enquire">
+          <EnquireButton name={artist.name} />
+        </p>
 
         <p className="container inc-back">
           <a href="#/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>← Back to exhibitions</a>
@@ -509,9 +509,9 @@ function AboutScreen() {
         </div>
 
         <section className="container inc-detail__bio" style={{ paddingInline: 0, marginTop: "var(--s-16)" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "start", columnGap: "0.5em", rowGap: "var(--s-3)", fontSize: 16 }}>
-            <strong style={{ textAlign: "right" }}>Angelica Jopling</strong><span style={{ textAlign: "center" }}>—</span><strong>Founding Director</strong>
-            <strong style={{ textAlign: "right" }}>Isabella Mackintosh</strong><span style={{ textAlign: "center" }}>—</span><strong>Gallery Manager</strong>
+          <div style={{ display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "start", columnGap: "0.6em", rowGap: "var(--s-3)", fontSize: 16, fontWeight: 700 }}>
+            <span style={{ textAlign: "left" }}>Angelica Jopling</span><span style={{ textAlign: "center" }}>—</span><span>Founding Director</span>
+            <span style={{ textAlign: "left" }}>Isabella Mackintosh</span><span style={{ textAlign: "center" }}>—</span><span>Gallery Manager</span>
           </div>
         </section>
       </article>
