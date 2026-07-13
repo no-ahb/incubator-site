@@ -216,6 +216,9 @@ function RichTextEditor({ value, onChange, roles, ariaLabel }) {
     const el = ref.current;
     if (!el) return;
     el.innerHTML = value && value.trim() ? value : "<p><br></p>";
+    // styleWithCSS off → Bold/Italic emit semantic <b>/<i> tags (which canonicalise
+    // to <strong>/<em>) rather than <span style> that would be dropped.
+    try { document.execCommand("styleWithCSS", false, false); } catch (e) {}
     try { document.execCommand("defaultParagraphSeparator", false, "p"); } catch (e) {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
