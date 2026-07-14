@@ -12,7 +12,12 @@
 @font-face {
   font-family: "Century Schoolbook";
   src: url("fonts/centuryschoolbook.ttf") format("truetype");
-  font-weight: 400 700;          /* let browser synthesise bold from regular */
+  /* Only a regular (400) master is supplied. Declaring just 400 — NOT a
+     400-700 range — is what lets the browser synthesise faux-bold for
+     <strong>/700 text. Claiming the face already spans 400-700 (as it did)
+     told the browser bold was "covered", so it rendered 600/700 with the plain
+     regular glyphs and bold looked identical to body text. */
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
