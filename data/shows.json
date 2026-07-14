@@ -1,6 +1,36 @@
 {
   "exhibitions": [
     {
+      "id": "quiet-companions",
+      "artistId": null,
+      "artist": "Quiet Companions",
+      "title": "Quiet Companions",
+      "dates": "1 July – 2 August 2026",
+      "startISO": "2026-07-01",
+      "endISO": "2026-08-02",
+      "palette": "sap",
+      "pressRelease": "<p>Incubator is pleased to present <em>Quiet Companions</em>, a group exhibition of painting, sculpture and sound, attending to the unnoticed rituals, objects and gestures that shape our existence. A wooden chair, a silver saucer, a folded paper star: these ordinary things locate memory and care in the smallest, most overlooked corners of daily life. The works ask what gives our days meaning when they go unwitnessed.</p><p>The show opens on Jungwon Jay Hur's <em>Illusion</em>, a head turned toward a feather afloat in the curve of a pale vessel. Here, the real and the imagined blur into something half seen, half remembered, and quietly uncanny. As one moves through the space, that same quiet holds, where Kairi Tokoro's sound sculpture repeats a single small ritual: water falls, drop by drop, onto a metal grate, each contact sounding out before it is caught in a handmade clay vessel below. Nearby, a bowl of folded paper stars, made by Hur as a private ritual of her own, a way of staying close to home. Each star carries a wish, a tradition passed down through the folding itself. Both works turn repetition into a kind of devotion, the body brought back to its objects through habit, touch and small acts of care.</p><p>Elsewhere, that same attention turns to intimacy, held in gesture and in the objects left behind. Ishbel Lowther's dual charcoal paintings hold that moment just before an embrace ends, physicality and familiarity caught in the instant a hug loosens, fleeting and already passing. While Felix Butterwick finds a different intimacy in inanimate things, a jug, a well worn chair, ordinary vessels that become containers of memory, their quiet presence bearing the traces of lives lived. Losel Yauch's <em>Silver Setting</em> extends this further: an empty plate and fork laid on a dark table, charged with the presence of someone who has just departed, remembered in stillness. Together, the three works ask how much of a person can be held in the things they leave behind.</p><p>That feeling carries into the room given over entirely to Emma Windsor-Liscombe. Her paintings bear witness to home through memory, recalling those who have been forgotten. Figures drawn from <em>The Big Rock Candy Mountains</em> and the myth of Cockaigne, old folk fantasies of a land where want doesn't exist, surface in a palette that turns sickly sweet, its sweetness curdling the longer it is held. Some figures resolve with clarity, others remain indeterminate, evoking a mysterious presence that is neither fully fixed nor fully lost. What lingers is not the fantasy of plenty, but the want it was built to cover.</p><p>Downstairs, a different kind of solitude continues, shaped by presence rather than absence. Gabriel Cautain's sculptures, cast from signage found in places tied to memory, give physical form to distance itself, holding the presence of someone who occupies our thoughts despite being far away, quiet triggers for what remains vivid and what slips away. Yauch's Impression and Tokoro's gently sounding sculpture offer quieter echoes of the same question: what a person leaves behind in the things they touch. The show closes with Marco Bizzarri's excavation of a space, worked in oil, acrylic and sand. A beam of light pours through a door left ajar at the far end: an ending that reads equally as a way in, a return to the room the light comes from, or a way out, back into the world beyond the show.</p><p>Through <em>Quiet Companions</em>, we encounter the traces of other lives. To witness them is, quietly, to be witnessed in return.</p>",
+      "installation": [
+        "assets/shows/quiet-companions/1784037351298-Incubator_-_Quiet_Companions_-_002.jpg",
+        "assets/shows/quiet-companions/1784037353013-Incubator_-_Quiet_Companions_-_003.jpg",
+        "assets/shows/quiet-companions/1784037354697-Incubator_-_Quiet_Companions_-_006.jpg",
+        "assets/shows/quiet-companions/1784037356336-Incubator_-_Quiet_Companions_-_013.jpg",
+        "assets/shows/quiet-companions/1784037358079-Incubator_-_Quiet_Companions_-_009.jpg"
+      ],
+      "isGroup": true,
+      "groupArtists": [
+        "Marco Bizzarri",
+        "Felix Butterwick",
+        "Gabriel Cautain",
+        "Jungwon Jay Hur",
+        "Ishbel Lowther",
+        "Kairi Tokoro",
+        "Emma Windsor-Liscombe",
+        "Losel Yauch"
+      ],
+      "heroImage": "assets/shows/quiet-companions/1784037349380-Incubator_-_Quiet_Companions_-_Inventory.jpg"
+    },
+    {
       "id": "eva-dixon-crash",
       "artistId": "eva-dixon",
       "artist": "Eva Dixon",
