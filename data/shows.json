@@ -2396,6 +2396,106 @@
     "mailingListUrl": "https://first-thursday.typeform.com/incubator",
     "mapQuery": "2 Chiltern Street London W1U 7PR"
   },
-  "press": [],
+  "press": [
+    {
+      "year": 2024,
+      "items": [
+        {
+          "date": "",
+          "pub": "Wallpaper",
+          "title": "",
+          "href": "https://www.wallpaper.com/art/exhibitions-shows/incubator-gallery-spring-2024-solo-shows-london"
+        }
+      ]
+    },
+    {
+      "year": 2023,
+      "items": [
+        {
+          "date": "",
+          "pub": "Where's the Frame",
+          "title": "",
+          "href": "https://www.wherestheframe.com/post/incubator-launches-as-permanent-space"
+        }
+      ]
+    },
+    {
+      "year": 2023,
+      "items": [
+        {
+          "date": "",
+          "pub": "Something Curated",
+          "title": "",
+          "href": "https://somethingcurated.com/2023/04/26/interview-london-gallerist-angelica-jopling-on-the-launch-of-incubator/"
+        }
+      ]
+    },
+    {
+      "year": 2023,
+      "items": [
+        {
+          "date": "",
+          "pub": "Ocula Magazine",
+          "title": "",
+          "href": "https://ocula.com/magazine/spotlight/angelica-jopling-incubator/"
+        }
+      ]
+    },
+    {
+      "year": 2023,
+      "items": [
+        {
+          "date": "",
+          "pub": "Flaunt Magazine",
+          "title": "",
+          "href": "https://www.flaunt.com/post/angelica-jopling-the-besties-issue"
+        }
+      ]
+    },
+    {
+      "year": 2023,
+      "items": [
+        {
+          "date": "",
+          "pub": "Vogue Italia",
+          "title": "",
+          "href": "https://www.vogue.it/article/angelica-jopling-incubator-galleria-londra"
+        }
+      ]
+    },
+    {
+      "year": 2022,
+      "items": [
+        {
+          "date": "",
+          "pub": "Another Magazine",
+          "title": "",
+          "href": "https://www.anothermag.com/art-photography/14062/inside-a-new-exhibition-celebrating-londons-emerging-artists-incubator-22"
+        }
+      ]
+    },
+    {
+      "year": 2022,
+      "items": [
+        {
+          "date": "",
+          "pub": "Dazed",
+          "title": "",
+          "href": "https://www.dazeddigital.com/art-photography/article/55993/1/incubator-22-is-the-adrenalised-series-spotlighting-six-new-artists"
+        }
+      ]
+    },
+    {
+      "year": 2021,
+      "items": [
+        {
+          "date": "",
+          "pub": "Evening Standard",
+          "title": "",
+          "href": "https://www.standard.co.uk/news/uk/young-artists-london-west-end-shows-incubator-21-angelica-jopling-b959462.html"
+        }
+      ]
+    }
+  ],
   "archive": []
 }
