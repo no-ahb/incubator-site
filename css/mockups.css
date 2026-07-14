@@ -94,6 +94,13 @@
   .inc-list__work { font-size: 17px; }
 }
 .inc-list__preview .inc-poster { width: 100%; }
+/* The preview poster+caption is a link (navigates on tap) but should read as
+   the plain preview it replaced — no underline, inherited colour. */
+.inc-list__preview-link {
+  display: flex; flex-direction: column; gap: var(--s-4);
+  color: inherit; border: 0; text-decoration: none;
+}
+.inc-list__preview-link:hover { color: inherit; border: 0; }
 .inc-list__preview-meta {
   display: flex; justify-content: space-between; align-items: baseline;
   font-size: 14px;
@@ -156,7 +163,7 @@
   font-family: var(--font-serif);
   font-style: italic;
 }
-.inc-participants a:hover { color: var(--green); border-bottom-color: currentColor; }
+.inc-participants a:hover { color: var(--green); }
 
 /* Section jump-links on detail pages */
 .inc-jumps {

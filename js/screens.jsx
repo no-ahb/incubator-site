@@ -252,7 +252,16 @@ function ExhibitionsListScreen({ onNav }) {
           </div>
           <aside className="inc-list__preview" aria-hidden="true">
             {preview ? (
-              <>
+              // The poster mirrors the list's hovered/first item. It duplicates a
+              // list row, so it stays out of the a11y tree and tab order (the rows
+              // are the canonical links) — but pointer/touch taps navigate, which
+              // is what mobile users reach for since the poster sits above the list.
+              <a
+                className="inc-list__preview-link"
+                href={"#/exhibitions/" + preview.id}
+                tabIndex={-1}
+                onClick={(e) => { e.preventDefault(); onNav && onNav("/exhibitions/" + preview.id); }}
+              >
                 <Poster ex={preview} size="card" />
                 <div className="inc-list__preview-meta">
                   <span>
@@ -263,7 +272,7 @@ function ExhibitionsListScreen({ onNav }) {
                   </span>
                   <span>{preview.dates}</span>
                 </div>
-              </>
+              </a>
             ) : null}
           </aside>
         </div>

@@ -37,11 +37,11 @@ ul { list-style: none; padding: 0; margin: 0; }
   font-size: 15px;
   color: var(--ink);
   padding: 4px 0;
-  border-bottom: 1px solid transparent;
-  transition: color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
 }
-.inc-header__nav a:hover { color: var(--green); border-bottom-color: currentColor; }
-.inc-header__nav a.is-active { color: var(--green); border-bottom-color: var(--green); }
+/* The draw-in underline comes from the base `a` rule (background-size). Hover
+   just swaps the colour; the active tab keeps the rule fully drawn in green. */
+.inc-header__nav a:hover { color: var(--green); }
+.inc-header__nav a.is-active { color: var(--green); background-size: 100% 1px; }
 
 .inc-menu-btn {
   display: none;                /* mobile / overflow */
@@ -129,11 +129,14 @@ ul { list-style: none; padding: 0; margin: 0; }
 }
 
 /* ---------- Route enter + scroll reveal ---------------------------------- */
-/* Each navigation re-keys .mock__view, replaying a soft fade-up of the new
-   page. The reduced-motion kill-switch in ds.css neutralises the animation. */
-.mock__view { animation: inc-view-enter var(--dur-slow) var(--ease-out); }
+/* Each navigation re-keys .mock__view, crossfading the new page in. The fade is
+   opacity-led with only a whisper of lift, and eased at both ends, so pages
+   settle in softly instead of snapping. Reduced-motion (ds.css) neutralises it.
+   No fill-mode: a retained forwards/both fill would keep this a stacking context
+   after the animation ends, trapping the fixed lightbox below the header. */
+.mock__view { animation: inc-view-enter 460ms var(--ease-soft); }
 @keyframes inc-view-enter {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(3px); }
   to   { opacity: 1; transform: none; }
 }
 /* Grid/list items below the fold start hidden (class added by JS only when
@@ -446,12 +449,16 @@ ul { list-style: none; padding: 0; margin: 0; }
   transition: color var(--dur-fast) var(--ease);
 }
 .inc-press-item:hover { color: var(--green); }
-.inc-press-item:hover .inc-press-item__title { border-bottom-color: currentColor; }
+.inc-press-item:hover .inc-press-item__title { background-size: 100% 1px; }
 .inc-press-item__date { font-size: 14px; color: var(--ink-3); }
 .inc-press-item__pub { font-size: 15px; font-style: italic; }
 .inc-press-item__title {
-  font-size: 17px; border-bottom: 1px solid transparent;
-  transition: border-color var(--dur-fast) var(--ease);
+  font-size: 17px;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size var(--dur) var(--ease-out);
 }
 .inc-press-item__cta { font-size: 14px; color: var(--ink-3); text-align: right; }
 @media (max-width: 720px) {
@@ -551,8 +558,8 @@ ul { list-style: none; padding: 0; margin: 0; }
    stays left, giving the footer a balanced left/right split. */
 .inc-footer__contact { justify-self: end; text-align: right; }
 .inc-footer p { margin: var(--s-3) 0 0; }
-.inc-footer a { color: var(--ink); border-bottom: 1px solid transparent; }
-.inc-footer a:hover { color: var(--green); border-bottom-color: currentColor; }
+.inc-footer a { color: var(--ink); }
+.inc-footer a:hover { color: var(--green); }
 .inc-footer__legal { margin-top: var(--s-6); font-size: 12px; color: var(--ink-3); }
 .inc-footer__seal { mix-blend-mode: multiply; }
 @media (max-width: 900px) {

@@ -143,6 +143,7 @@
   /* ---------- Motion ---------- */
   --ease:               cubic-bezier(0.2, 0.0, 0.2, 1);
   --ease-out:           cubic-bezier(0.0, 0.0, 0.2, 1);
+  --ease-soft:          cubic-bezier(0.4, 0.0, 0.2, 1);  /* gentle both-ends fade */
   --dur-fast:           120ms;
   --dur:                200ms;
   --dur-slow:           300ms;
@@ -248,20 +249,42 @@ em, .italic { font-style: italic; }
 strong { font-weight: 600; }
 
 /* ---------- Links ---------- */
+/* Hover underline is a gradient "rule" pinned to the bottom-left and grown from
+   0%→100% width, so it draws in left-to-right instead of just fading on. Using
+   background-size (not a pseudo-element) keeps it working on inline links that
+   wrap, and the reduced-motion kill-switch below snaps it on with no animation. */
 a {
   color: var(--link);
   text-decoration: none;
-  border-bottom: 1px solid transparent;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
   transition: color var(--dur-fast) var(--ease),
-              border-color var(--dur-fast) var(--ease);
+              background-size var(--dur) var(--ease-out);
 }
 a:hover {
   color: var(--link-hover);
-  border-bottom-color: currentColor;
+  background-size: 100% 1px;
 }
 a:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
+}
+/* Links that manage their own underline (or want none): opt out of the draw so
+   it can't stack on top. Whole-block links (brand, cards, media, list rows) get
+   no rule; hero CTA and jump-links keep their own persistent border underline. */
+.inc-header__brand,
+.inc-hero__media,
+.inc-hero__title a,
+.inc-card,
+.inc-list__link,
+.inc-list__preview-link,
+.inc-overlay__nav a,
+.inc-hero__cta,
+.inc-jumps a,
+.inc-press-item {
+  background-image: none;
 }
 
 /* ---------- Utility containers ---------- */
