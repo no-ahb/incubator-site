@@ -413,14 +413,17 @@
 
 .mock {
   width: 100%;
+  min-height: 100vh;            /* fill the viewport so the footer can pin to the bottom */
   background: var(--paper);
   display: flex; flex-direction: column;
   overflow: hidden;
   container-type: inline-size;
 }
-.mock__scroll {
-  /* content flows naturally — the host scroller is the page */
-}
+/* Sticky-footer chain: the scroll/view columns grow, and the screen's <main>
+   takes up any slack, pushing the footer to the bottom on short pages (e.g. Press). */
+.mock__scroll { flex: 1 0 auto; display: flex; flex-direction: column; }
+.mock__view { flex: 1 0 auto; display: flex; flex-direction: column; }
+.mock__view > .inc-main { flex: 1 0 auto; }
 
 /* Override the design-system container max width so the artboard width
    becomes the page width — the artboard's px size IS the breakpoint. */
