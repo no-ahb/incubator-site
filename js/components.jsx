@@ -558,8 +558,28 @@ function RichContent({ value, variant }) {
   );
 }
 
+// A rich value should be a canonical HTML STRING (new) or a plain-text
+// paragraph ARRAY (legacy). A stale Worker, though, can save the editor's HTML
+// string wrapped in a 1-element array (["<p>…</p><p>…</p>"]). Left alone, the
+// legacy array path would HTML-escape it and the page would show literal "<p>"
+// tags. Detect array elements that already carry canonical markup and re-join
+// them into the HTML string they always were; richBlocks re-sanitises on render,
+// so this stays a strict whitelist. Genuine plain-text arrays are untouched.
+// A closing block tag is the reliable fingerprint of the editor's canonical
+// output (every block is wrapped, e.g. "<p>…</p>"). Plain-text gallery prose
+// never contains one, so this won't misfire on a legacy paragraph that happens
+// to include a stray "<b>" or "<" — those keep the escaped legacy path.
+const RICH_HTML_MARKER = /<\/(p|blockquote)>/i;
+function coerceRichValue(value) {
+  if (Array.isArray(value) && value.some((el) => typeof el === "string" && RICH_HTML_MARKER.test(el))) {
+    return value.join("");
+  }
+  return value;
+}
+
 function Prose({ paragraphs, max }) {
   // Newly-saved bios are a canonical HTML string; legacy bios are string arrays.
+  paragraphs = coerceRichValue(paragraphs);
   if (typeof paragraphs === "string") {
     return <RichContent value={paragraphs} variant="prose" />;
   }
@@ -672,6 +692,7 @@ function PressRelease({ paragraphs }) {
   // Both shapes render through one path: a canonical HTML string renders directly;
   // a legacy paragraph array is first converted (inferring quotes/attributions/
   // byline) to the same canonical HTML.
+  paragraphs = coerceRichValue(paragraphs);
   const html = typeof paragraphs === "string"
     ? paragraphs
     : releaseArrayToRichHtml(paragraphs || []);
@@ -686,6 +707,6 @@ Object.assign(window, {
 // Rich-text helpers shared with the admin editor (admin.jsx loads after this).
 window.RichText = {
   canonicalize: canonicalizeRichHtml,
-  fromRelease: (v) => (typeof v === "string" ? canonicalizeRichHtml(v) : releaseArrayToRichHtml(v || [])),
-  fromProse: (v) => (typeof v === "string" ? canonicalizeRichHtml(v) : proseArrayToRichHtml(v || [])),
+  fromRelease: (v) => { v = coerceRichValue(v); return typeof v === "string" ? canonicalizeRichHtml(v) : releaseArrayToRichHtml(v || []); },
+  fromProse: (v) => { v = coerceRichValue(v); return typeof v === "string" ? canonicalizeRichHtml(v) : proseArrayToRichHtml(v || []); },
 };
