@@ -557,7 +557,8 @@ function AdminAboutForm({ pw, onSaved }) {
   return (
     <form className="inc-admin__form" onSubmit={submit}>
       <label className="inc-report__label">Intro paragraphs</label>
-      <textarea className="inc-report__textarea" rows={8} value={paragraphs} onChange={(e) => setParagraphs(e.target.value)} placeholder="One paragraph per block, separated by a blank line." />
+      <p className="inc-admin__hint">One paragraph per block, separated by a blank line. Wrap text in <strong>**double asterisks**</strong> for <strong>bold</strong> and <em>*single asterisks*</em> for <em>italic</em> (e.g. italic show titles).</p>
+      <textarea className="inc-report__textarea" rows={8} value={paragraphs} onChange={(e) => setParagraphs(e.target.value)} placeholder="One paragraph per block, separated by a blank line.  Use **bold** and *italic*." />
 
       <AdminImagePicker label="Gallery photo" multiple={false} items={image} onChange={setImage} />
 

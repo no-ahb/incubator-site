@@ -418,16 +418,21 @@ function Footer({ onNav }) {
 }
 
 /* ---------- PROSE BLOCK ---------------------------------------------------
-   Paragraphs support a single inline convention: *emphasis* → <em>. Text now
-   comes from the admin form (committed to shows.json), so we HTML-escape first
-   and only then apply the emphasis transform — raw tags in the source can never
-   reach the DOM (defends the public site even if the admin password leaks). */
+   Plain-text paragraphs (About intro, legacy bios) support two inline
+   conventions: **bold** → <strong> and *emphasis* → <em> (e.g. italic show
+   titles). Text comes from the admin form (committed to shows.json), so we
+   HTML-escape first and only then apply the transforms — raw tags in the source
+   can never reach the DOM (defends the public site even if the admin password
+   leaks). Bold runs before italic so a `**x**` run isn't half-eaten by the
+   single-star rule. */
 const PROSE_ESCAPE = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" };
 function escapeHtml(s) {
   return String(s).replace(/[&<>"]/g, (c) => PROSE_ESCAPE[c]);
 }
 function proseHtml(p) {
-  return escapeHtml(p).replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  return escapeHtml(p)
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
 }
 
 /* ---------- RICH TEXT (press releases & bios) -----------------------------
@@ -444,29 +449,37 @@ function proseHtml(p) {
    store the canonical HTML STRING. */
 const RICH_BLOCK_CLASSES = ["attrib", "byline", "indent"];
 
-// Serialise a node's inline content to canonical HTML — text + <strong>/<em>/<br>.
+// Serialise ONE node (text or element) to canonical inline HTML. Crucially this
+// inspects the node it is given — its own <strong>/<em>/<b>/<i> tag or inline
+// bold/italic style — so a formatting element survives even when it sits at the
+// top level of the editor (e.g. bolding a whole paragraph yields a bare <b>…</b>
+// with no <p> wrapper). Serialising only a node's *children* here would silently
+// drop that wrapper, which is exactly what stopped bold/italic from saving.
+function richInlineNode(n) {
+  if (n.nodeType === 3) return escapeHtml(n.nodeValue);
+  if (n.nodeType !== 1) return "";
+  const tag = n.tagName;
+  if (tag === "BR") return "<br>";
+  if (tag === "STRONG" || tag === "B") return "<strong>" + richInline(n) + "</strong>";
+  if (tag === "EM" || tag === "I") return "<em>" + richInline(n) + "</em>";
+  // Bold/italic conveyed via inline style rather than a semantic tag — e.g.
+  // execCommand's <span style="font-weight:bold"> or pasted content — is mapped
+  // to <strong>/<em> so the formatting survives canonicalisation. Only the
+  // decision is read from the style; the style itself is never emitted.
+  const st = n.style || {};
+  const fw = String(st.fontWeight || "");
+  const bold = fw === "bold" || fw === "bolder" || (/^\d+$/.test(fw) && parseInt(fw, 10) >= 600);
+  const italic = st.fontStyle === "italic" || st.fontStyle === "oblique";
+  let inner = richInline(n); // unknown element: keep its text, drop the tag
+  if (italic) inner = "<em>" + inner + "</em>";
+  if (bold) inner = "<strong>" + inner + "</strong>";
+  return inner;
+}
+
+// Serialise a node's inline *content* (its children) to canonical HTML.
 function richInline(node) {
   let out = "";
-  node.childNodes.forEach((n) => {
-    if (n.nodeType === 3) { out += escapeHtml(n.nodeValue); return; }
-    if (n.nodeType !== 1) return;
-    const tag = n.tagName;
-    if (tag === "BR") { out += "<br>"; return; }
-    if (tag === "STRONG" || tag === "B") { out += "<strong>" + richInline(n) + "</strong>"; return; }
-    if (tag === "EM" || tag === "I") { out += "<em>" + richInline(n) + "</em>"; return; }
-    // Bold/italic conveyed via inline style rather than a semantic tag — e.g.
-    // execCommand's <span style="font-weight:bold"> or pasted content — is mapped
-    // to <strong>/<em> so the formatting survives canonicalisation. Only the
-    // decision is read from the style; the style itself is never emitted.
-    const st = n.style || {};
-    const fw = String(st.fontWeight || "");
-    const bold = fw === "bold" || fw === "bolder" || (/^\d+$/.test(fw) && parseInt(fw, 10) >= 600);
-    const italic = st.fontStyle === "italic" || st.fontStyle === "oblique";
-    let inner = richInline(n); // unknown element: keep its text, drop the tag
-    if (italic) inner = "<em>" + inner + "</em>";
-    if (bold) inner = "<strong>" + inner + "</strong>";
-    out += inner;
-  });
+  node.childNodes.forEach((n) => { out += richInlineNode(n); });
   return out;
 }
 
@@ -490,7 +503,7 @@ function richBlocks(html) {
     const tag = n.tagName;
     const isBlock = tag === "P" || tag === "DIV" || tag === "BLOCKQUOTE" ||
       tag === "LI" || /^H[1-6]$/.test(tag);
-    if (!isBlock) { pending += tag === "BR" ? "<br>" : richInline(n); return; }
+    if (!isBlock) { pending += richInlineNode(n); return; }
     flush();
     const role = tag === "BLOCKQUOTE" ? "quote" : "para";
     let cls = "";
