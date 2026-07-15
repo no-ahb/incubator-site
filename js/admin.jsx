@@ -319,8 +319,10 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
     // Group shows have no single artist: the exhibition title names the show and
     // the participant list carries the artists. Solo shows keep the artist field.
     const showArtist = isGroup ? title.trim() : artist.trim();
-    if (!title.trim() || (!isGroup && !artist.trim())) {
-      setError(isGroup ? "Exhibition title is required." : "Artist and title are required.");
+    // A solo show may be announced before it has a title (date-holder shows,
+    // #125) — only the artist is required. A group show is named by its title.
+    if (isGroup ? !title.trim() : !artist.trim()) {
+      setError(isGroup ? "Exhibition title is required." : "Artist is required.");
       return;
     }
     setBusy(true);
@@ -368,7 +370,7 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
 
       <div className="inc-admin__formgrid">
         {!isGroup && <label>Artist *<input className="inc-report__input" value={artist} onChange={(e) => setArtist(e.target.value)} required /></label>}
-        <label>Exhibition title *<input className="inc-report__input" value={title} onChange={(e) => setTitle(e.target.value)} required /></label>
+        <label>{isGroup ? "Exhibition title *" : "Exhibition title"}<input className="inc-report__input" value={title} onChange={(e) => setTitle(e.target.value)} required={isGroup} /></label>
         <label>Start date<input type="date" className="inc-report__input" value={startISO} onChange={(e) => setStartISO(e.target.value)} /></label>
         <label>End date<input type="date" className="inc-report__input" value={endISO} onChange={(e) => setEndISO(e.target.value)} /></label>
         <label>Private view link<input className="inc-report__input" value={privateView} onChange={(e) => setPrivateView(e.target.value)} placeholder="https://…" /></label>
@@ -659,17 +661,17 @@ function AdminPressForm({ pw, onSaved }) {
   const init = Array.isArray(adSiteData().press) ? adSiteData().press : [];
   const [groups, setGroups] = adState(
     init.length
-      ? init.map((g) => ({ year: String(g.year || ""), items: (g.items || []).map((it) => ({ date: it.date || "", pub: it.pub || "", title: it.title || "", href: it.href || "" })) }))
+      ? init.map((g) => ({ year: String(g.year || ""), items: (g.items || []).map((it) => ({ pub: it.pub || "", title: it.title || "", href: it.href || "" })) }))
       : []
   );
   const [busy, setBusy] = adState(false);
   const [error, setError] = adState("");
 
   const mutate = (fn) => setGroups((gs) => fn(gs.map((g) => ({ ...g, items: g.items.map((it) => ({ ...it })) }))));
-  function addYear() { mutate((gs) => [...gs, { year: "", items: [{ date: "", pub: "", title: "", href: "" }] }]); }
+  function addYear() { mutate((gs) => [...gs, { year: "", items: [{ pub: "", title: "", href: "" }] }]); }
   function removeYear(gi) { mutate((gs) => gs.filter((_, i) => i !== gi)); }
   function setYear(gi, val) { mutate((gs) => { gs[gi].year = val; return gs; }); }
-  function addItem(gi) { mutate((gs) => { gs[gi].items.push({ date: "", pub: "", title: "", href: "" }); return gs; }); }
+  function addItem(gi) { mutate((gs) => { gs[gi].items.push({ pub: "", title: "", href: "" }); return gs; }); }
   function removeItem(gi, ii) { mutate((gs) => { gs[gi].items = gs[gi].items.filter((_, j) => j !== ii); return gs; }); }
   function setItem(gi, ii, key, val) { mutate((gs) => { gs[gi].items[ii][key] = val; return gs; }); }
 
@@ -679,7 +681,7 @@ function AdminPressForm({ pw, onSaved }) {
     try {
       const press = groups.map((g) => ({
         year: parseInt(g.year, 10) || 0,
-        items: g.items.map((it) => ({ date: it.date.trim(), pub: it.pub.trim(), title: it.title.trim(), href: it.href.trim() })).filter((it) => it.title || it.pub || it.href),
+        items: g.items.map((it) => ({ pub: it.pub.trim(), title: it.title.trim(), href: it.href.trim() })).filter((it) => it.title || it.pub || it.href),
       })).filter((g) => g.year && g.items.length);
       const res = await adAuthFetch("/admin/save-content", pw, {
         method: "POST", headers: { "Content-Type": "application/json" },
@@ -704,7 +706,6 @@ function AdminPressForm({ pw, onSaved }) {
           </div>
           {g.items.map((it, ii) => (
             <div key={ii} className="inc-admin__formgrid" style={{ alignItems: "end" }}>
-              <label>Date<input className="inc-report__input" value={it.date} onChange={(e) => setItem(gi, ii, "date", e.target.value)} placeholder="e.g. March 2026" /></label>
               <label>Publication<input className="inc-report__input" value={it.pub} onChange={(e) => setItem(gi, ii, "pub", e.target.value)} /></label>
               <label>Title<input className="inc-report__input" value={it.title} onChange={(e) => setItem(gi, ii, "title", e.target.value)} /></label>
               <label>Link<input className="inc-report__input" value={it.href} onChange={(e) => setItem(gi, ii, "href", e.target.value)} placeholder="https://…" /></label>

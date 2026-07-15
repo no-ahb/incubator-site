@@ -78,10 +78,9 @@ function Wordmark({ size = 20, color, className = "", as: Tag = "span", style })
     <Tag
       className={"inc-wordmark " + className}
       style={{
-        fontFamily: "var(--font-serif)",
-        fontWeight: 700,
+        // Face, weight and case come from .inc-wordmark (site.css) — only the
+        // per-instance size/colour and the wider display tracking live here.
         letterSpacing: "0.18em",
-        textTransform: "uppercase",
         fontSize: size,
         color: color || "var(--green)",
         lineHeight: 1,
@@ -156,7 +155,7 @@ function Poster({ ex, size = "card" }) {
         <img
           className="inc-poster__img"
           src={ex.heroImage}
-          alt={ex.title ? ex.artist ? ex.artist + " — " + ex.title : ex.title : "Exhibition"}
+          alt={[ex.artist, ex.title].filter(Boolean).join(" — ") || "Exhibition"}
           loading="lazy"
         />
       </div>
@@ -167,7 +166,9 @@ function Poster({ ex, size = "card" }) {
     <div className={cls}>
       <span className="inc-poster__wm">INCUBATOR</span>
       <span className="inc-poster__title">
-        {ex.title ? (ex.isGroup ? ex.title : <em>{ex.title}</em>) : null}
+        {/* A title-less (announced) solo show prints the artist's name so two
+            forthcoming posters aren't identical anonymous INCUBATOR cards. */}
+        {ex.title ? (ex.isGroup ? ex.title : <em>{ex.title}</em>) : (ex.artist || null)}
       </span>
       <span className="inc-poster__addr">2&nbsp;CHILTERN&nbsp;STREET, LONDON, W1U&nbsp;7PR</span>
     </div>
@@ -299,6 +300,24 @@ function InstallationStrip({ frames }) {
   const count = frames.length;
   const go = (delta) => setOpen((i) => (i + delta + count) % count);
 
+  // The frame shown before this one — rendered behind the incoming image so a
+  // step reads as a dissolve rather than a blink to the dark backdrop. The ref
+  // updates after paint, so during a render it still holds the outgoing frame.
+  const prevIdx = useRef(-1);
+  useEffect(() => { prevIdx.current = open; }, [open]);
+  const prevSrc =
+    open >= 0 && prevIdx.current >= 0 && prevIdx.current !== open && isImageRef(frames[prevIdx.current])
+      ? frames[prevIdx.current]
+      : null;
+
+  // Warm the neighbours while the lightbox is open so stepping never waits.
+  useEffect(() => {
+    if (open < 0 || count < 2) return;
+    [frames[(open + 1) % count], frames[(open - 1 + count) % count]].forEach((f) => {
+      if (isImageRef(f)) { const img = new Image(); img.src = f; }
+    });
+  }, [open, count, frames]);
+
   useEffect(() => {
     if (open < 0) return;
     const onKey = (e) => {
@@ -348,15 +367,21 @@ function InstallationStrip({ frames }) {
             >‹</button>
           )}
           <figure className="inc-lightbox__stage" onClick={(e) => e.stopPropagation()}>
-            {/* key={open} remounts the media each step so it cross-fades
-                between frames rather than hard-cutting (see .inc-lightbox__img). */}
+            {/* key={open} remounts the media each step and fades it in; the
+                outgoing frame is held as the wrapper's background so the fade
+                is a true dissolve between images, never a blink to black. */}
             {isImageRef(frames[open]) ? (
-              <img
-                key={open}
-                className="inc-lightbox__img inc-lightbox__img--photo"
-                src={frames[open]}
-                alt={"Installation view " + (open + 1)}
-              />
+              <div
+                className="inc-lightbox__xfade"
+                style={prevSrc ? { backgroundImage: 'url("' + prevSrc + '")' } : null}
+              >
+                <img
+                  key={open}
+                  className="inc-lightbox__img inc-lightbox__img--photo"
+                  src={frames[open]}
+                  alt={"Installation view " + (open + 1)}
+                />
+              </div>
             ) : (
               <Tile key={open} kind={frames[open]} aspect="3/2" className="inc-lightbox__img" />
             )}
@@ -378,11 +403,13 @@ function InstallationStrip({ frames }) {
 /* ---------- PRESS ITEM ---------------------------------------------------- */
 function PressItem({ item }) {
   return (
-    <a href={item.href} className="inc-press-item">
-      <span className="inc-press-item__date">{item.date}</span>
+    <a href={item.href} className="inc-press-item" target="_blank" rel="noopener">
       <span className="inc-press-item__pub">{item.pub}</span>
       <span className="inc-press-item__title">{item.title}</span>
-      <span className="inc-press-item__cta">Read ↗</span>
+      {/* U+FE0E pins the arrow to text presentation — without it iOS/Android
+          can swap U+2197 for the boxed emoji glyph. Decorative: the row's
+          name comes from pub + title. */}
+      <span className="inc-press-item__cta" aria-hidden="true">{"↗︎"}</span>
     </a>
   );
 }
@@ -397,20 +424,24 @@ function Footer({ onNav }) {
   const mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(c.mapQuery || "Incubator London");
   return (
     <footer className="inc-footer">
-      <div className="container inc-footer__inner">
+      {/* Deliberately NOT a .container — site.css owns the inner sizing so
+          .mock .container's padding/max-width can't fight it (#108). */}
+      <div className="inc-footer__inner">
         <div className="inc-footer__brand">
           <p>
             {(c.addressLines || []).map((line, i) => <React.Fragment key={i}>{line}<br/></React.Fragment>)}
             <a href={mapsUrl} target="_blank" rel="noopener">View map</a>
           </p>
         </div>
+        {/* The © sits in its own centre column so the address and contact
+            columns stay the same height. */}
+        <div className="inc-footer__legal">&copy; 2026 Incubator</div>
         <div className="inc-footer__contact">
           <p>
             <a href={"mailto:" + c.enquiriesEmail}>{c.enquiriesEmail}</a><br/>
             <a href={c.instagramUrl} target="_blank" rel="noopener">{c.instagramHandle}</a><br/>
             <a href="#" onClick={(e)=>{e.preventDefault(); onNav && onNav("/contact");}}>Subscribe to mailing list</a>
           </p>
-          <div className="inc-footer__legal">&copy; 2026 Incubator</div>
         </div>
       </div>
     </footer>

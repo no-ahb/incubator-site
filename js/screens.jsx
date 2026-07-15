@@ -46,11 +46,14 @@ function HomeScreen({ onNav }) {
       </main>
     );
   }
-  const next = EXHIBITIONS
+  // Every genuinely upcoming show, soonest first — the season ahead is listed
+  // in full with dates, not just the next opening (#125).
+  const upcoming = EXHIBITIONS
     .filter((e) => e.id !== current.id && (e.startISO || "") > TODAY)
-    .sort((a, b) => (a.startISO || "").localeCompare(b.startISO || ""))[0];
+    .sort((a, b) => (a.startISO || "").localeCompare(b.startISO || ""));
+  // Everything already opened except the lead show (upcoming = startISO > TODAY).
   const past = all
-    .filter((e) => e.id !== current.id && (!next || e.id !== next.id))
+    .filter((e) => e.id !== current.id && (e.startISO || "") <= TODAY)
     .sort((a, b) => (b.startISO || "").localeCompare(a.startISO || ""))
     .slice(0, 8);
 
@@ -86,13 +89,14 @@ function HomeScreen({ onNav }) {
         </div>
       </section>
 
-      {/* Forthcoming — only when a genuinely upcoming show exists */}
-      {next && (
+      {/* Forthcoming — every upcoming show, soonest first, with dates (#125) */}
+      {upcoming.length > 0 && (
       <section className="inc-section container">
         <header className="inc-section__head">
           <h2>Forthcoming</h2>
         </header>
-        <div className="inc-coming">
+        {upcoming.map((next) => (
+        <div className="inc-coming" key={next.id}>
           <a
             href={"#/exhibitions/" + next.id}
             className="inc-card"
@@ -101,11 +105,17 @@ function HomeScreen({ onNav }) {
             <Poster ex={next} size="card" />
           </a>
           <div className="inc-coming__meta">
-            <span className="inc-eyebrow">Opening {next.startISO.slice(8,10)} {monthName(next.startISO)}</span>
+            {/* When the show has its own opening line, don't derive a second
+                (contradicting) date from startISO — openings are usually the
+                evening before the public dates. */}
+            <span className="inc-eyebrow">
+              {next.openingNote ? "Forthcoming" : <>Opening {parseInt(next.startISO.slice(8,10), 10)} {monthName(next.startISO)}</>}
+            </span>
             <h3 className="inc-hero__title">
               {next.isGroup ? <em>{next.title}</em> : <>{next.artist}{next.title ? <>:&nbsp;<em>{next.title}</em></> : null}</>}
             </h3>
             <div className="inc-meta">{next.dates}</div>
+            {next.openingNote ? <div className="inc-meta">{next.openingNote}</div> : null}
             <a
               className="inc-hero__cta"
               href={"#/exhibitions/" + next.id}
@@ -115,6 +125,7 @@ function HomeScreen({ onNav }) {
             </a>
           </div>
         </div>
+        ))}
       </section>
       )}
 
@@ -177,10 +188,12 @@ function ExhibitionsListScreen({ onNav }) {
   // Warm the browser cache for the hover preview posters during idle time so the
   // image is already loaded on first hover instead of fetching on demand (#95).
   // Skipped on data-saver / slow connections to avoid a heavy background load.
+  // Capped to the first rows on screen: warming every hero pulled ~35 MB per
+  // visit; the list is date-sorted, so the top posters are the likely hovers.
   msEffect(() => {
     const conn = navigator.connection;
     if (conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || ""))) return;
-    const urls = all.map((e) => e.heroImage).filter(Boolean);
+    const urls = sorted.slice(0, 8).map((e) => e.heroImage).filter(Boolean);
     const warm = () => urls.forEach((src) => { const img = new Image(); img.src = src; });
     const ric = window.requestIdleCallback;
     if (ric) { const h = ric(warm); return () => window.cancelIdleCallback && window.cancelIdleCallback(h); }
@@ -224,7 +237,7 @@ function ExhibitionsListScreen({ onNav }) {
               </button>
             ))}
           </div>
-          <span className="inc-listbar__count">{sorted.length} exhibition{sorted.length === 1 ? "" : "s"}</span>
+          <span className="inc-eyebrow inc-listbar__count">{sorted.length} exhibition{sorted.length === 1 ? "" : "s"}</span>
           <div className="inc-toggle" role="tablist" aria-label="Sort">
             <button role="tab" aria-selected={sort==="date"}  className={sort==="date"  ? "is-active":""} onClick={()=>setSort("date")}>By date</button>
             <button role="tab" aria-selected={sort==="alpha"} className={sort==="alpha" ? "is-active":""} onClick={()=>setSort("alpha")}>A – Z</button>
@@ -264,13 +277,18 @@ function ExhibitionsListScreen({ onNav }) {
               >
                 <Poster ex={preview} size="card" />
                 <div className="inc-list__preview-meta">
-                  <span>
+                  {/* Title sits on its own line under the artist — inline it
+                      wrapped awkwardly on long titles (#114). */}
+                  <span className="inc-list__preview-main">
                     {preview.isGroup
                       ? (preview.title ? <em>{preview.title}</em> : null)
-                      : <>{preview.artist}{preview.title ? <> · <em>{preview.title}</em></> : null}</>
+                      : <>
+                          <span>{preview.artist}</span>
+                          {preview.title ? <em>{preview.title}</em> : null}
+                        </>
                     }
                   </span>
-                  <span>{preview.dates}</span>
+                  <span className="inc-list__preview-dates">{preview.dates}</span>
                 </div>
               </a>
             ) : null}
@@ -286,7 +304,21 @@ function ExhibitionsListScreen({ onNav }) {
    ===================================================================== */
 function ExhibitionDetailScreen({ id, onNav }) {
   const all = [...EXHIBITIONS, ...EXHIBITION_ARCHIVE];
-  const ex = all.find((e) => e.id === id) || EXHIBITIONS[0];
+  const ex = all.find((e) => e.id === id);
+  // A stale or mistyped URL gets an honest not-found, not an arbitrary show
+  // presented as if it were the page asked for.
+  if (!ex) {
+    return (
+      <main className="inc-main">
+        <div className="container" style={{ padding: "80px 0" }}>
+          <p className="inc-prose" style={{ color: "var(--ink-3)" }}>Exhibition not found.</p>
+          <p className="inc-back" style={{ marginTop: "var(--s-6)" }}>
+            <a href="#/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>← Back to exhibitions</a>
+          </p>
+        </div>
+      </main>
+    );
+  }
   const artistRec = !ex.isGroup ? ARTISTS.find((a) => a.id === ex.artistId) : null;
   // "Other exhibitions by …" includes both the artist's own solo shows and any
   // group shows they were featured in. Solo shows key off artistId; group shows
@@ -326,6 +358,11 @@ function ExhibitionDetailScreen({ id, onNav }) {
               : <>{artistRec ? artistLink(ex.artist) : ex.artist}{ex.title ? <>: <em>{ex.title}</em></> : null}</>}
           </h1>
           <div className="inc-meta">{ex.dates}</div>
+          {/* The opening line matters until the show opens; afterwards it would
+              read as stale ("Opening on the evening of 9 September" on a past
+              show), and no admin field exists to clear it. */}
+          {ex.openingNote && ex.startISO && ex.startISO > new Date().toISOString().slice(0, 10)
+            ? <div className="inc-meta">{ex.openingNote}</div> : null}
           {ex.isGroup && (ex.groupArtists || []).length > 0 && (
             <div className="inc-participants">
               <span className="inc-participants__label">Artists</span>
@@ -349,15 +386,32 @@ function ExhibitionDetailScreen({ id, onNav }) {
           )}
         </div>
 
-        <section id="installation" className="container inc-detail__installation">
-          <h3>Installation views</h3>
-          <InstallationStrip frames={ex.installation || ["a","b","c","d","e","f"]} />
-        </section>
+        {/* Forthcoming shows have no photography or release yet — hide the
+            empty sections rather than showing bare headings (#125). */}
+        {(ex.installation || []).length > 0 && (
+          <section id="installation" className="container inc-detail__installation">
+            <h3>Installation views</h3>
+            <InstallationStrip frames={ex.installation} />
+          </section>
+        )}
 
-        <section id="release" className="container inc-detail__release">
-          <h3>Press release</h3>
-          <PressRelease paragraphs={ex.pressRelease || []} />
-        </section>
+        {hasRichContent(ex.pressRelease) && (
+          <section id="release" className="container inc-detail__release">
+            <h3>Press release</h3>
+            <PressRelease paragraphs={ex.pressRelease} />
+          </section>
+        )}
+
+        {/* Coverage of this show specifically — kept off the site-wide Press
+            page on purpose (#115–#124). */}
+        {(ex.press || []).length > 0 && (
+          <section className="container inc-detail__press">
+            <h3>Press</h3>
+            <div className="inc-press-list">
+              {ex.press.map((it, i) => <PressItem key={i} item={it} />)}
+            </div>
+          </section>
+        )}
 
         {!ex.isGroup && ex.artist && (
           <p className="container inc-detail__enquire">
@@ -394,6 +448,14 @@ function ExhibitionDetailScreen({ id, onNav }) {
       </article>
     </main>
   );
+}
+
+// A press release is "real" when it has visible text. A cleared rich-text
+// editor saves markup like "<p><br></p>" — non-empty as a string, blank on
+// screen — which must not resurrect a bare "Press release" heading.
+function hasRichContent(v) {
+  if (Array.isArray(v)) return v.some((p) => String(p).trim());
+  return String(v || "").replace(/<[^>]*>|&nbsp;/gi, "").trim().length > 0;
 }
 
 function slug(name) {
@@ -453,10 +515,14 @@ function ArtistScreen({ id, onNav }) {
               </div>
             </header>
 
-            <section className="container inc-detail__installation">
-              <h3>Installation views</h3>
-              <InstallationStrip frames={ex.installation || []} />
-            </section>
+            {/* Same guard as the exhibition page — no bare heading over an
+                empty strip for a show without photography yet (#125). */}
+            {(ex.installation || []).length > 0 && (
+              <section className="container inc-detail__installation">
+                <h3>Installation views</h3>
+                <InstallationStrip frames={ex.installation} />
+              </section>
+            )}
           </div>
         ))}
 
@@ -481,6 +547,7 @@ function ArtistScreen({ id, onNav }) {
    PRESS — chronological, 2026 first
    ===================================================================== */
 function PressScreen() {
+  // PRESS arrives canonical from data.jsx (one merged group per year, #110).
   const ordered = [...PRESS].sort((a, b) => b.year - a.year);
   return (
     <main className="inc-main">
@@ -540,16 +607,15 @@ function AboutScreen() {
         </div>
 
         {team.length > 0 && (
-          <section className="container inc-detail__bio" style={{ paddingInline: 0, marginTop: "var(--s-16)" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "auto auto auto", justifyContent: "start", columnGap: "0.6em", rowGap: "var(--s-3)", fontSize: 16, fontWeight: 700 }}>
-              {team.map((m, i) => (
-                <React.Fragment key={i}>
-                  <span style={{ textAlign: "left" }}>{m.name}</span>
-                  <span style={{ textAlign: "center" }}>—</span>
-                  <span>{m.role}</span>
-                </React.Fragment>
-              ))}
-            </div>
+          <section className="inc-about__team">
+            {/* Each member is one flowing line — the old aligned-columns grid
+                stretched the dash away from short names (#113). */}
+            {team.map((m, i) => (
+              <p key={i}>
+                {m.name}
+                <span className="inc-about__team-role"> — {m.role}</span>
+              </p>
+            ))}
           </section>
         )}
       </article>
@@ -659,7 +725,9 @@ function ContactScreen() {
 
             <h3>Mailing list</h3>
             <p>
-              <a className="inc-btn" href={c.mailingListUrl} target="_blank" rel="noopener" onClick={openSubscribe}>
+              {/* A plain link, like every other link in this column — the green
+                  centred button read as out of place here (#112). */}
+              <a href={c.mailingListUrl} target="_blank" rel="noopener" onClick={openSubscribe}>
                 Subscribe
               </a>
             </p>

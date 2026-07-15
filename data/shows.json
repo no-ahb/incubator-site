@@ -1,6 +1,40 @@
 {
   "exhibitions": [
     {
+      "id": "amelia-cross",
+      "artistId": null,
+      "artist": "Amelia Cross",
+      "title": "",
+      "dates": "10 – 26 September 2026",
+      "startISO": "2026-09-10",
+      "endISO": "2026-09-26",
+      "openingNote": "Opening on the evening of 9 September",
+      "palette": "sap",
+      "heroImage": "assets/shows/amelia-cross/amelia-cross-sewn-painting.jpg"
+    },
+    {
+      "id": "kirubel-mandefro",
+      "artistId": null,
+      "artist": "Kirubel Mandefro",
+      "title": "",
+      "dates": "8 October – 1 November 2026",
+      "startISO": "2026-10-08",
+      "endISO": "2026-11-01",
+      "openingNote": "Opening on the evening of 7 October",
+      "palette": "sap"
+    },
+    {
+      "id": "valentina-attolini",
+      "artistId": null,
+      "artist": "Valentina Attolini",
+      "title": "",
+      "dates": "5 – 29 November 2026",
+      "startISO": "2026-11-05",
+      "endISO": "2026-11-29",
+      "openingNote": "Opening on 4 November",
+      "palette": "sap"
+    },
+    {
       "id": "quiet-companions",
       "artistId": null,
       "artist": "Quiet Companions",
@@ -176,7 +210,19 @@
         "assets/shows/harry-grundy-full-pelt/5.jpg",
         "assets/shows/harry-grundy-full-pelt/6.jpg"
       ],
-      "heroImage": "assets/shows/harry-grundy-full-pelt/hero.jpg"
+      "heroImage": "assets/shows/harry-grundy-full-pelt/hero.jpg",
+      "press": [
+        {
+          "pub": "Plaster",
+          "title": "Plaster Paparazzi: Harry Grundy at Incubator",
+          "href": "https://plastermagazine.com/paparazzi/plaster-paparazzi-harry-grundy-incubator/"
+        },
+        {
+          "pub": "GoWithYamo",
+          "title": "15 Questions with... Harry Grundy",
+          "href": "https://www.gowithyamo.com/editorial/15-questions-with-harry-grundy"
+        }
+      ]
     },
     {
       "id": "lorena-levi-cold-hard-plastic",
@@ -263,7 +309,19 @@
         "assets/shows/maya-gurung-russell-campbell-i-want-to-be-ready/5.jpg",
         "assets/shows/maya-gurung-russell-campbell-i-want-to-be-ready/6.jpg"
       ],
-      "heroImage": "assets/shows/maya-gurung-russell-campbell-i-want-to-be-ready/1784038629939-Incubator_-_GUC_Works_-_33.jpg"
+      "heroImage": "assets/shows/maya-gurung-russell-campbell-i-want-to-be-ready/1784038629939-Incubator_-_GUC_Works_-_33.jpg",
+      "press": [
+        {
+          "pub": "FLO London",
+          "title": "In conversation with Maya Gurung-Russell Campbell",
+          "href": "https://www.flolondon.co.uk/all-posts/in-conversation-with-maya-gurung-russell-campbell"
+        },
+        {
+          "pub": "Copy",
+          "title": "Maya Gurung-Russell Campbell at Incubator",
+          "href": "https://readcopy.co/Maya-Gurung-Russell-Campbell-at-Incubator"
+        }
+      ]
     },
     {
       "id": "kasia-wozniak-stillpoint",
@@ -296,7 +354,29 @@
         "assets/shows/kasia-wozniak-stillpoint/5.jpg",
         "assets/shows/kasia-wozniak-stillpoint/6.jpg"
       ],
-      "heroImage": "assets/shows/kasia-wozniak-stillpoint/hero.jpg"
+      "heroImage": "assets/shows/kasia-wozniak-stillpoint/hero.jpg",
+      "press": [
+        {
+          "pub": "METAL",
+          "title": "Kasia Wozniak: Celebrating the Imperfections",
+          "href": "https://metalmagazine.eu/en/post/kasia-wozniak"
+        },
+        {
+          "pub": "Wallpaper",
+          "title": "Emerging artist Kasia Wozniak's traditional photography techniques make for ethereal images",
+          "href": "https://www.wallpaper.com/art/photography/kasia-wozniak-exhibition-incubator-london"
+        },
+        {
+          "pub": "10 Magazine",
+          "title": "Ten Craves: Valentino Stages A Spring Sleepover, Burberry Lands At The Standard, Ibiza And More!",
+          "href": "https://10magazine.com/ten-craves-valentino-burberry-schiaparelli-erdem-ganni/"
+        },
+        {
+          "pub": "SHOWstudio",
+          "title": "SHOWnews: The World's Largest Art Project, Edward Burra and Designing the Future",
+          "href": "https://www.showstudio.com/news/shownews-the-worlds-largest-art-project-edward-burra"
+        }
+      ]
     },
     {
       "id": "losel-yauch-until-next-time",
@@ -480,7 +560,14 @@
         "assets/shows/yuma-radne-playing-with-hands/5.jpg",
         "assets/shows/yuma-radne-playing-with-hands/6.jpg"
       ],
-      "heroImage": "assets/shows/yuma-radne-playing-with-hands/hero.jpg"
+      "heroImage": "assets/shows/yuma-radne-playing-with-hands/hero.jpg",
+      "press": [
+        {
+          "pub": "METAL",
+          "title": "Yuma Radne: It's All Fun and Games… and Identity",
+          "href": "https://metalmagazine.eu/en/post/yuma-radne"
+        }
+      ]
     },
     {
       "id": "tamara-al-mashouk-i-don-t-want-to-stab-the-beast-i-just-want-to-go-home",
@@ -611,7 +698,14 @@
         "assets/shows/orfeo-tagiuri-the-great-bambino/5.jpg",
         "assets/shows/orfeo-tagiuri-the-great-bambino/6.jpg"
       ],
-      "heroImage": "assets/shows/orfeo-tagiuri-the-great-bambino/hero.jpg"
+      "heroImage": "assets/shows/orfeo-tagiuri-the-great-bambino/hero.jpg",
+      "press": [
+        {
+          "pub": "WWD",
+          "title": "Orfeo Tagiuri Looked to Delinquency and Death for Latest Exhibition",
+          "href": "https://wwd.com/eye/scoops/orfeo-tagiuri-looked-to-delinquency-death-for-latest-london-exhibition-1236693555/"
+        }
+      ]
     },
     {
       "id": "fungai-benhura-both-directions-at-once",
@@ -725,7 +819,19 @@
         "assets/shows/corbin-shaw-little-dark-age/5.jpg",
         "assets/shows/corbin-shaw-little-dark-age/6.jpg"
       ],
-      "heroImage": "assets/shows/corbin-shaw-little-dark-age/1783697369577-Incubator_-_Corbin_Shaw_-_Works_-_03.jpg"
+      "heroImage": "assets/shows/corbin-shaw-little-dark-age/1783697369577-Incubator_-_Corbin_Shaw_-_Works_-_03.jpg",
+      "press": [
+        {
+          "pub": "HERO",
+          "title": "Corbin Shaw's dark age, Nan Goldin and too many festivals to count",
+          "href": "https://hero-magazine.com/article/256692/corbin-shaws-dark-age-nan-goldin-and-too-many-festivals-to-count"
+        },
+        {
+          "pub": "SHOWstudio",
+          "title": "Dreaming of England? Corbin Shaw's 'Little Dark Age' Opens in London",
+          "href": "https://www.showstudio.com/news/dreaming-of-england-corbin-shaws-little-dark-age-opens-in-london"
+        }
+      ]
     },
     {
       "id": "lucrezia-abatzoglu-feminarium",
@@ -908,7 +1014,14 @@
         "assets/shows/elinor-stanley-tropo/5.jpg",
         "assets/shows/elinor-stanley-tropo/6.jpg"
       ],
-      "heroImage": "assets/shows/elinor-stanley-tropo/1783697606337-Screenshot_2026-07-10_at_16_33_11.jpg"
+      "heroImage": "assets/shows/elinor-stanley-tropo/1783697606337-Screenshot_2026-07-10_at_16_33_11.jpg",
+      "press": [
+        {
+          "pub": "Dazed",
+          "title": "Incubator's latest programme celebrates London's young, thriving art scene",
+          "href": "https://www.dazeddigital.com/art-photography/article/60845/1/incubator-autumn-2023-programme-celebrates-london-young-thriving-art-scene"
+        }
+      ]
     },
     {
       "id": "oleksandra-marston-still",
@@ -1680,7 +1793,14 @@
         "assets/shows/five-by-five/5.jpg",
         "assets/shows/five-by-five/6.jpg"
       ],
-      "heroImage": "assets/shows/five-by-five/hero.jpg"
+      "heroImage": "assets/shows/five-by-five/hero.jpg",
+      "press": [
+        {
+          "pub": "Elephant",
+          "title": "Rendering the Invisible Visible: Five by Five at the Incubator",
+          "href": "https://elephant.art/five-by-five-at-the-incubator/"
+        }
+      ]
     },
     {
       "id": "utopia",
@@ -1778,7 +1898,14 @@
         "assets/shows/mind-to-hand/5.jpg",
         "assets/shows/mind-to-hand/6.jpg"
       ],
-      "heroImage": "assets/shows/mind-to-hand/hero.jpg"
+      "heroImage": "assets/shows/mind-to-hand/hero.jpg",
+      "press": [
+        {
+          "pub": "SHOWstudio",
+          "title": "SHOWnews: Your Weekly Arts Bulletin",
+          "href": "https://www.showstudio.com/news/shownews-your-weekly-arts-bulletin-15"
+        }
+      ]
     },
     {
       "id": "the-yellow-wallpaper",
@@ -1890,7 +2017,19 @@
         "assets/shows/notes-from-the-studio/5.jpg",
         "assets/shows/notes-from-the-studio/6.jpg"
       ],
-      "heroImage": "assets/shows/notes-from-the-studio/hero.jpg"
+      "heroImage": "assets/shows/notes-from-the-studio/hero.jpg",
+      "press": [
+        {
+          "pub": "AnOther Magazine",
+          "title": "Notes from the Studios of Tracey Emin, Bella Freud and Christian Marclay",
+          "href": "https://www.anothermag.com/art-photography/16838/notes-from-the-studio-incubor-tracey-emin-francesco-risso-claire-keegan"
+        },
+        {
+          "pub": "Wallpaper",
+          "title": "What do creatives pin to their walls? Artists from Tracey Emin to Michael Stipe reveal all",
+          "href": "https://www.wallpaper.com/art/exhibitions-shows/notes-from-the-studio-artists-pin-ups-incubator-london"
+        }
+      ]
     }
   ],
   "artists": [
@@ -2392,7 +2531,7 @@
         {
           "date": "",
           "pub": "Wallpaper",
-          "title": "",
+          "title": "London gallery Incubator's six emerging artists to see in spring 2024",
           "href": "https://www.wallpaper.com/art/exhibitions-shows/incubator-gallery-spring-2024-solo-shows-london"
         }
       ]
@@ -2403,51 +2542,31 @@
         {
           "date": "",
           "pub": "Where's the Frame",
-          "title": "",
+          "title": "Incubator Launches as Permanent Space",
           "href": "https://www.wherestheframe.com/post/incubator-launches-as-permanent-space"
-        }
-      ]
-    },
-    {
-      "year": 2023,
-      "items": [
+        },
         {
           "date": "",
           "pub": "Something Curated",
-          "title": "",
+          "title": "Interview: London Gallerist Angelica Jopling On The Launch Of Incubator",
           "href": "https://somethingcurated.com/2023/04/26/interview-london-gallerist-angelica-jopling-on-the-launch-of-incubator/"
-        }
-      ]
-    },
-    {
-      "year": 2023,
-      "items": [
+        },
         {
           "date": "",
           "pub": "Ocula Magazine",
-          "title": "",
+          "title": "Angelica Jopling's Incubator Finds a Permanent Home on Chiltern Street",
           "href": "https://ocula.com/magazine/spotlight/angelica-jopling-incubator/"
-        }
-      ]
-    },
-    {
-      "year": 2023,
-      "items": [
+        },
         {
           "date": "",
-          "pub": "Flaunt Magazine",
-          "title": "",
+          "pub": "Flaunt",
+          "title": "Angelica Jopling | A Beautiful Boundary Erosion",
           "href": "https://www.flaunt.com/post/angelica-jopling-the-besties-issue"
-        }
-      ]
-    },
-    {
-      "year": 2023,
-      "items": [
+        },
         {
           "date": "",
           "pub": "Vogue Italia",
-          "title": "",
+          "title": "Angelica Jopling e la ridefinizione della scena artistica di Londra",
           "href": "https://www.vogue.it/article/angelica-jopling-incubator-galleria-londra"
         }
       ]
@@ -2457,19 +2576,14 @@
       "items": [
         {
           "date": "",
-          "pub": "Another Magazine",
-          "title": "",
+          "pub": "AnOther Magazine",
+          "title": "Inside a New Exhibition Celebrating London's Emerging Artists",
           "href": "https://www.anothermag.com/art-photography/14062/inside-a-new-exhibition-celebrating-londons-emerging-artists-incubator-22"
-        }
-      ]
-    },
-    {
-      "year": 2022,
-      "items": [
+        },
         {
           "date": "",
           "pub": "Dazed",
-          "title": "",
+          "title": "Incubator 22 is the 'adrenalised series' spotlighting six new artists",
           "href": "https://www.dazeddigital.com/art-photography/article/55993/1/incubator-22-is-the-adrenalised-series-spotlighting-six-new-artists"
         }
       ]
@@ -2480,7 +2594,7 @@
         {
           "date": "",
           "pub": "Evening Standard",
-          "title": "",
+          "title": "Incubator 21: Young artists get solo West End shows",
           "href": "https://www.standard.co.uk/news/uk/young-artists-london-west-end-shows-incubator-21-angelica-jopling-b959462.html"
         }
       ]

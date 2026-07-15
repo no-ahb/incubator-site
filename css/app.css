@@ -31,12 +31,6 @@
   .mock .container { padding-inline: var(--gutter-lg); }
 }
 
-/* Footer keeps its full-bleed surface background while its inner content
-   stays aligned to the same measure as the rest of the page. */
-.inc-footer__inner {
-  max-width: var(--content-max);
-  margin-inline: auto;
-}
 
 /* Smooth in-page jumps for the detail-page section links (#installation,
    #release, #biography, #show-N) — offset so the sticky header never covers
@@ -67,10 +61,6 @@ html { scroll-behavior: smooth; }
   margin-top: var(--s-10);
   padding-top: var(--s-8);
   border-top: 1px solid var(--hairline);
-}
-.inc-related h3 {
-  font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
-  font-weight: 600; color: var(--ink-3); margin: 0 0 var(--s-5);
 }
 .inc-related__items { display: flex; flex-direction: column; }
 .inc-related__row { border-top: 1px solid var(--hairline); }
@@ -147,7 +137,7 @@ html { scroll-behavior: smooth; }
   border-radius: 50%;
   font-size: 11px;
   line-height: 1;
-  font-weight: 700;
+  font-weight: 400;
 }
 
 /* Modal -------------------------------------------------------------------- */
