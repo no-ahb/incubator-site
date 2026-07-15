@@ -316,20 +316,21 @@ ul { list-style: none; padding: 0; margin: 0; }
 }
 .inc-detail__head h1 em { font-style: italic; }
 
-/* Section labels — sentence case, regular weight, quiet grey. ONE convention
-   site-wide (detail sections, contact, related shows): letterspaced caps at a
-   synthetic 600 weight read muddy in Century Schoolbook, which only ships a
-   400 master. Status eyebrows (.inc-eyebrow) deliberately stay small caps. */
+/* Section labels — ONE spec site-wide (detail sections, related shows,
+   contact): small caps in ink at TRUE regular weight with wide, even
+   tracking. Never 600/700 — the brand face ships one 400 master and
+   synthetic bold reads muddy (#107). */
 .inc-detail__installation h3,
 .inc-detail__release h3,
 .inc-detail__press h3,
 .inc-detail__bio h3,
-.inc-related h3 {
-  font-size: 15px;
+.inc-related h3,
+.inc-contact h3 {
+  font-size: 12px;
   font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--ink-3);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
   margin: 0 0 var(--s-5);
 }
 
@@ -483,6 +484,8 @@ ul { list-style: none; padding: 0; margin: 0; }
 .inc-press-item__pub { font-size: 15px; font-style: italic; }
 .inc-press-item__title {
   font-size: 17px;
+  justify-self: start;   /* shrink to the text so the hover rule underlines
+                            only the headline, not the whole 1fr column */
   background-image: linear-gradient(currentColor, currentColor);
   background-repeat: no-repeat;
   background-position: 0 100%;
@@ -523,17 +526,8 @@ ul { list-style: none; padding: 0; margin: 0; }
   margin-top: var(--s-6);
 }
 @media (max-width: 900px) { .inc-contact__grid { grid-template-columns: 1fr; gap: var(--s-10); } }
-/* Contact keeps caps labels — set in ink at true regular weight with wide,
-   even tracking and generous space above each group, so they read as quiet
-   structure rather than the muddy faux-bold grey they replaced. */
-.inc-contact h3 {
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink);
-  margin: var(--s-8) 0 var(--s-3);
-}
+/* Label spec shared above; contact only spaces its groups differently. */
+.inc-contact h3 { margin: var(--s-8) 0 var(--s-3); }
 .inc-contact h3:first-of-type { margin-top: 0; }
 .inc-contact p { font-size: 16px; line-height: 1.55; margin: 0 0 var(--s-4); }
 
