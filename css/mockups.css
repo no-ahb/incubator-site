@@ -103,11 +103,15 @@
 .inc-list__preview-link:hover { color: inherit; border: 0; }
 .inc-list__preview-meta {
   display: flex; justify-content: space-between; align-items: baseline;
+  gap: var(--s-6);
   font-size: 14px;
   color: var(--ink-3);
   letter-spacing: 0.04em;
 }
+/* Artist on the first line, italic title on its own line beneath (#114). */
+.inc-list__preview-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .inc-list__preview-meta em { font-style: italic; color: var(--ink); }
+.inc-list__preview-dates { flex-shrink: 0; text-align: right; }
 
 /* Sort + filter row above the list */
 .inc-listbar {
@@ -118,12 +122,8 @@
   padding: var(--s-3) 0;
   margin-top: var(--s-4);
 }
-.inc-listbar__count {
-  font-size: 13px;
-  color: var(--ink-3);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
+/* Caps spec comes from .inc-eyebrow (shared class); only the layout differs. */
+.inc-listbar__count { margin-bottom: 0; }
 /* On narrow artboards the three groups can't share one row: the tabs get
    squeezed until their labels ("Group shows", "By date", "A – Z") break
    mid-word. Stack the row instead — filter tabs, count, then sort tabs — each
@@ -214,6 +214,12 @@
   border-top: 1px solid var(--hairline);
 }
 .inc-coming__meta { display: flex; flex-direction: column; gap: var(--s-3); }
+/* Several forthcoming shows can now stack (#125); on narrow viewports each
+   row folds to poster-above-text instead of squeezing two columns. */
+.inc-coming + .inc-coming { margin-top: var(--s-10); }
+@container (max-width: 700px) {
+  .inc-coming { grid-template-columns: 1fr; gap: var(--s-5); }
+}
 
 /* The "Past" archive grid — denser than primary card grid */
 .inc-past {
@@ -439,15 +445,3 @@
   padding-inline: var(--gutter-lg);
 }
 
-/* Footer: two columns (address left, contact hard right — no seal). */
-.mock .inc-footer__inner {
-  grid-template-columns: 1fr 1fr;
-  gap: var(--s-8);
-}
-.inc-footer__brand .inc-wordmark { display: block; margin-bottom: var(--s-3); }
-@container (max-width: 900px) {
-  .mock .inc-footer__inner { grid-template-columns: 1fr 1fr; }
-}
-@container (max-width: 600px) {
-  .mock .inc-footer__inner { grid-template-columns: 1fr; gap: var(--s-6); }
-}

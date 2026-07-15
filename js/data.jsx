@@ -23,15 +23,32 @@ let SITE_DATA = null;
 
 const DATA_URL = "data/shows.json";
 
+// Older Worker saves appended one group per article, repeating the year heading
+// on the Press page (#110). Canonicalise at ingestion — one group per year,
+// newest first — so every consumer sees merged data. Number() also merges a
+// hand-edited "2023" string with a numeric 2023.
+function mergePressYears(groups) {
+  const byYear = new Map();
+  groups.forEach((g) => {
+    const year = Number(g && g.year) || 0;
+    byYear.set(year, (byYear.get(year) || []).concat((g && g.items) || []));
+  });
+  return [...byYear.entries()]
+    .sort((a, b) => b[0] - a[0])
+    .map(([year, items]) => ({ year, items }));
+}
+
 async function loadSiteData() {
-  // no-store so an admin sees their edit immediately after the Pages redeploy.
-  const res = await fetch(DATA_URL, { cache: "no-store" });
+  // no-cache (not no-store): always revalidates, so an admin still sees their
+  // edit immediately after the Pages redeploy — but an unchanged file answers
+  // with a 304 instead of re-downloading ~250 KB on every page load.
+  const res = await fetch(DATA_URL, { cache: "no-cache" });
   if (!res.ok) throw new Error(`Failed to load site data (${res.status})`);
   const data = await res.json();
 
   SITE_DATA = data;
   ARTISTS = Array.isArray(data.artists) ? data.artists : [];
-  PRESS = Array.isArray(data.press) ? data.press : [];
+  PRESS = mergePressYears(Array.isArray(data.press) ? data.press : []);
   EXHIBITION_ARCHIVE = (Array.isArray(data.archive) ? data.archive : []).filter((e) => !e.hidden);
   EXHIBITIONS = (Array.isArray(data.exhibitions) ? data.exhibitions : []).filter((e) => !e.hidden);
   ABOUT = (data.about && typeof data.about === "object") ? data.about : null;

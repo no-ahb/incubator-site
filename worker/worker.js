@@ -435,8 +435,10 @@ async function handleAdminSaveShow(request, env, cors) {
   const payload = body.payload;
 
   const show = normalizeShow(payload.show || {});
-  if (!show.title || (!show.isGroup && !show.artist)) {
-    return json({ ok: false, error: show.isGroup ? "A group show needs a title." : "Artist and title are required." }, 400, cors);
+  // Solo shows may be announced before they have a title (#125); group shows
+  // are named by their title.
+  if (show.isGroup ? !show.title : !show.artist) {
+    return json({ ok: false, error: show.isGroup ? "A group show needs a title." : "Artist is required." }, 400, cors);
   }
 
   // Rich text: new canonical HTML string, or legacy plain-paragraph array.
@@ -541,7 +543,6 @@ function normalizePress(input) {
       const items = Array.isArray(group && group.items)
         ? group.items
             .map((it) => ({
-              date: String((it && it.date) || "").trim(),
               pub: String((it && it.pub) || "").trim(),
               title: String((it && it.title) || "").trim(),
               href: String((it && it.href) || "").trim(),
@@ -551,6 +552,14 @@ function normalizePress(input) {
       return { year, items };
     })
     .filter((g) => g.year && g.items.length)
+    // Merge groups sharing a year so saved data stays canonical — one heading
+    // per year on the Press page (#110).
+    .reduce((acc, g) => {
+      const prev = acc.find((x) => x.year === g.year);
+      if (prev) prev.items.push(...g.items);
+      else acc.push(g);
+      return acc;
+    }, [])
     .sort((a, b) => b.year - a.year);
 }
 

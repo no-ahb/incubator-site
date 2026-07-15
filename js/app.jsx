@@ -34,8 +34,11 @@ function MobileMenu({ open, onNav, onClose }) {
   appEffect(() => {
     if (open) {
       wasOpen.current = true;
-      const first = document.querySelector(".inc-overlay__nav a");
-      if (first) first.focus();
+      // Focus the panel itself (tabIndex -1), not the first link — focusing the
+      // link paints a focus ring on "Exhibitions" every time the menu opens on
+      // touch devices (#109). Keyboard users tab straight into the first link.
+      const panel = document.querySelector(".inc-overlay__nav");
+      if (panel) panel.focus({ preventScroll: true });
     } else if (wasOpen.current) {
       wasOpen.current = false;
       const btn = document.querySelector(".inc-menu-btn");
@@ -55,7 +58,7 @@ function MobileMenu({ open, onNav, onClose }) {
       aria-label="Menu"
       aria-hidden={open ? undefined : "true"}
     >
-      <nav className="inc-overlay__nav container" aria-label="Primary">
+      <nav className="inc-overlay__nav container" aria-label="Primary" tabIndex={-1}>
         <ul>
           {items.map(([path, label]) => (
             <li key={path}>

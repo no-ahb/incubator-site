@@ -3,6 +3,9 @@
 /* ---------- Reset --------------------------------------------------------- */
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
+/* iOS paints a grey flash over tapped links/buttons — reads as a glitch on the
+   big menu items (#109). Focus states still show via :focus-visible. */
+html { -webkit-tap-highlight-color: transparent; }
 img, svg { display: block; max-width: 100%; }
 button { font: inherit; color: inherit; }
 ul { list-style: none; padding: 0; margin: 0; }
@@ -10,7 +13,7 @@ ul { list-style: none; padding: 0; margin: 0; }
 /* ---------- Wordmark ------------------------------------------------------ */
 .inc-wordmark {
   font-family: var(--font-serif);
-  font-weight: 700;
+  font-weight: 400; /* regular — synthetic bold reads too chunky (#107) */
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   white-space: nowrap;
@@ -93,6 +96,9 @@ ul { list-style: none; padding: 0; margin: 0; }
 .inc-overlay__nav {
   flex: 1; padding-top: var(--s-12);
 }
+/* The panel receives programmatic focus when it opens (app.jsx) purely to
+   anchor keyboard/AT flow — never show a ring on the container itself. */
+.inc-overlay__nav:focus { outline: none; }
 .inc-overlay__nav ul { display: flex; flex-direction: column; gap: 18px; }
 .inc-overlay__nav li {
   opacity: 0; transform: translateY(16px);
@@ -255,7 +261,7 @@ ul { list-style: none; padding: 0; margin: 0; }
 
 .inc-poster__wm {
   font-family: var(--font-serif);
-  font-weight: 700;
+  font-weight: 400; /* brand face is regular-only; synthetic bold reads chunky (#107) */
   letter-spacing: 0.06em;
   font-size: clamp(28px, 6vw, 96px);
   line-height: 1;
@@ -278,7 +284,7 @@ ul { list-style: none; padding: 0; margin: 0; }
   bottom: var(--s-4);
   left: 0; right: 0;
   font-family: var(--font-serif);
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: 0.08em;
   font-size: 11px;
   opacity: 0.85;
@@ -298,11 +304,20 @@ ul { list-style: none; padding: 0; margin: 0; }
 }
 .inc-detail__head h1 em { font-style: italic; }
 
+/* Section labels — sentence case, regular weight, quiet grey. ONE convention
+   site-wide (detail sections, contact, related shows): letterspaced caps at a
+   synthetic 600 weight read muddy in Century Schoolbook, which only ships a
+   400 master. Status eyebrows (.inc-eyebrow) deliberately stay small caps. */
 .inc-detail__installation h3,
 .inc-detail__release h3,
-.inc-detail__bio h3 {
-  font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
-  font-weight: 600;
+.inc-detail__press h3,
+.inc-detail__bio h3,
+.inc-related h3,
+.inc-contact h3 {
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--ink-3);
   margin: 0 0 var(--s-5);
 }
@@ -419,6 +434,11 @@ ul { list-style: none; padding: 0; margin: 0; }
   .inc-about__intro { grid-template-columns: 1fr; gap: var(--s-10); }
 }
 
+/* About: gallery team, one "Name — Role" line per member (#113). */
+.inc-about__team { margin-top: var(--s-16); }
+.inc-about__team p { font-size: 16px; margin: 0 0 var(--s-2); }
+.inc-about__team-role { color: var(--ink-3); }
+
 .inc-back { margin-top: var(--s-12); }
 .inc-back a { font-size: 14px; color: var(--ink-3); }
 .inc-back a:hover { color: var(--green); }
@@ -432,15 +452,15 @@ ul { list-style: none; padding: 0; margin: 0; }
 @media (min-width: 900px) { .inc-strip { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
 
 /* ---------- Press --------------------------------------------------------- */
-.inc-press-year { margin-bottom: var(--s-12); }
+.inc-press-year { margin-bottom: var(--s-10); }
 .inc-press-year h2 {
-  font-weight: 400; font-size: 28px; margin: 0 0 var(--s-4);
+  font-weight: 400; font-size: 28px; margin: 0 0 var(--s-2);
   padding-bottom: var(--s-3); border-bottom: 1px solid var(--hairline);
 }
 .inc-press-list { display: flex; flex-direction: column; }
 .inc-press-item {
   display: grid;
-  grid-template-columns: 140px 160px 1fr 60px;
+  grid-template-columns: 200px 1fr 60px;   /* pub · headline · cta (#110) */
   gap: var(--s-6);
   padding: var(--s-4) 0;
   border-bottom: 1px solid var(--hairline);
@@ -450,7 +470,6 @@ ul { list-style: none; padding: 0; margin: 0; }
 }
 .inc-press-item:hover { color: var(--green); }
 .inc-press-item:hover .inc-press-item__title { background-size: 100% 1px; }
-.inc-press-item__date { font-size: 14px; color: var(--ink-3); }
 .inc-press-item__pub { font-size: 15px; font-style: italic; }
 .inc-press-item__title {
   font-size: 17px;
@@ -492,10 +511,7 @@ ul { list-style: none; padding: 0; margin: 0; }
   margin-top: var(--s-6);
 }
 @media (max-width: 900px) { .inc-contact__grid { grid-template-columns: 1fr; gap: var(--s-10); } }
-.inc-contact h3 {
-  font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
-  font-weight: 600; color: var(--ink-3); margin: var(--s-6) 0 var(--s-3);
-}
+.inc-contact h3 { margin: var(--s-6) 0 var(--s-3); } /* label spec shared above */
 .inc-contact h3:first-of-type { margin-top: 0; }
 .inc-contact p { font-size: 16px; line-height: 1.55; margin: 0 0 var(--s-4); }
 
@@ -541,33 +557,42 @@ ul { list-style: none; padding: 0; margin: 0; }
    far-left gutter instead of lining up with the press-release heading (#91). */
 .inc-detail__enquire { margin-top: var(--s-10); }
 
-/* ---------- Footer -------------------------------------------------------- */
+/* ---------- Footer --------------------------------------------------------
+   A compact banner that hugs its text with a little room either side (#108),
+   centred on the page, rather than a full-bleed band with the columns pinned
+   to the viewport edges. Address stays left-justified, contact right-justified
+   — at every size, including phones (#111). */
 .inc-footer {
-  background: var(--surface);
   margin-top: var(--s-24);
-  padding: var(--s-12) 0;
+  padding: 0 var(--gutter) var(--s-10);
 }
 .inc-footer__inner {
+  background: var(--surface);
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--s-10);
+  grid-template-columns: auto auto;
+  column-gap: clamp(var(--s-10), 10vw, var(--s-32));
   align-items: start;
+  padding: var(--s-8) var(--s-10);
   font-family: var(--font-serif); font-size: 14px; line-height: 1.55;
 }
-/* Contact column hugs the right edge of the browser (#93); the brand column
-   stays left, giving the footer a balanced left/right split. */
-.inc-footer__contact { justify-self: end; text-align: right; }
+.inc-footer__contact { text-align: right; }
 .inc-footer p { margin: var(--s-3) 0 0; }
 .inc-footer a { color: var(--ink); }
 .inc-footer a:hover { color: var(--green); }
 .inc-footer__legal { margin-top: var(--s-6); font-size: 12px; color: var(--ink-3); }
-.inc-footer__seal { mix-blend-mode: multiply; }
-@media (max-width: 900px) {
-  .inc-footer__inner { grid-template-columns: 1fr 1fr; }
-  .inc-footer__seal { grid-column: span 2; justify-self: start; width: 96px !important; height: 96px !important; }
-}
 @media (max-width: 600px) {
-  .inc-footer__inner { grid-template-columns: 1fr; gap: var(--s-6); }
-  .inc-footer__contact { justify-self: start; text-align: left; }
-  .inc-footer__seal { grid-column: 1; }
+  .inc-footer__inner {
+    font-size: 12px;
+    /* Columns may shrink below their widest line (minmax 0) so the banner can
+       never push past the viewport; the long enquiries email stays whole and
+       the address wraps instead. */
+    grid-template-columns: minmax(0, auto) minmax(0, auto);
+    column-gap: var(--s-4);
+    padding: var(--s-5) var(--s-4);
+    overflow-wrap: break-word;
+  }
+  .inc-footer__legal { font-size: 11px; }
 }

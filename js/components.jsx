@@ -78,10 +78,9 @@ function Wordmark({ size = 20, color, className = "", as: Tag = "span", style })
     <Tag
       className={"inc-wordmark " + className}
       style={{
-        fontFamily: "var(--font-serif)",
-        fontWeight: 700,
+        // Face, weight and case come from .inc-wordmark (site.css) — only the
+        // per-instance size/colour and the wider display tracking live here.
         letterSpacing: "0.18em",
-        textTransform: "uppercase",
         fontSize: size,
         color: color || "var(--green)",
         lineHeight: 1,
@@ -156,7 +155,7 @@ function Poster({ ex, size = "card" }) {
         <img
           className="inc-poster__img"
           src={ex.heroImage}
-          alt={ex.title ? ex.artist ? ex.artist + " — " + ex.title : ex.title : "Exhibition"}
+          alt={[ex.artist, ex.title].filter(Boolean).join(" — ") || "Exhibition"}
           loading="lazy"
         />
       </div>
@@ -167,7 +166,9 @@ function Poster({ ex, size = "card" }) {
     <div className={cls}>
       <span className="inc-poster__wm">INCUBATOR</span>
       <span className="inc-poster__title">
-        {ex.title ? (ex.isGroup ? ex.title : <em>{ex.title}</em>) : null}
+        {/* A title-less (announced) solo show prints the artist's name so two
+            forthcoming posters aren't identical anonymous INCUBATOR cards. */}
+        {ex.title ? (ex.isGroup ? ex.title : <em>{ex.title}</em>) : (ex.artist || null)}
       </span>
       <span className="inc-poster__addr">2&nbsp;CHILTERN&nbsp;STREET, LONDON, W1U&nbsp;7PR</span>
     </div>
@@ -378,8 +379,7 @@ function InstallationStrip({ frames }) {
 /* ---------- PRESS ITEM ---------------------------------------------------- */
 function PressItem({ item }) {
   return (
-    <a href={item.href} className="inc-press-item">
-      <span className="inc-press-item__date">{item.date}</span>
+    <a href={item.href} className="inc-press-item" target="_blank" rel="noopener">
       <span className="inc-press-item__pub">{item.pub}</span>
       <span className="inc-press-item__title">{item.title}</span>
       <span className="inc-press-item__cta">Read ↗</span>
@@ -397,7 +397,9 @@ function Footer({ onNav }) {
   const mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(c.mapQuery || "Incubator London");
   return (
     <footer className="inc-footer">
-      <div className="container inc-footer__inner">
+      {/* Deliberately NOT a .container — the compact banner owns its own
+          sizing (#108); .mock .container's padding/max-width would override it. */}
+      <div className="inc-footer__inner">
         <div className="inc-footer__brand">
           <p>
             {(c.addressLines || []).map((line, i) => <React.Fragment key={i}>{line}<br/></React.Fragment>)}
