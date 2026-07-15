@@ -300,6 +300,24 @@ function InstallationStrip({ frames }) {
   const count = frames.length;
   const go = (delta) => setOpen((i) => (i + delta + count) % count);
 
+  // The frame shown before this one — rendered behind the incoming image so a
+  // step reads as a dissolve rather than a blink to the dark backdrop. The ref
+  // updates after paint, so during a render it still holds the outgoing frame.
+  const prevIdx = useRef(-1);
+  useEffect(() => { prevIdx.current = open; }, [open]);
+  const prevSrc =
+    open >= 0 && prevIdx.current >= 0 && prevIdx.current !== open && isImageRef(frames[prevIdx.current])
+      ? frames[prevIdx.current]
+      : null;
+
+  // Warm the neighbours while the lightbox is open so stepping never waits.
+  useEffect(() => {
+    if (open < 0 || count < 2) return;
+    [frames[(open + 1) % count], frames[(open - 1 + count) % count]].forEach((f) => {
+      if (isImageRef(f)) { const img = new Image(); img.src = f; }
+    });
+  }, [open, count, frames]);
+
   useEffect(() => {
     if (open < 0) return;
     const onKey = (e) => {
@@ -349,15 +367,21 @@ function InstallationStrip({ frames }) {
             >‹</button>
           )}
           <figure className="inc-lightbox__stage" onClick={(e) => e.stopPropagation()}>
-            {/* key={open} remounts the media each step so it cross-fades
-                between frames rather than hard-cutting (see .inc-lightbox__img). */}
+            {/* key={open} remounts the media each step and fades it in; the
+                outgoing frame is held as the wrapper's background so the fade
+                is a true dissolve between images, never a blink to black. */}
             {isImageRef(frames[open]) ? (
-              <img
-                key={open}
-                className="inc-lightbox__img inc-lightbox__img--photo"
-                src={frames[open]}
-                alt={"Installation view " + (open + 1)}
-              />
+              <div
+                className="inc-lightbox__xfade"
+                style={prevSrc ? { backgroundImage: 'url("' + prevSrc + '")' } : null}
+              >
+                <img
+                  key={open}
+                  className="inc-lightbox__img inc-lightbox__img--photo"
+                  src={frames[open]}
+                  alt={"Installation view " + (open + 1)}
+                />
+              </div>
             ) : (
               <Tile key={open} kind={frames[open]} aspect="3/2" className="inc-lightbox__img" />
             )}
@@ -409,13 +433,15 @@ function Footer({ onNav }) {
             <a href={mapsUrl} target="_blank" rel="noopener">View map</a>
           </p>
         </div>
+        {/* The © sits in its own centre column so the address and contact
+            columns stay the same height. */}
+        <div className="inc-footer__legal">&copy; 2026 Incubator</div>
         <div className="inc-footer__contact">
           <p>
             <a href={"mailto:" + c.enquiriesEmail}>{c.enquiriesEmail}</a><br/>
             <a href={c.instagramUrl} target="_blank" rel="noopener">{c.instagramHandle}</a><br/>
             <a href="#" onClick={(e)=>{e.preventDefault(); onNav && onNav("/contact");}}>Subscribe to mailing list</a>
           </p>
-          <div className="inc-footer__legal">&copy; 2026 Incubator</div>
         </div>
       </div>
     </footer>

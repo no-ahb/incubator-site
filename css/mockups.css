@@ -351,10 +351,17 @@
   animation: inc-lb-rise var(--dur) var(--ease);
 }
 @keyframes inc-lb-rise { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-/* Each step through the strip re-keys the media (components.jsx), replaying
-   this quick fade so frames dissolve instead of hard-cutting. */
-.inc-lightbox__img { width: 100%; max-height: 80vh; animation: inc-lb-imgfade var(--dur-fast) var(--ease); }
+/* Each step through the strip re-keys the media (components.jsx); the new
+   frame fades in over the previous one, which the wrapper holds as its
+   background — a dissolve, not a blink to the dark backdrop. */
+.inc-lightbox__img { width: 100%; max-height: 80vh; animation: inc-lb-imgfade var(--dur) var(--ease); }
 @keyframes inc-lb-imgfade { from { opacity: 0; } to { opacity: 1; } }
+.inc-lightbox__xfade {
+  width: 100%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 .inc-lightbox__caption {
   font-family: var(--font-serif);
   font-size: 13px; letter-spacing: 0.06em;
