@@ -382,7 +382,10 @@ function PressItem({ item }) {
     <a href={item.href} className="inc-press-item" target="_blank" rel="noopener">
       <span className="inc-press-item__pub">{item.pub}</span>
       <span className="inc-press-item__title">{item.title}</span>
-      <span className="inc-press-item__cta">Read ↗</span>
+      {/* U+FE0E pins the arrow to text presentation — without it iOS/Android
+          can swap U+2197 for the boxed emoji glyph. Decorative: the row's
+          name comes from pub + title. */}
+      <span className="inc-press-item__cta" aria-hidden="true">{"↗︎"}</span>
     </a>
   );
 }
@@ -397,8 +400,8 @@ function Footer({ onNav }) {
   const mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(c.mapQuery || "Incubator London");
   return (
     <footer className="inc-footer">
-      {/* Deliberately NOT a .container — the compact banner owns its own
-          sizing (#108); .mock .container's padding/max-width would override it. */}
+      {/* Deliberately NOT a .container — site.css owns the inner sizing so
+          .mock .container's padding/max-width can't fight it (#108). */}
       <div className="inc-footer__inner">
         <div className="inc-footer__brand">
           <p>

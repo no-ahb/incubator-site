@@ -728,7 +728,7 @@ function ContactScreen() {
               {/* A plain link, like every other link in this column — the green
                   centred button read as out of place here (#112). */}
               <a href={c.mailingListUrl} target="_blank" rel="noopener" onClick={openSubscribe}>
-                Subscribe to our mailing list
+                Subscribe
               </a>
             </p>
           </section>

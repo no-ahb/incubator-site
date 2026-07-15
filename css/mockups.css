@@ -210,13 +210,13 @@
   grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
   gap: var(--s-10);
   align-items: center;
-  padding-top: var(--s-12);
-  border-top: 1px solid var(--hairline);
+  /* No hairline between rows — a page-wide rule under each "Read more →"
+     read as a stray line; whitespace separates the entries instead. */
 }
 .inc-coming__meta { display: flex; flex-direction: column; gap: var(--s-3); }
 /* Several forthcoming shows can now stack (#125); on narrow viewports each
    row folds to poster-above-text instead of squeezing two columns. */
-.inc-coming + .inc-coming { margin-top: var(--s-10); }
+.inc-coming + .inc-coming { margin-top: var(--s-14); }
 @container (max-width: 700px) {
   .inc-coming { grid-template-columns: 1fr; gap: var(--s-5); }
 }
@@ -402,14 +402,9 @@
   border-bottom: 0;
   padding: var(--s-3) 0;
 }
+/* Hover underline comes solely from the title's draw-in rule (site.css) —
+   stacking text-decoration on top produced a double underline. */
 .mock .inc-press-item__title {
-  border-bottom: 0;
-}
-.mock .inc-press-item:hover .inc-press-item__title {
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
-  text-decoration-color: var(--green);
   border-bottom: 0;
 }
 .mock .inc-press-item__cta {

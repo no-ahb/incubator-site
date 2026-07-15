@@ -312,8 +312,7 @@ ul { list-style: none; padding: 0; margin: 0; }
 .inc-detail__release h3,
 .inc-detail__press h3,
 .inc-detail__bio h3,
-.inc-related h3,
-.inc-contact h3 {
+.inc-related h3 {
   font-size: 15px;
   font-weight: 400;
   letter-spacing: 0;
@@ -479,10 +478,12 @@ ul { list-style: none; padding: 0; margin: 0; }
   background-size: 0% 1px;
   transition: background-size var(--dur) var(--ease-out);
 }
-.inc-press-item__cta { font-size: 14px; color: var(--ink-3); text-align: right; }
+.inc-press-item__cta { font-size: 16px; color: var(--ink-3); text-align: right; }
 @media (max-width: 720px) {
-  .inc-press-item { grid-template-columns: 1fr; gap: 4px; padding: var(--s-5) 0; }
-  .inc-press-item__cta { display:none; }
+  .inc-press-item { grid-template-columns: 1fr auto; gap: 4px var(--s-4); padding: var(--s-5) 0; }
+  .inc-press-item__pub,
+  .inc-press-item__title { grid-column: 1; }
+  .inc-press-item__cta { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
 }
 
 /* ---------- Sort toggle --------------------------------------------------- */
@@ -511,7 +512,17 @@ ul { list-style: none; padding: 0; margin: 0; }
   margin-top: var(--s-6);
 }
 @media (max-width: 900px) { .inc-contact__grid { grid-template-columns: 1fr; gap: var(--s-10); } }
-.inc-contact h3 { margin: var(--s-6) 0 var(--s-3); } /* label spec shared above */
+/* Contact keeps caps labels — set in ink at true regular weight with wide,
+   even tracking and generous space above each group, so they read as quiet
+   structure rather than the muddy faux-bold grey they replaced. */
+.inc-contact h3 {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: var(--s-8) 0 var(--s-3);
+}
 .inc-contact h3:first-of-type { margin-top: 0; }
 .inc-contact p { font-size: 16px; line-height: 1.55; margin: 0 0 var(--s-4); }
 
@@ -558,41 +569,41 @@ ul { list-style: none; padding: 0; margin: 0; }
 .inc-detail__enquire { margin-top: var(--s-10); }
 
 /* ---------- Footer --------------------------------------------------------
-   A compact banner that hugs its text with a little room either side (#108),
-   centred on the page, rather than a full-bleed band with the columns pinned
-   to the viewport edges. Address stays left-justified, contact right-justified
-   — at every size, including phones (#111). */
+   Full-bleed grey band; the fix for #108 was VERTICAL economy, not width —
+   modest top/bottom padding, address left / contact right. On phones the two
+   columns stay side by side with smaller text, mirroring desktop (#111). */
 .inc-footer {
+  background: var(--surface);
   margin-top: var(--s-24);
-  padding: 0 var(--gutter) var(--s-10);
+  padding: var(--s-8) 0;
 }
 .inc-footer__inner {
-  background: var(--surface);
-  width: fit-content;
-  max-width: 100%;
+  max-width: var(--content-max);
   margin-inline: auto;
+  padding-inline: var(--gutter);
   display: grid;
-  grid-template-columns: auto auto;
-  column-gap: clamp(var(--s-10), 10vw, var(--s-32));
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-10);
   align-items: start;
-  padding: var(--s-8) var(--s-10);
   font-family: var(--font-serif); font-size: 14px; line-height: 1.55;
 }
-.inc-footer__contact { text-align: right; }
+@media (min-width: 900px) {
+  .inc-footer__inner { padding-inline: var(--gutter-lg); }
+}
+.inc-footer__contact { justify-self: end; text-align: right; }
 .inc-footer p { margin: var(--s-3) 0 0; }
 .inc-footer a { color: var(--ink); }
 .inc-footer a:hover { color: var(--green); }
-.inc-footer__legal { margin-top: var(--s-6); font-size: 12px; color: var(--ink-3); }
+.inc-footer__legal { margin-top: var(--s-5); font-size: 12px; color: var(--ink-3); }
 @media (max-width: 600px) {
+  .inc-footer { padding: var(--s-6) 0; }
+  /* The enquiries email (231px at 12px) can't share a 390px row with the
+     address, so the blocks stack — but the contact block keeps its right
+     justification, mirroring the desktop split (#111). */
   .inc-footer__inner {
     font-size: 12px;
-    /* Columns may shrink below their widest line (minmax 0) so the banner can
-       never push past the viewport; the long enquiries email stays whole and
-       the address wraps instead. */
-    grid-template-columns: minmax(0, auto) minmax(0, auto);
-    column-gap: var(--s-4);
-    padding: var(--s-5) var(--s-4);
-    overflow-wrap: break-word;
+    grid-template-columns: 1fr;
+    gap: var(--s-5);
   }
-  .inc-footer__legal { font-size: 11px; }
+  .inc-footer__legal { font-size: 11px; margin-top: var(--s-4); }
 }
