@@ -2,7 +2,7 @@
   "exhibitions": [
     {
       "id": "amelia-cross",
-      "artistId": null,
+      "artistId": "amelia-cross",
       "artist": "Amelia Cross",
       "title": "",
       "dates": "10 – 26 September 2026",
@@ -10,7 +10,9 @@
       "endISO": "2026-09-26",
       "openingNote": "Opening on the evening of 9 September",
       "palette": "sap",
-      "heroImage": "assets/shows/amelia-cross/amelia-cross-sewn-painting.jpg"
+      "heroImage": "assets/shows/amelia-cross/amelia-cross-sewn-painting.jpg",
+      "pressRelease": "",
+      "installation": []
     },
     {
       "id": "kirubel-mandefro",
@@ -2502,6 +2504,11 @@
       "id": "kirubel-mandefro",
       "name": "Kirubel Mandefro",
       "bio": "<p>Kirubel Mandefro (b. 1990, Ethiopia) is a painter whose work explores the psychological tension between belonging and becoming. Through diaphanous acrylic paintings on canvas, he examines tenderness, masculinity and the fragile conditions that shape human connection. Rooted in a search for a life beyond fear, his work attends to the textures of intimacy, vulnerability and closeness.</p><p>Painted in earthy tones, cropped figures of men in moments of exposure carry traces of his queer and migrant experience while speaking to broader questions of belonging, desire and recognition. His paintings seek to offer moments of connection, a silent caress to viewers in what may be only a brief encounter. He treats the canvas as a space where masculinity can be soft without apology. For Mandefro, painting is both a personal necessity and a quiet act of resistance.</p>"
+    },
+    {
+      "id": "amelia-cross",
+      "name": "Amelia Cross",
+      "bio": "<p>Amelia Cross (b. 1995) is a British artist, born and based in London. Following an early career in tailoring and womenswear design, her practice focuses on uncovering confessions through the mediums of painting, pattern-cutting and sewing.</p><p>Guided by questions surrounding uniforms and rules, Cross studies the codification of dress and unspoken systems of how we construct identity through garments. This research of the clothed form is examined by introducing the craft of pattern-cutting to the painted canvas, resulting in a new form of trompe l’œil defined as the ‘Sewn Painting’:</p><p><strong>sewn painting (n.) </strong><em>“that which surface is painted on and constructed by means of needle and thread”</em><em></em></p><p><em><br></em></p><p>These works occupy a space in-between the binary conditions of the painterly and the sculptural: not quite a painting but not quite a garment. Their real, structural shadows are placed in close proximity to painted ones, tricking the eye. Cross uses a limited palette on exposed natural linen to constrict her practice within a rule, as the unforgiving fabric displays every crease and mark made by the hand. This enables the artist to control the representation of herself, yet also, strangely allows it to control her.</p><p>She investigates sartorial rules, both self-inflicted and societal, removing traces of the figure to explore the psychology of garments and the choices we make every day by wearing them. Drawing upon clothing from her personal archive and popular culture, each work offers up a potential secret - at times dark, at times humorous. These sewn paintings establish the significance of life’s uniforms, the clothes that give us a place from which to speak or hold authority, at the cost of having a bodily presence.</p>"
     }
   ],
   "about": {
