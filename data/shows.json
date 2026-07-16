@@ -25,14 +25,17 @@
     },
     {
       "id": "valentina-attolini",
-      "artistId": null,
+      "artistId": "valentina-attolini",
       "artist": "Valentina Attolini",
       "title": "",
       "dates": "5 – 29 November 2026",
       "startISO": "2026-11-05",
       "endISO": "2026-11-29",
       "openingNote": "Opening on 4 November",
-      "palette": "sap"
+      "palette": "sap",
+      "pressRelease": "",
+      "installation": [],
+      "heroImage": "assets/shows/valentina-attolini/1784209680753-Screenshot_2026-07-16_at_14_47_20.jpg"
     },
     {
       "id": "quiet-companions",
@@ -2486,6 +2489,11 @@
       "bio": [
         "Eva Dixon (b. 2000, Australia) lives and works in London. Dixon received their BA in Fine Art from Central Saint Martin's (2023) and is attending the Royal Academy from October 2026. Recent solo presentations include All-American (2026) at Art Cologne Palma with Particular Ideas, SCORE! at Split Rivera (2025), Mercury 13 at WIP Space (2025), Lesbian Trucker Paintings at The Fores Project (2023). Notable group exhibitions include 'What Holds Things Together' CC Jasper, New York, Preview art fair with Caption Seoul (Korea, 2026), Lands End (London, Art Mama, 2024) and duo exhibition Top Dog at Parlour Gallery (London, 2026), Rose Easton (London, 2025), Saatchi Gallery (London 2023, 2025), Christie's (London, 2023). Dixon is a recipient of the Maison/0 This Earth award with LVMH (2023) and 'Best UK solo presentation' at Minor Attractions (2025, Split Rivera)."
       ]
+    },
+    {
+      "id": "valentina-attolini",
+      "name": "Valentina Attolini",
+      "bio": "<p>Valentina Attolini (b. 1998, Mexico) works with charcoal to investigate how experience takes shape through the body.</p><p>She approaches drawing and painting as a physical act in which memory is translated into sensation. Using her hands directly on the surface, she builds images through contact, accumulation, friction, and erasure. This tactile engagement creates an intimate encounter between body and material, allowing images to emerge through gesture rather than representation</p><p>Attolini’s paintings emerge from encounters between opposing forces—control and interruption, structure and collapse, restraint and excess. Rather than resolving these tensions, she sustains them within the image exploring instability, transformation, and the ways experience and meaning remain in motion.</p>"
     }
   ],
   "about": {
