@@ -14,14 +14,17 @@
     },
     {
       "id": "kirubel-mandefro",
-      "artistId": null,
+      "artistId": "kirubel-mandefro",
       "artist": "Kirubel Mandefro",
       "title": "",
       "dates": "8 October – 1 November 2026",
       "startISO": "2026-10-08",
       "endISO": "2026-11-01",
       "openingNote": "Opening on the evening of 7 October",
-      "palette": "sap"
+      "palette": "sap",
+      "pressRelease": "",
+      "installation": [],
+      "heroImage": "assets/shows/kirubel-mandefro/1784209716419-Screenshot_2024-11-12_at_14_50_08.jpg"
     },
     {
       "id": "valentina-attolini",
@@ -2494,6 +2497,11 @@
       "id": "valentina-attolini",
       "name": "Valentina Attolini",
       "bio": "<p>Valentina Attolini (b. 1998, Mexico) works with charcoal to investigate how experience takes shape through the body.</p><p>She approaches drawing and painting as a physical act in which memory is translated into sensation. Using her hands directly on the surface, she builds images through contact, accumulation, friction, and erasure. This tactile engagement creates an intimate encounter between body and material, allowing images to emerge through gesture rather than representation</p><p>Attolini’s paintings emerge from encounters between opposing forces—control and interruption, structure and collapse, restraint and excess. Rather than resolving these tensions, she sustains them within the image exploring instability, transformation, and the ways experience and meaning remain in motion.</p>"
+    },
+    {
+      "id": "kirubel-mandefro",
+      "name": "Kirubel Mandefro",
+      "bio": "<p>Kirubel Mandefro (b. 1990, Ethiopia) is a painter whose work explores the psychological tension between belonging and becoming. Through diaphanous acrylic paintings on canvas, he examines tenderness, masculinity and the fragile conditions that shape human connection. Rooted in a search for a life beyond fear, his work attends to the textures of intimacy, vulnerability and closeness.</p><p>Painted in earthy tones, cropped figures of men in moments of exposure carry traces of his queer and migrant experience while speaking to broader questions of belonging, desire and recognition. His paintings seek to offer moments of connection, a silent caress to viewers in what may be only a brief encounter. He treats the canvas as a space where masculinity can be soft without apology. For Mandefro, painting is both a personal necessity and a quiet act of resistance.</p>"
     }
   ],
   "about": {
