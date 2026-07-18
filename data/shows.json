@@ -2546,10 +2546,19 @@
   },
   "press": [
     {
+      "year": 2026,
+      "items": [
+        {
+          "pub": "Financial Times",
+          "title": "Meet the women behind London’s new gallery scene",
+          "href": "https://www.ft.com/content/de629ec4-d787-4543-9f81-df0bf0112ba8"
+        }
+      ]
+    },
+    {
       "year": 2024,
       "items": [
         {
-          "date": "",
           "pub": "Wallpaper",
           "title": "London gallery Incubator's six emerging artists to see in spring 2024",
           "href": "https://www.wallpaper.com/art/exhibitions-shows/incubator-gallery-spring-2024-solo-shows-london"
@@ -2560,31 +2569,26 @@
       "year": 2023,
       "items": [
         {
-          "date": "",
           "pub": "Where's the Frame",
           "title": "Incubator Launches as Permanent Space",
           "href": "https://www.wherestheframe.com/post/incubator-launches-as-permanent-space"
         },
         {
-          "date": "",
           "pub": "Something Curated",
           "title": "Interview: London Gallerist Angelica Jopling On The Launch Of Incubator",
           "href": "https://somethingcurated.com/2023/04/26/interview-london-gallerist-angelica-jopling-on-the-launch-of-incubator/"
         },
         {
-          "date": "",
           "pub": "Ocula Magazine",
           "title": "Angelica Jopling's Incubator Finds a Permanent Home on Chiltern Street",
           "href": "https://ocula.com/magazine/spotlight/angelica-jopling-incubator/"
         },
         {
-          "date": "",
           "pub": "Flaunt",
           "title": "Angelica Jopling | A Beautiful Boundary Erosion",
           "href": "https://www.flaunt.com/post/angelica-jopling-the-besties-issue"
         },
         {
-          "date": "",
           "pub": "Vogue Italia",
           "title": "Angelica Jopling e la ridefinizione della scena artistica di Londra",
           "href": "https://www.vogue.it/article/angelica-jopling-incubator-galleria-londra"
@@ -2595,13 +2599,11 @@
       "year": 2022,
       "items": [
         {
-          "date": "",
           "pub": "AnOther Magazine",
           "title": "Inside a New Exhibition Celebrating London's Emerging Artists",
           "href": "https://www.anothermag.com/art-photography/14062/inside-a-new-exhibition-celebrating-londons-emerging-artists-incubator-22"
         },
         {
-          "date": "",
           "pub": "Dazed",
           "title": "Incubator 22 is the 'adrenalised series' spotlighting six new artists",
           "href": "https://www.dazeddigital.com/art-photography/article/55993/1/incubator-22-is-the-adrenalised-series-spotlighting-six-new-artists"
@@ -2612,7 +2614,6 @@
       "year": 2021,
       "items": [
         {
-          "date": "",
           "pub": "Evening Standard",
           "title": "Incubator 21: Young artists get solo West End shows",
           "href": "https://www.standard.co.uk/news/uk/young-artists-london-west-end-shows-incubator-21-angelica-jopling-b959462.html"
