@@ -696,8 +696,12 @@ function ContactScreen() {
           <section>
             <h3>Visit</h3>
             <p>
-              {c.addressLines.map((line, i) => <React.Fragment key={i}>{line}<br/></React.Fragment>)}
-              <a href={mapsSearch} target="_blank" rel="noopener">View on Google Maps</a>
+              {/* The address itself links to Google Maps (#127) — no separate button. */}
+              <a href={mapsSearch} target="_blank" rel="noopener">
+                {c.addressLines.map((line, i) => (
+                  <React.Fragment key={i}>{line}{i < c.addressLines.length - 1 ? <br/> : null}</React.Fragment>
+                ))}
+              </a>
             </p>
 
             <h3>Hours</h3>
