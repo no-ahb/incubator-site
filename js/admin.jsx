@@ -461,9 +461,9 @@ function AdminIssues({ pw }) {
   const [issues, setIssues] = adState([]);
   const [error, setError] = adState("");
 
-  // New-issue composer. Creates a GitHub issue through the same Worker report
-  // endpoint the (removed) on-page "Report an issue" widget used, so nothing new
-  // is needed server-side — it just needs a title and a description.
+  // New-issue composer. Creates a labelled GitHub issue via the password-gated
+  // /admin/create-issue Worker route — same admin-password gate as every other
+  // write in this panel. (Requires the Worker to be deployed with that route.)
   const [creating, setCreating] = adState(false);
   const [title, setTitle] = adState("");
   const [body, setBody] = adState("");
@@ -493,7 +493,7 @@ function AdminIssues({ pw }) {
     setBusy(true);
     setFormError("");
     try {
-      const res = await fetch(ADMIN_ENDPOINT, {
+      const res = await adAuthFetch("/admin/create-issue", pw, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: t, body: b }),
