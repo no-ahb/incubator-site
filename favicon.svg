@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <title>Incubator</title>
+  <circle cx="50" cy="50" r="50" fill="#FFFFFF"/>
+  <g transform="translate(34.211 78.000) scale(0.03786 -0.03786)">
+    <path d="M76 1479H758V1404H641Q563 1404 542.5 1384.5Q522 1365 522 1302V182Q522 115 540 98Q564 75 627 75H758V0H76V75H205Q273 75 293.0 95.0Q313 115 313 182V1302Q313 1366 295 1381Q267 1404 192 1404H76Z" fill="#009838"/>
+  </g>
+</svg>
