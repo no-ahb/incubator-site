@@ -461,8 +461,19 @@ function AdminIssues({ pw }) {
   const [issues, setIssues] = adState([]);
   const [error, setError] = adState("");
 
+  // New-issue composer. Creates a GitHub issue through the same Worker report
+  // endpoint the (removed) on-page "Report an issue" widget used, so nothing new
+  // is needed server-side — it just needs a title and a description.
+  const [creating, setCreating] = adState(false);
+  const [title, setTitle] = adState("");
+  const [body, setBody] = adState("");
+  const [busy, setBusy] = adState(false);
+  const [formError, setFormError] = adState("");
+
   function load() {
-    setState("loading");
+    // Keep the current list visible while refreshing (e.g. after creating an
+    // issue) — only show the placeholder on the first load or an error retry.
+    setState((s) => (s === "ready" ? s : "loading"));
     adAuthFetch("/admin/issues", pw, { method: "GET" })
       .then(async (res) => {
         const data = await res.json().catch(() => null);
@@ -475,24 +486,76 @@ function AdminIssues({ pw }) {
 
   adEffect(() => { load(); }, []);
 
-  if (state === "loading") return <p className="inc-admin__muted">Loading reported issues…</p>;
-  if (state === "error") return <p className="inc-report__error">{error}</p>;
-  if (!issues.length) return <p className="inc-admin__muted">No open issue reports. 🎉</p>;
+  async function createIssue(e) {
+    e.preventDefault();
+    const t = title.trim(), b = body.trim();
+    if (!t || !b) { setFormError("Title and description are required."); return; }
+    setBusy(true);
+    setFormError("");
+    try {
+      const res = await fetch(ADMIN_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: t, body: b }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || "Could not create issue.");
+      setTitle("");
+      setBody("");
+      setCreating(false);
+      load(); // pull the freshly created issue into the list
+    } catch (err) {
+      setFormError(err.message || "Could not create issue.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  let list;
+  if (state === "loading") {
+    list = <p className="inc-admin__muted">Loading reported issues…</p>;
+  } else if (state === "error") {
+    list = <p className="inc-report__error">{error}</p>;
+  } else if (!issues.length) {
+    list = <p className="inc-admin__muted">No open issue reports. 🎉</p>;
+  } else {
+    list = (
+      <ul className="inc-admin__list">
+        {issues.map((it) => (
+          <li key={it.number} className="inc-admin__row">
+            <span className="inc-admin__row-main">
+              <span className="inc-admin__row-title">#{it.number} — {it.title}</span>
+              <span className="inc-admin__row-dates">{(it.createdAt || "").slice(0, 10)}{it.comments ? " · " + it.comments + " comment" + (it.comments === 1 ? "" : "s") : ""}</span>
+            </span>
+            <span className="inc-admin__row-actions">
+              <a className="inc-admin__btn-ghost" href={it.url} target="_blank" rel="noopener">Open ↗</a>
+            </span>
+          </li>
+        ))}
+      </ul>
+    );
+  }
 
   return (
-    <ul className="inc-admin__list">
-      {issues.map((it) => (
-        <li key={it.number} className="inc-admin__row">
-          <span className="inc-admin__row-main">
-            <span className="inc-admin__row-title">#{it.number} — {it.title}</span>
-            <span className="inc-admin__row-dates">{(it.createdAt || "").slice(0, 10)}{it.comments ? " · " + it.comments + " comment" + (it.comments === 1 ? "" : "s") : ""}</span>
-          </span>
-          <span className="inc-admin__row-actions">
-            <a className="inc-admin__btn-ghost" href={it.url} target="_blank" rel="noopener">Open ↗</a>
-          </span>
-        </li>
-      ))}
-    </ul>
+    <>
+      <div className="inc-admin__bar">
+        {creating ? (
+          <form className="inc-admin__form" onSubmit={createIssue}>
+            <label>Title<input className="inc-report__input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Short summary" maxLength={200} required /></label>
+            <label>Description<textarea className="inc-report__textarea" rows={5} value={body} onChange={(e) => setBody(e.target.value)} placeholder="What needs doing, and on which page…" required /></label>
+            {formError ? <p className="inc-report__error">{formError}</p> : null}
+            <div className="inc-admin__actions">
+              <button type="submit" className="inc-report__btn" disabled={busy}>{busy ? "Creating…" : "Create issue"}</button>
+              <button type="button" className="inc-admin__btn-ghost" onClick={() => { setCreating(false); setFormError(""); setTitle(""); setBody(""); }}>Cancel</button>
+            </div>
+          </form>
+        ) : (
+          <button type="button" className="inc-report__btn" onClick={() => setCreating(true)}>+ New issue</button>
+        )}
+      </div>
+
+      {list}
+    </>
   );
 }
 
