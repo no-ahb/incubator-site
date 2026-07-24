@@ -222,6 +222,13 @@ async function handleReport(request, env, cors) {
     return json({ ok: false, error: "Invalid JSON." }, 400, cors);
   }
 
+  return await createLabeledIssue(env, owner, repo, payload, cors);
+}
+
+// Create a labelled GitHub issue from { title, body, screenshot?, screenshotName? }.
+// Shared by the public report endpoint (handleReport) and the password-gated
+// admin composer (handleAdminCreateIssue) so both validate/label identically.
+async function createLabeledIssue(env, owner, repo, payload, cors) {
   const title = String(payload.title || "").trim().slice(0, 200);
   let body = String(payload.body || "").trim();
   if (!title || !body) {
@@ -620,6 +627,20 @@ async function handleAdminVisibility(request, env, cors) {
   return json({ ok: true, id, hidden }, 200, cors);
 }
 
+// POST /admin/create-issue — password-gated issue creation from the admin panel.
+// Opens the same labelled issue as the public report endpoint, but behind the
+// admin password (Body: { title, body }).
+async function handleAdminCreateIssue(request, env, cors) {
+  const gate = adminGate(request, env, cors);
+  if (gate.error) return gate.error;
+  if (!env.GITHUB_TOKEN) {
+    return json({ ok: false, error: "Server not configured (missing token)." }, 500, cors);
+  }
+  const body = await readJsonBody(request, cors);
+  if (body.error) return body.error;
+  return await createLabeledIssue(env, gate.owner, gate.repo, body.payload, cors);
+}
+
 // GET /admin/issues — list open reported issues.
 async function handleAdminIssues(request, env, cors) {
   const gate = adminGate(request, env, cors);
@@ -756,6 +777,7 @@ export default {
       if (path === "/admin/save-content" && request.method === "POST") return await handleAdminSaveContent(request, env, cors);
       if (path === "/admin/visibility" && request.method === "POST") return await handleAdminVisibility(request, env, cors);
       if (path === "/admin/issues" && request.method === "GET") return await handleAdminIssues(request, env, cors);
+      if (path === "/admin/create-issue" && request.method === "POST") return await handleAdminCreateIssue(request, env, cors);
 
       // Report-issue (default): any POST to the root path.
       if (path === "/" && request.method === "POST") return await handleReport(request, env, cors);
