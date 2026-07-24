@@ -35,7 +35,7 @@ const SHOWS_PATH = "data/shows.json";
 // End-of-show reminder: fire this many days before a show's end date.
 const REMINDER_LEAD_DAYS = 7;
 const REMINDER_TO = "incubator.enquiries@gmail.com";
-const ADMIN_URL = "https://no-ahb.github.io/incubator-site/#/admin";
+const ADMIN_URL = "https://www.incubatorart.com/#/admin";
 const EXT_FOR_MIME = {
   "image/png": "png",
   "image/jpeg": "jpg",
