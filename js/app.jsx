@@ -280,7 +280,6 @@ function App() {
         <div className="mock__view" key={route + "|" + dataState}>{content}</div>
       </div>
       <MobileMenu open={menuOpen} onNav={navigate} onClose={() => setMenuOpen(false)} />
-      <ReportIssue />
     </div>
   );
 }

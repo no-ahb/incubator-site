@@ -23,10 +23,9 @@
   <body>
     <div id="root"></div>
 
-    <!-- Report-an-issue config. Set ENDPOINT to your deployed Worker URL to
-         create GitHub issues automatically (with screenshots, no GitHub login
-         needed). Leave it empty to fall back to GitHub's prefilled new-issue
-         page. REPO is the "owner/repo" used by the fallback link. -->
+    <!-- Worker endpoint for the admin panel's issue tooling (js/admin.jsx).
+         The public "Report an issue" button was removed; issues are now
+         handled from the admin backend, which POSTs to this Worker. -->
     <script>
       window.REPORT_ISSUE_ENDPOINT = "https://incubator-report-issue.noahberrie7.workers.dev";
       window.REPORT_ISSUE_REPO = "no-ahb/incubator-site";
@@ -35,7 +34,6 @@
     <script type="text/babel" src="js/data.jsx"></script>
     <script type="text/babel" src="js/components.jsx"></script>
     <script type="text/babel" src="js/screens.jsx"></script>
-    <script type="text/babel" src="js/report-issue.jsx"></script>
     <script type="text/babel" src="js/admin.jsx"></script>
     <script type="text/babel" src="js/app.jsx"></script>
   </body>
