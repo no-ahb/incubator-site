@@ -320,6 +320,10 @@ function ExhibitionDetailScreen({ id, onNav }) {
     );
   }
   const artistRec = !ex.isGroup ? ARTISTS.find((a) => a.id === ex.artistId) : null;
+  // Once a show has its own write-up (press release), that takes over and the
+  // artist bio is shown only on the artist page; before then, the bio stands in
+  // as the readable content on the show page (#129).
+  const hasRelease = hasRichContent(ex.pressRelease);
   // "Other exhibitions by …" includes both the artist's own solo shows and any
   // group shows they were featured in. Solo shows key off artistId; group shows
   // list participants as free-text names, so match those by slug or by this
@@ -395,10 +399,22 @@ function ExhibitionDetailScreen({ id, onNav }) {
           </section>
         )}
 
-        {hasRichContent(ex.pressRelease) && (
+        {hasRelease && (
           <section id="release" className="container inc-detail__release">
             <h3>Press release</h3>
             <PressRelease paragraphs={ex.pressRelease} />
+          </section>
+        )}
+
+        {/* An upcoming/current show that has no press release yet surfaces the
+            artist bio here — in the same prose style as the artist page — so the
+            show can be read about when you click it. Once the show's own write-up
+            (press release) exists it takes over; a past show never shows the bio
+            (it lives on the artist page). (#129) */}
+        {artistRec && !hasRelease && exhibitionStatus(ex) !== "Past exhibition" && hasRichContent(artistRec.bio) && (
+          <section id="biography" className="container inc-detail__bio">
+            <h3>Biography</h3>
+            <Prose paragraphs={artistRec.bio} />
           </section>
         )}
 
