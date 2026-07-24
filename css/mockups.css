@@ -17,6 +17,10 @@
 }
 .inc-list__col      { min-width: 0; }
 .inc-list__items    { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+/* Status groups (Forthcoming / Current / Past, #132) — each a labelled section
+   so the list distinguishes them at a glance. Space sets one group off the next;
+   the heading uses the shared section-label spec (site.css). */
+.inc-list__group + .inc-list__group { margin-top: var(--s-10); }
 .inc-list__row      { border-top: 1px solid var(--hairline); }
 .inc-list__row:last-child { border-bottom: 1px solid var(--hairline); }
 .inc-list__link {

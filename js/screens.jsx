@@ -181,9 +181,29 @@ function ExhibitionsListScreen({ onNav }) {
     return xs;
   }, [all, sort, filter, query]);
 
-  const [hovered, setHovered] = msState(sorted[0]);
-  // keep hovered in sync if filter empties the list
-  const preview = hovered && sorted.find((e) => e.id === hovered.id) ? hovered : sorted[0];
+  // Split the (already sorted) list into status groups so the page distinguishes
+  // Forthcoming / Current / Past at a glance (#132). The fixed group order holds
+  // even under A–Z sort (which interleaves statuses); empty groups are dropped.
+  const groups = msMemo(() => {
+    // One table pairs each exhibitionStatus() value with its display label, in
+    // programme order (what's coming, what's on, what's been). Empty groups drop
+    // out; an unmatched status simply lands in no group rather than crashing.
+    const DEFS = [
+      { label: "Forthcoming", status: "Forthcoming" },
+      { label: "Current",     status: "Current exhibition" },
+      { label: "Past",        status: "Past exhibition" },
+    ];
+    return DEFS
+      .map((d) => ({ label: d.label, items: sorted.filter((e) => exhibitionStatus(e) === d.status) }))
+      .filter((g) => g.items.length > 0);
+  }, [sorted]);
+
+  // Default the preview to the first row actually shown — the top of the first
+  // non-empty group — which under A–Z sort isn't the global sorted[0].
+  const firstShown = groups[0] ? groups[0].items[0] : null;
+  const [hovered, setHovered] = msState(firstShown);
+  // keep hovered in sync if the filter/search no longer contains it
+  const preview = hovered && sorted.find((e) => e.id === hovered.id) ? hovered : firstShown;
 
   // Warm the browser cache for the hover preview posters during idle time so the
   // image is already loaded on first hover instead of fetching on demand (#95).
@@ -252,16 +272,21 @@ function ExhibitionsListScreen({ onNav }) {
 
         <div className="inc-list">
           <div className="inc-list__col">
-            <ul className="inc-list__items">
-              {sorted.map((ex) => (
-                <ExhibitionsListRow
-                  key={ex.id}
-                  ex={ex}
-                  onNav={onNav}
-                  onHover={setHovered}
-                />
-              ))}
-            </ul>
+            {groups.map((g) => (
+              <section className="inc-list__group" key={g.label}>
+                <h2 className="inc-list__grouplabel">{g.label}</h2>
+                <ul className="inc-list__items">
+                  {g.items.map((ex) => (
+                    <ExhibitionsListRow
+                      key={ex.id}
+                      ex={ex}
+                      onNav={onNav}
+                      onHover={setHovered}
+                    />
+                  ))}
+                </ul>
+              </section>
+            ))}
           </div>
           <aside className="inc-list__preview" aria-hidden="true">
             {preview ? (

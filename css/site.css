@@ -325,6 +325,7 @@ ul { list-style: none; padding: 0; margin: 0; }
 .inc-detail__press h3,
 .inc-detail__bio h3,
 .inc-related h3,
+.inc-list__grouplabel,
 .inc-contact h3 {
   font-size: 12px;
   font-weight: 400;
