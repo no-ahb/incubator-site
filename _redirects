@@ -1,0 +1,2 @@
+# Cloudflare Pages: bare domain -> www (GitHub Pages does this itself today).
+https://incubatorart.com/* https://www.incubatorart.com/:splat 301

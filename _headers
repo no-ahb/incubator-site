@@ -1,0 +1,18 @@
+# Cloudflare Pages response headers (ignored by GitHub Pages, which cannot set
+# headers). Security baseline for a static site whose only dynamic calls go to
+# the admin Worker. Babel compiles JSX in the browser by injecting inline
+# <script> tags, and React sets inline styles, hence 'unsafe-inline' for both.
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://incubator-report-issue.noahberrie7.workers.dev; frame-src https://maps.google.com https://www.google.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests
+
+# Versioned vendor scripts never change under the same name: cache for a year.
+/js/vendor/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Site content must be re-validated so an admin save shows up on the next load.
+/data/shows.json
+  Cache-Control: no-cache

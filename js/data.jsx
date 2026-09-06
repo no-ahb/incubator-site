@@ -38,14 +38,9 @@ function mergePressYears(groups) {
     .map(([year, items]) => ({ year, items }));
 }
 
-async function loadSiteData() {
-  // no-cache (not no-store): always revalidates, so an admin still sees their
-  // edit immediately after the Pages redeploy — but an unchanged file answers
-  // with a 304 instead of re-downloading ~250 KB on every page load.
-  const res = await fetch(DATA_URL, { cache: "no-cache" });
-  if (!res.ok) throw new Error(`Failed to load site data (${res.status})`);
-  const data = await res.json();
-
+// Make `data` the site's content: the public arrays/singletons above are all
+// derived from it here, and nowhere else.
+function setSiteData(data) {
   SITE_DATA = data;
   ARTISTS = Array.isArray(data.artists) ? data.artists : [];
   PRESS = mergePressYears(Array.isArray(data.press) ? data.press : []);
@@ -53,9 +48,29 @@ async function loadSiteData() {
   EXHIBITIONS = (Array.isArray(data.exhibitions) ? data.exhibitions : []).filter((e) => !e.hidden);
   ABOUT = (data.about && typeof data.about === "object") ? data.about : null;
   CONTACT = (data.contact && typeof data.contact === "object") ? data.contact : null;
-
   Object.assign(window, { EXHIBITIONS, ARTISTS, PRESS, EXHIBITION_ARCHIVE, ABOUT, CONTACT, SITE_DATA });
+}
+
+async function loadSiteData() {
+  // no-cache (not no-store): always revalidates, so an admin still sees their
+  // edit immediately after the Pages redeploy — but an unchanged file answers
+  // with a 304 instead of re-downloading ~250 KB on every page load.
+  const res = await fetch(DATA_URL, { cache: "no-cache" });
+  if (!res.ok) throw new Error(`Failed to load site data (${res.status})`);
+  const data = await res.json();
+  setSiteData(data);
   return data;
+}
+
+// After the admin page saves something, apply the same change to the loaded
+// copy (`mutate(data)` edits it in place) and re-derive everything from it, so
+// the admin forms and the public screens show what was just saved without a
+// reload. Returns the patched data.
+function patchSiteData(mutate) {
+  if (!SITE_DATA) return null;
+  mutate(SITE_DATA);
+  setSiteData(SITE_DATA);
+  return SITE_DATA;
 }
 
 Object.assign(window, {
@@ -66,5 +81,6 @@ Object.assign(window, {
   ABOUT,
   CONTACT,
   loadSiteData,
+  patchSiteData,
   getSiteData: () => SITE_DATA,
 });

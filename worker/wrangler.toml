@@ -8,6 +8,14 @@ compatibility_date = "2024-11-01"
 REPO = "no-ahb/incubator-site"
 ALLOWED_ORIGINS = "https://www.incubatorart.com,https://incubatorart.com,https://no-ahb.github.io,http://localhost:8000,http://127.0.0.1:8000"
 ISSUE_LABEL = "site-report"
+
+# Brute-force guard for the shared admin password: at most `limit` WRONG
+# passwords per client IP per `period` seconds (a correct password never counts).
+# Free on every Workers plan. Needs wrangler >= 4.36.
+[[ratelimits]]
+name = "ADMIN_LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }
 # REMINDER_FROM = "reminders@yourdomain.com"   # uncomment + set once Email Routing is on (below)
 
 # ---------------------------------------------------------------------------

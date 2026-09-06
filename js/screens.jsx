@@ -9,19 +9,28 @@ const { useState: msState, useMemo: msMemo, useEffect: msEffect } = React;
 // hasn't opened yet is "Forthcoming"; anything else is past. heroFallback: on
 // the home hero, a past fallback show reads as the "Most recent exhibition".
 function exhibitionStatus(ex, { heroFallback = false } = {}) {
-  const todayISO = new Date().toISOString().slice(0, 10);
-  const started = ex.startISO && ex.startISO <= todayISO;
-  const ended = ex.endISO && ex.endISO < todayISO;
+  const today = todayISO();
+  const started = ex.startISO && ex.startISO <= today;
+  const ended = ex.endISO && ex.endISO < today;
   if (started && !ended) return "Current exhibition";
-  if (ex.startISO && ex.startISO > todayISO) return "Forthcoming";
+  if (ex.startISO && ex.startISO > today) return "Forthcoming";
   return heroFallback ? "Most recent exhibition" : "Past exhibition";
+}
+
+// Today's date as YYYY-MM-DD in the visitor's local time zone (show dates are
+// London calendar days). toISOString() would give UTC, so a show would flip to
+// "Current" an hour early or late around midnight.
+function todayISO() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
 }
 
 /* =====================================================================
    HOME
    ===================================================================== */
 function HomeScreen({ onNav }) {
-  const TODAY = new Date().toISOString().slice(0, 10);
+  const TODAY = todayISO();
   const all = [...EXHIBITIONS, ...EXHIBITION_ARCHIVE];
   // Pick the lead show purely by date: whatever is on view now (most recently
   // opened wins), else the most recently opened show overall. There's no admin
@@ -390,7 +399,7 @@ function ExhibitionDetailScreen({ id, onNav }) {
           {/* The opening line matters until the show opens; afterwards it would
               read as stale ("Opening on the evening of 9 September" on a past
               show), and no admin field exists to clear it. */}
-          {ex.openingNote && ex.startISO && ex.startISO > new Date().toISOString().slice(0, 10)
+          {ex.openingNote && ex.startISO && ex.startISO > todayISO()
             ? <div className="inc-meta">{ex.openingNote}</div> : null}
           {ex.isGroup && (ex.groupArtists || []).length > 0 && (
             <div className="inc-participants">
@@ -531,8 +540,18 @@ function ArtistScreen({ id, onNav }) {
   const shows = EXHIBITIONS
     .filter((e) => e.artistId === id || (e.isGroup && (e.groupArtists || []).some((n) => slug(n) === id || (artistName && n.trim().toLowerCase() === artistName))))
     .sort((a, b) => (b.startISO || "").localeCompare(a.startISO || ""));
+  // Same honest not-found as the exhibition page, with a way back.
   if (!artist || shows.length === 0) {
-    return <div className="container" style={{padding:"80px 0"}}>Not found.</div>;
+    return (
+      <main className="inc-main">
+        <div className="container" style={{ padding: "80px 0" }}>
+          <p className="inc-prose" style={{ color: "var(--ink-3)" }}>Artist not found.</p>
+          <p className="inc-back" style={{ marginTop: "var(--s-6)" }}>
+            <a href="#/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>← Back to exhibitions</a>
+          </p>
+        </div>
+      </main>
+    );
   }
   // Header image comes from the artist's own (most recent) solo show, not from a
   // group show they merely appeared in — those images aren't theirs (#97).
@@ -590,6 +609,8 @@ function ArtistScreen({ id, onNav }) {
 function PressScreen() {
   // PRESS arrives canonical from data.jsx (one merged group per year, #110).
   const ordered = [...PRESS].sort((a, b) => b.year - a.year);
+  // Same admin-editable press address as the Contact page.
+  const pressEmail = resolveContact().pressEmail;
   return (
     <main className="inc-main">
       <div className="container">
@@ -600,7 +621,7 @@ function PressScreen() {
           <p className="inc-prose" style={{ color: "var(--ink-3)", maxWidth: "62ch" }}>
             Selected press and writing on Incubator exhibitions will be collected here.
             For press enquiries, please reach out to:{" "}
-            <a href="mailto:fabian@strobellall.com">fabian@strobellall.com</a>.
+            <a href={"mailto:" + pressEmail}>{pressEmail}</a>.
           </p>
         ) : ordered.map((year) => (
           <section key={year.year} className="inc-press-year">

@@ -20,13 +20,18 @@ const AD_ALLOWED_MIME = new Set(["image/png", "image/jpeg", "image/webp", "image
 // Build the human date string shown across the site from the ISO pickers, so
 // staff never hand-type it. "2026-06-01"+"2026-06-30" -> "1 – 30 June 2026".
 // Reuses monthName() from screens.jsx (shared global scope).
+function adParseISO(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec((iso || "").trim());
+  return m ? { y: +m[1], mo: +m[2] - 1, d: +m[3], iso: m[0] } : null;
+}
+// "2026-09-20" -> "20 September 2026" (accepts a full ISO timestamp too).
+function adFormatDay(iso) {
+  const p = adParseISO(String(iso || "").slice(0, 10));
+  return p ? p.d + " " + monthName(p.iso) + " " + p.y : String(iso);
+}
 function adFormatDates(startISO, endISO) {
-  const parse = (iso) => {
-    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec((iso || "").trim());
-    return m ? { y: +m[1], mo: +m[2] - 1, d: +m[3], iso: m[0] } : null;
-  };
-  const one = (p) => p.d + " " + monthName(p.iso) + " " + p.y;
-  const s = parse(startISO), e = parse(endISO);
+  const one = (p) => adFormatDay(p.iso);
+  const s = adParseISO(startISO), e = adParseISO(endISO);
   if (!s && !e) return "";
   if (!s) return one(e);
   if (!e) return one(s);
@@ -66,6 +71,49 @@ function adAuthFetch(path, pw, options = {}) {
     ...options,
     headers: { "X-Admin-Password": pw, ...(options.headers || {}) },
   });
+}
+
+// Same rule as the Worker's safeHttpUrl (worker/worker.js, the trust boundary):
+// a bare domain ("www.ft.com/…") gets https://, anything that isn't http(s)
+// becomes "". Keep the two in step.
+function adNormalizeUrl(v) {
+  const s = String(v || "").trim();
+  if (/^https?:\/\//i.test(s)) return s;
+  if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(\/|$)/i.test(s)) return "https://" + s;
+  return "";
+}
+
+/* ---------- HEALTH BANNER --------------------------------------------------
+   Asks the Worker whether it can still reach GitHub. The Worker commits every
+   save with a fine-grained GitHub token that EXPIRES, and until now an expired
+   token surfaced only as "Internal error." on save. Shown once signed in. */
+function AdminHealth({ pw }) {
+  const [msg, setMsg] = adState(null); // { kind: "warn" | "error", text }
+  adEffect(() => {
+    let alive = true;
+    adAuthFetch("/admin/health", pw, { method: "GET" })
+      .then(async (res) => {
+        const data = await res.json().catch(() => null);
+        if (!alive) return;
+        if (res.status === 404) {
+          setMsg({ kind: "warn", text: "The Worker is out of date — run `npx wrangler deploy` in worker/ so saves report real errors and the GitHub token is checked here." });
+          return;
+        }
+        if (!res.ok || !data || !data.ok || !data.github) return;
+        const g = data.github;
+        if (!g.ok) { setMsg({ kind: "error", text: "Saving is currently broken: " + (g.error || "the Worker cannot reach GitHub.") }); return; }
+        if (g.tokenExpires) {
+          const days = (new Date(g.tokenExpires).getTime() - Date.now()) / 86400000;
+          if (days <= 21) {
+            setMsg({ kind: "warn", text: "The Worker's GitHub token expires on " + adFormatDay(g.tokenExpires) + ". Renew it before then or saving will stop working (worker/README.md → “Rotate the GitHub token”)." });
+          }
+        }
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [pw]);
+  if (!msg) return null;
+  return <p className={"inc-admin__flash inc-admin__flash--" + msg.kind} role="alert">{msg.text}</p>;
 }
 
 /* ---------- LOGIN --------------------------------------------------------- */
@@ -276,7 +324,9 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
   const [groupArtists, setGroupArtists] = adState(Array.isArray(init.groupArtists) ? init.groupArtists.join("\n") : "");
   const [startISO, setStartISO] = adState(init.startISO || "");
   const [endISO, setEndISO] = adState(init.endISO || "");
-  const [privateView, setPrivateView] = adState(init.privateView || "");
+  // Free-text opening line ("Opening 9 September, 6–8pm"); shown on the home
+  // page and the show page until the show opens.
+  const [openingNote, setOpeningNote] = adState(init.openingNote || "");
   // Press release & bio are edited as canonical rich-text HTML. Legacy shows
   // (paragraph arrays) are converted up front so existing content opens already
   // structured; the bio is prefilled from the loaded site data.
@@ -300,8 +350,13 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
 
   const showId = slug(init.id || "") || slug(isGroup ? title : artist + " " + title);
 
+  // Paths of images already committed during this form session, by entry key,
+  // so a save that fails after uploading (and is retried) doesn't upload the
+  // same file twice.
+  const uploaded = adRef({});
   async function uploadEntry(entry) {
     if (entry.path && !entry.file) return entry.path; // already committed
+    if (uploaded.current[entry.key]) return uploaded.current[entry.key];
     setStatus("Optimising & uploading images…");
     const dataUrl = await adResizeImage(entry.file);
     const res = await adAuthFetch("/admin/upload", pw, {
@@ -311,6 +366,7 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
     });
     const data = await res.json().catch(() => null);
     if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || "Image upload failed.");
+    uploaded.current[entry.key] = data.path;
     return data.path;
   }
 
@@ -323,6 +379,10 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
     // #125) — only the artist is required. A group show is named by its title.
     if (isGroup ? !title.trim() : !artist.trim()) {
       setError(isGroup ? "Exhibition title is required." : "Artist is required.");
+      return;
+    }
+    if (startISO && endISO && endISO < startISO) {
+      setError("The end date is before the start date.");
       return;
     }
     setBusy(true);
@@ -343,7 +403,7 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
         dates: adFormatDates(startISO, endISO) || init.dates || "",
         startISO: startISO.trim(),
         endISO: endISO.trim(),
-        privateView: privateView.trim(),
+        openingNote: openingNote.trim(),
         pressRelease,
         heroImage: heroPath,
         installation,
@@ -356,7 +416,7 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
       const data = await res.json().catch(() => null);
       if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || "Save failed.");
 
-      onSaved({ ...show, id: data.id, artistId: isGroup ? null : slug(showArtist) });
+      onSaved({ ...show, id: data.id, artistId: isGroup ? null : slug(showArtist) }, artistBio);
     } catch (err) {
       setError(err.message || "Save failed.");
       setBusy(false);
@@ -373,7 +433,7 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
         <label>{isGroup ? "Exhibition title *" : "Exhibition title"}<input className="inc-report__input" value={title} onChange={(e) => setTitle(e.target.value)} required={isGroup} /></label>
         <label>Start date<input type="date" className="inc-report__input" value={startISO} onChange={(e) => setStartISO(e.target.value)} /></label>
         <label>End date<input type="date" className="inc-report__input" value={endISO} onChange={(e) => setEndISO(e.target.value)} /></label>
-        <label>Private view link<input className="inc-report__input" value={privateView} onChange={(e) => setPrivateView(e.target.value)} placeholder="https://…" /></label>
+        <label>Opening note (optional)<input className="inc-report__input" value={openingNote} onChange={(e) => setOpeningNote(e.target.value)} placeholder="e.g. Opening 9 September, 6–8pm" /></label>
       </div>
 
       {isGroup && (
@@ -613,9 +673,13 @@ function AdminAboutForm({ pw, onSaved }) {
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || "Save failed.");
+      window.patchSiteData((d) => { d.about = about; });
+      setImage(imagePath ? [{ key: "about", path: imagePath }] : []);
       onSaved();
     } catch (err) {
-      setError(err.message || "Save failed."); setBusy(false); setStatus("");
+      setError(err.message || "Save failed.");
+    } finally {
+      setBusy(false); setStatus("");
     }
   }
 
@@ -675,6 +739,8 @@ function AdminContactForm({ pw, onSaved }) {
         ...f,
         addressLines: splitLines(f.addressLines),
         hours: splitLines(f.hours),
+        instagramUrl: adNormalizeUrl(f.instagramUrl),
+        mailingListUrl: adNormalizeUrl(f.mailingListUrl),
       };
       const res = await adAuthFetch("/admin/save-content", pw, {
         method: "POST", headers: { "Content-Type": "application/json" },
@@ -682,9 +748,13 @@ function AdminContactForm({ pw, onSaved }) {
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || "Save failed.");
+      window.patchSiteData((d) => { d.contact = contact; });
+      setF((prev) => ({ ...prev, instagramUrl: contact.instagramUrl, mailingListUrl: contact.mailingListUrl }));
       onSaved();
     } catch (err) {
-      setError(err.message || "Save failed."); setBusy(false);
+      setError(err.message || "Save failed.");
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -740,21 +810,39 @@ function AdminPressForm({ pw, onSaved }) {
 
   async function submit(e) {
     e.preventDefault();
-    setBusy(true); setError("");
+    setError("");
+    // Validate before saving instead of silently dropping: a group with a
+    // missing/malformed year, or an article with no title, used to vanish on
+    // save with no explanation.
+    const press = [];
+    for (const g of groups) {
+      const items = g.items
+        .map((it) => ({ pub: it.pub.trim(), title: it.title.trim(), href: adNormalizeUrl(it.href), rawHref: it.href.trim() }))
+        .filter((it) => it.title || it.pub || it.rawHref);
+      if (!items.length) continue; // an empty year block is simply ignored
+      const year = /^\d{4}$/.test(g.year.trim()) ? parseInt(g.year, 10) : 0;
+      if (!year) { setError("Every year needs a four-digit year (e.g. 2026)."); return; }
+      const untitled = items.find((it) => !it.title);
+      if (untitled) { setError("Every article in " + year + " needs a title."); return; }
+      const badLink = items.find((it) => it.rawHref && !it.href);
+      if (badLink) { setError("“" + badLink.rawHref + "” doesn’t look like a web address (it should start with https://)."); return; }
+      press.push({ year, items: items.map(({ pub, title, href }) => ({ pub, title, href })) });
+    }
+    setBusy(true);
     try {
-      const press = groups.map((g) => ({
-        year: parseInt(g.year, 10) || 0,
-        items: g.items.map((it) => ({ pub: it.pub.trim(), title: it.title.trim(), href: it.href.trim() })).filter((it) => it.title || it.pub || it.href),
-      })).filter((g) => g.year && g.items.length);
       const res = await adAuthFetch("/admin/save-content", pw, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ press }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || "Save failed.");
+      window.patchSiteData((d) => { d.press = press; });
+      setGroups(press.map((g) => ({ year: String(g.year), items: g.items.map((it) => ({ ...it })) })));
       onSaved();
     } catch (err) {
-      setError(err.message || "Save failed."); setBusy(false);
+      setError(err.message || "Save failed.");
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -764,7 +852,7 @@ function AdminPressForm({ pw, onSaved }) {
       {groups.map((g, gi) => (
         <div key={gi} className="inc-admin__pressyear" style={{ borderTop: "1px solid var(--line, #ddd)", paddingTop: "var(--s-4)", marginTop: "var(--s-4)" }}>
           <div className="inc-admin__formgrid" style={{ alignItems: "end" }}>
-            <label>Year<input className="inc-report__input" value={g.year} onChange={(e) => setYear(gi, e.target.value)} placeholder="2026" /></label>
+            <label>Year<input className="inc-report__input" value={g.year} onChange={(e) => setYear(gi, e.target.value)} placeholder="2026" inputMode="numeric" maxLength={4} /></label>
             <button type="button" className="inc-admin__btn-ghost" onClick={() => removeYear(gi)}>Remove year</button>
           </div>
           {g.items.map((it, ii) => (
@@ -826,19 +914,36 @@ function AdminScreen() {
   function startAdd() { setEditing(null); setTab("form"); }
   function startEdit(show) { setEditing(show); setTab("form"); }
 
-  function afterSave(saved) {
-    setShows((prev) => {
-      const idx = prev.findIndex((s) => s.id === saved.id);
-      if (idx >= 0) { const next = prev.slice(); next[idx] = { ...next[idx], ...saved }; return next; }
-      return [saved, ...prev];
+  // Mirror the Worker's save into the loaded site data (show upsert + artist
+  // bio upsert), then show the list from that single source. Without the bio
+  // part, a second edit of the same show would send the old bio back and
+  // overwrite the one just saved.
+  function afterSave(saved, artistBio) {
+    const d = window.patchSiteData((d) => {
+      d.exhibitions = Array.isArray(d.exhibitions) ? d.exhibitions : [];
+      const idx = d.exhibitions.findIndex((s) => s.id === saved.id);
+      if (idx >= 0) d.exhibitions[idx] = { ...d.exhibitions[idx], ...saved };
+      else d.exhibitions.unshift(saved);
+      if (!saved.isGroup && saved.artistId) {
+        d.artists = Array.isArray(d.artists) ? d.artists : [];
+        const a = d.artists.find((x) => x.id === saved.artistId);
+        const hasBio = !!(artistBio && artistBio.trim());
+        if (a) { if (hasBio) a.bio = artistBio; if (!a.name) a.name = saved.artist; }
+        else d.artists.push({ id: saved.artistId, name: saved.artist, bio: hasBio ? artistBio : [] });
+      }
     });
+    if (d) setShows(d.exhibitions.slice());
     setTab("shows");
     setEditing(null);
     setFlash("Saved. The live site updates in about a minute, once it rebuilds.");
   }
 
   function afterToggle(id, hidden) {
-    setShows((prev) => prev.map((s) => (s.id === id ? { ...s, hidden } : s)));
+    const d = window.patchSiteData((d) => {
+      const s = (d.exhibitions || []).find((e) => e.id === id);
+      if (s) { if (hidden) s.hidden = true; else delete s.hidden; }
+    });
+    if (d) setShows(d.exhibitions.slice());
     setFlash((hidden ? "Hidden" : "Unhidden") + ". Live in about a minute.");
   }
 
@@ -863,6 +968,7 @@ function AdminScreen() {
           <button className={tab === "issues" ? "is-active" : ""} onClick={() => setTab("issues")}>Issues</button>
         </nav>
 
+        <AdminHealth pw={pw} />
         {flash ? <p className="inc-admin__flash">{flash}</p> : null}
 
         {tab === "shows" && (
