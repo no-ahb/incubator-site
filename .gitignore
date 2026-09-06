@@ -1,8 +1,10 @@
 .DS_Store
 *.log
 
-# Wrangler local state / cache (contains Cloudflare account identifiers).
+# Wrangler local state / cache (contains Cloudflare account identifiers) and
+# local secrets for `wrangler dev`.
 .wrangler/
+worker/.dev.vars
 
 # Local source materials — data workbook + original mockup reference.
 # Kept in the project folder but never published to GitHub Pages.

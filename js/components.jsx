@@ -156,7 +156,10 @@ function Poster({ ex, size = "card" }) {
           className="inc-poster__img"
           src={ex.heroImage}
           alt={[ex.artist, ex.title].filter(Boolean).join(" — ") || "Exhibition"}
-          loading="lazy"
+          // The hero is the largest thing above the fold: fetch it at once
+          // rather than lazily, so the page doesn't sit on a blank block.
+          loading={size === "hero" ? "eager" : "lazy"}
+          fetchpriority={size === "hero" ? "high" : undefined}
         />
       </div>
     );
@@ -228,8 +231,10 @@ function HeroPoster({ ex, size = "hero" }) {
    Opens the visitor's mail client pre-addressed to the gallery with the
    artist's name in the subject and a ready-made enquiry line in the body. */
 function EnquireButton({ name }) {
+  // Same admin-editable enquiries address as the Contact page and footer.
+  const c = (typeof resolveContact === "function") ? resolveContact() : {};
   const href =
-    "mailto:incubator.enquiries@gmail.com" +
+    "mailto:" + (c.enquiriesEmail || "incubator.enquiries@gmail.com") +
     "?subject=" + encodeURIComponent("Enquiry - " + name) +
     "&body=" + encodeURIComponent("I would like to enquire about available works by " + name + ".");
   return (
@@ -435,7 +440,7 @@ function Footer({ onNav }) {
         </div>
         {/* The © sits in its own centre column so the address and contact
             columns stay the same height. */}
-        <div className="inc-footer__legal">&copy; 2026 Incubator</div>
+        <div className="inc-footer__legal">&copy; {new Date().getFullYear()} Incubator</div>
         <div className="inc-footer__contact">
           <p>
             <a href={"mailto:" + c.enquiriesEmail}>{c.enquiriesEmail}</a><br/>

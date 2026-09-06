@@ -124,6 +124,25 @@ function routeToScreen(route, navigate) {
   }
 }
 
+// Browser-tab / bookmark / shared-link title for a route. Every page used to
+// carry the one site-wide title, so a link to a show read as generic.
+const SITE_TITLE = "Incubator — Chiltern Street, London";
+function routeTitle(route) {
+  const seg = route.split("/").filter(Boolean);
+  const showName = (ex) => ex.isGroup ? ex.title : [ex.artist, ex.title].filter(Boolean).join(": ");
+  let page = "";
+  if (seg[0] === "exhibitions" && seg[1]) {
+    const ex = [...EXHIBITIONS, ...EXHIBITION_ARCHIVE].find((e) => e.id === seg[1]);
+    page = ex ? showName(ex) : "Exhibition";
+  } else if (seg[0] === "artists" && seg[1]) {
+    const a = ARTISTS.find((x) => x.id === seg[1]);
+    page = a ? a.name : "Artist";
+  } else if (seg[0]) {
+    page = { exhibitions: "Exhibitions", press: "Press", about: "About", contact: "Contact", admin: "Admin" }[seg[0]] || "";
+  }
+  return page ? page + " — Incubator" : SITE_TITLE;
+}
+
 /* ---------- DATA LOADING / ERROR STATES ----------------------------------- */
 function SiteLoading() {
   return (
@@ -217,6 +236,10 @@ function App() {
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
   }, []);
+
+  appEffect(() => {
+    document.title = dataState === "ready" ? routeTitle(route) : SITE_TITLE;
+  }, [route, dataState]);
 
   // Lock background scroll while the mobile menu is open.
   appEffect(() => {

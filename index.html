@@ -23,20 +23,21 @@
     <link rel="stylesheet" href="css/mockups.css" />
     <link rel="stylesheet" href="css/app.css" />
 
-    <!-- Production React builds (dev builds are ~1 MB heavier and slower). -->
-    <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" integrity="sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+    <!-- Production React builds + Babel (JSX is compiled in the browser; there
+         is no build step). Self-hosted, pinned by version in the filename, so
+         the site never depends on a third-party CDN being up. To upgrade: drop
+         the new file in js/vendor/ under its version and change the path here. -->
+    <script src="js/vendor/react-18.3.1.production.min.js"></script>
+    <script src="js/vendor/react-dom-18.3.1.production.min.js"></script>
+    <script src="js/vendor/babel-standalone-7.29.0.min.js"></script>
   </head>
   <body>
     <div id="root"></div>
 
-    <!-- Worker endpoint for the admin panel's issue tooling (js/admin.jsx).
-         The public "Report an issue" button was removed; issues are now
-         handled from the admin backend, which POSTs to this Worker. -->
+    <!-- Worker endpoint for the staff admin page (js/admin.jsx): saving shows
+         and page content, and filing/listing issues. -->
     <script>
       window.REPORT_ISSUE_ENDPOINT = "https://incubator-report-issue.noahberrie7.workers.dev";
-      window.REPORT_ISSUE_REPO = "no-ahb/incubator-site";
     </script>
 
     <script type="text/babel" src="js/data.jsx"></script>
