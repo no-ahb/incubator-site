@@ -2572,6 +2572,31 @@
           "pub": "Puss Puss Magazine",
           "title": "Inside Lorena Levi’s World: Unfiltered, Unflinching, Unmissable – A Walk Through ‘Cold Hard Plastic’",
           "href": "https://www.pusspussmagazine.com/inside-lorena-levis-world-unfiltered-unflinching-unmissable-a-walk-through-cold-hard-plastic/"
+        },
+        {
+          "pub": "Bella Freud",
+          "title": "In the Spotlight: Angelica Jopling",
+          "href": "https://us.bellafreud.com/blogs/news/in-the-spotlight-angelica-jopling"
+        }
+      ]
+    },
+    {
+      "year": 2025,
+      "items": [
+        {
+          "pub": "AnOther Magazine",
+          "title": "Notes from the Studios of Tracey Emin, Bella Freud and Christian Marclay",
+          "href": "https://www.anothermag.com/art-photography/16838/notes-from-the-studio-incubor-tracey-emin-francesco-risso-claire-keegan"
+        },
+        {
+          "pub": "Wallpaper*",
+          "title": "Emerging artist Kasia Wozniak’s traditional photography techniques make for ethereal images",
+          "href": "https://www.wallpaper.com/art/photography/kasia-wozniak-exhibition-incubator-london"
+        },
+        {
+          "pub": "FLO London",
+          "title": "In conversation with Maya Gurung-Russell Campbell",
+          "href": "https://www.flolondon.co.uk/all-posts/in-conversation-with-maya-gurung-russell-campbell"
         }
       ]
     },
@@ -2589,9 +2614,14 @@
           "href": "https://www.thetimes.com/culture/art/article/new-gallerists-2024-q5cvf0dbm"
         },
         {
-          "pub": "Bella Freud",
-          "title": "In the Spotlight: Angelica Jopling",
-          "href": "https://us.bellafreud.com/blogs/news/in-the-spotlight-angelica-jopling"
+          "pub": "Elephant Magazine",
+          "title": "Rendering the Invisible Visible: Five by Five at the Incubator",
+          "href": "https://elephant.art/five-by-five-at-the-incubator/"
+        },
+        {
+          "pub": "ShowStudio",
+          "title": "Incubator Goes Carbon Neutral For New Show With Client Earth, 'Utopia'",
+          "href": "https://www.showstudio.com/news/incubator-goes-carbon-neutral-for-new-show-with-client-earth-utopia"
         }
       ]
     },
@@ -2632,6 +2662,11 @@
           "pub": "FAD Magazine",
           "title": "Incubator launches permanent gallery & project space for emerging artists",
           "href": "https://fadmagazine.com/2023/03/24/incubator-launches-permanent-gallery-project-space-for-emerging-artists/"
+        },
+        {
+          "pub": "Plinth",
+          "title": "Bacchanalia Royale: An interview with Atticus Wakefield",
+          "href": "https://plinth.uk.com/blogs/magazine/atticus-wakefield-incubator?srsltid=AfmBOopd8l9XOiRSvvhRsgPYlXQjyscXyjGo4BS-BalcDGf2NfBFzZOQ"
         }
       ]
     },
