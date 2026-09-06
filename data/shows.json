@@ -2552,6 +2552,26 @@
           "pub": "Financial Times",
           "title": "Meet the women behind London’s new gallery scene",
           "href": "https://www.ft.com/content/de629ec4-d787-4543-9f81-df0bf0112ba8"
+        },
+        {
+          "pub": "Wallpaper*",
+          "title": "Emerging artist Charlie Gosling is being compared to Frank Auerbach",
+          "href": "https://www.wallpaper.com/art/exhibitions-shows/charlie-gosling-incubator-london"
+        },
+        {
+          "pub": "Fetch",
+          "title": "Eva Dixon is Making Crashing Sexy Again",
+          "href": "https://www.fetch.london/post/eva-dixon-is-making-crashing-sexy-again"
+        },
+        {
+          "pub": "Plaster Magazine",
+          "title": "Harry Grundy at Incubator",
+          "href": "https://plastermagazine.com/paparazzi/plaster-paparazzi-harry-grundy-incubator/"
+        },
+        {
+          "pub": "Puss Puss Magazine",
+          "title": "Inside Lorena Levi’s World: Unfiltered, Unflinching, Unmissable – A Walk Through ‘Cold Hard Plastic’",
+          "href": "https://www.pusspussmagazine.com/inside-lorena-levis-world-unfiltered-unflinching-unmissable-a-walk-through-cold-hard-plastic/"
         }
       ]
     },
@@ -2567,6 +2587,11 @@
           "pub": "Elle",
           "title": "40 for 40: Women In Art",
           "href": "https://www.elle.com/uk/life-and-culture/culture/a68996174/40-for-40-women-in-art/"
+        },
+        {
+          "pub": "Metier",
+          "title": "Frieze Kickoff: An Art-Filled Afternoon in Marylebone",
+          "href": "https://us.metier.com/blogs/stories/frieze-kickoff-an-art-filled-afternoon-in-marylebone"
         }
       ]
     },
