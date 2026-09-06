@@ -127,7 +127,10 @@ access to the private repo.
   as "Internal error."; now the Worker says what failed and the admin page
   warns three weeks before the token expires (`/admin/health`).
 - **Password brute-force protection.** Ten wrong passwords a minute per IP,
-  then 429. The old Worker accepted unlimited guesses.
+  then 429. The old Worker accepted unlimited guesses. Counted per Cloudflare
+  edge server (see `worker/README.md`), so it slows guessing rather than
+  hard-capping it; a zone-level rate-limiting rule after the migration
+  (Security → WAF → Rate limiting rules, one rule free) would cap it properly.
 - **The anonymous issue-report route is gone.** Anyone who found the Worker URL
   could commit screenshots to the repo and open issues.
 - **Links are sanitised server-side.** Press, Contact and show links must be

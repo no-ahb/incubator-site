@@ -16,7 +16,12 @@ The site finds the Worker through `window.REPORT_ISSUE_ENDPOINT` in
 Every request must come from an allow-listed origin and carry an
 `X-Admin-Password` header. A wrong password returns 401; after 10 wrong
 passwords in a minute from one IP the Worker answers 429 for the rest of that
-minute (the `ADMIN_LIMITER` binding in `wrangler.toml`).
+minute (the `ADMIN_LIMITER` binding in `wrangler.toml`). Cloudflare counts
+this per edge server, not globally: a browser (which reuses its connection)
+is throttled reliably, but a script opening a fresh connection per guess can
+spread across servers. It raises the cost of guessing rather than capping it;
+the real defence is a long password. Once the domain is on Cloudflare, a
+zone-level rate-limiting rule (free plan includes one) can cap it properly.
 
 | Endpoint | Method | Purpose |
 | --- | --- | --- |
