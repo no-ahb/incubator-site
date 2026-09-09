@@ -2536,13 +2536,14 @@
       "Thur – Sat, 11am – 6pm",
       "Sun, 11am – 5pm"
     ],
-    "enquiriesEmail": "incubator.enquiries@gmail.com",
+    "enquiriesEmail": "info@incubatorart.com",
     "pressEmail": "fabian@strobellall.com",
     "internshipText": "Incubator is unable to accept unsolicited artist submissions. We offer a number of internship opportunities throughout the year. Please send your resume and a cover letter to incubator.enquiries@gmail.com.",
     "instagramUrl": "https://www.instagram.com/__incubator__/",
     "instagramHandle": "@__incubator__",
     "mailingListUrl": "https://first-thursday.typeform.com/incubator",
-    "mapQuery": "2 Chiltern Street London W1U 7PR"
+    "mapQuery": "2 Chiltern Street London W1U 7PR",
+    "mapCaption": "Nearest tube — Baker Street (5 minutes' walk) · Marylebone (8 minutes)"
   },
   "press": [
     {
