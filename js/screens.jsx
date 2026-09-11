@@ -191,15 +191,15 @@ function ExhibitionsListScreen({ onNav }) {
   }, [all, sort, filter, query]);
 
   // Split the (already sorted) list into status groups so the page distinguishes
-  // Forthcoming / Current / Past at a glance (#132). The fixed group order holds
+  // Current / Forthcoming / Past at a glance (#132). The fixed group order holds
   // even under A–Z sort (which interleaves statuses); empty groups are dropped.
   const groups = msMemo(() => {
     // One table pairs each exhibitionStatus() value with its display label, in
-    // programme order (what's coming, what's on, what's been). Empty groups drop
+    // programme order (what's on, what's coming, what's been). Empty groups drop
     // out; an unmatched status simply lands in no group rather than crashing.
     const DEFS = [
-      { label: "Forthcoming", status: "Forthcoming" },
       { label: "Current",     status: "Current exhibition" },
+      { label: "Forthcoming", status: "Forthcoming" },
       { label: "Past",        status: "Past exhibition" },
     ];
     return DEFS
