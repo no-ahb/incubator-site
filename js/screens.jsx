@@ -797,12 +797,6 @@ function ContactScreen() {
   const enc = encodeURIComponent(c.mapQuery);
   const mapsSearch = "https://www.google.com/maps/search/?api=1&query=" + enc;
   const mapsEmbed = "https://maps.google.com/maps?q=" + enc + "&z=16&output=embed";
-  // Open the mailing-list form in a popup; fall back to the plain target=_blank
-  // link if the browser blocks the popup.
-  const openSubscribe = (e) => {
-    const w = window.open(c.mailingListUrl, "incubator-subscribe", "width=540,height=720");
-    if (w) e.preventDefault();
-  };
   return (
     <main className="inc-main">
       <div className="container inc-contact">
@@ -847,7 +841,7 @@ function ContactScreen() {
             <p>
               {/* A plain link, like every other link in this column — the green
                   centred button read as out of place here (#112). */}
-              <a href={c.mailingListUrl} target="_blank" rel="noopener" onClick={openSubscribe}>
+              <a href={c.mailingListUrl} target="_blank" rel="noopener" onClick={e => openMailingList(e, c.mailingListUrl)}>
                 Subscribe
               </a>
             </p>
@@ -881,21 +875,6 @@ Object.assign(window, {
   slug,
 });
 
-function ArtistsDirectoryScreen({ onNav }) {
-  const artists = publicArtists(SITE_DATA);
-  const names = sortByLastName(artists.map(a => a.name));
-  const groups = names.reduce((out, name) => {
-    const letter = name.trim().split(/\s+/).pop()[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
-    (out[letter] ||= []).push(artists.find(a => a.name === name)); return out;
-  }, {});
-  return <main className="inc-main"><div className="container">
-    <header className="inc-pagehead"><h1>Artists</h1><p className="inc-meta">Artists who have exhibited at Incubator, A–Z by surname.</p></header>
-    <nav className="inc-alphabet" aria-label="Artist surname initial">{Object.keys(groups).map(letter => <a key={letter} href={"#letter-" + letter}>{letter}</a>)}</nav>
-    <div className="inc-directory">{Object.entries(groups).map(([letter, entries]) => <section key={letter} id={"letter-" + letter}>
-      <h2>{letter}</h2><ul>{entries.map(a => <li key={a.id}><a href={pagePath("/artists/" + a.id)} onClick={e => navClick(e,onNav,"/artists/" + a.id)}>{a.name}</a></li>)}</ul>
-    </section>)}</div>
-  </div></main>;
-}
 function NotFoundScreen({onNav}) {
   return <main className="inc-main container"><header className="inc-pagehead"><h1>Page not found</h1></header><p className="inc-prose">This page may have moved. <a href="/exhibitions/" onClick={e => navClick(e,onNav,"/exhibitions")}>Browse exhibitions</a>.</p></main>;
 }

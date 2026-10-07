@@ -27,7 +27,6 @@ const withViewTransition = (apply) => {
 function MobileMenu({ open, onNav, onClose }) {
   const items = [
     ["/exhibitions", "Exhibitions"],
-    ["/artists", "Artists"],
     ["/press", "Press"],
     ["/about", "About"],
     ["/contact", "Contact"],
@@ -120,7 +119,7 @@ function routeToScreen(route, navigate) {
     case "artists":
       return seg[1]
         ? <ArtistScreen id={seg[1]} onNav={navigate} />
-        : <ArtistsDirectoryScreen onNav={navigate} />;
+        : <HomeScreen onNav={navigate} />;
     case "press":   return <PressScreen />;
     case "about":   return <AboutScreen />;
     case "contact": return <ContactScreen />;
@@ -156,7 +155,8 @@ function SiteError({ onRetry }) {
 // Old hash links are still accepted, then normalised to the public page URL.
 function getRoute() {
   const h = window.location.hash.slice(1);
-  return cleanRoute(h.startsWith("/") ? h : window.location.pathname);
+  const route = cleanRoute(h.startsWith("/") ? h : window.location.pathname);
+  return route === "/artists" ? "/" : route;
 }
 function updateMetadata(route) {
   const meta = pageMetadata(route, SITE_DATA);

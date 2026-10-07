@@ -37,8 +37,9 @@ publishing while `index.html` is a template.
 
 `node scripts/prototype.cjs` creates `.cache/ux-preview/` after a site build.
 Preview it with `PORT=8004 node scripts/preview.cjs .cache/ux-preview`.
-It adds homepage visitor information and a direct footer signup link for review.
-Neither change is included in production.
+It previews homepage visitor information and a snapshot of the artist directory.
+Those changes are not included in production. The footer signup now matches the
+Contact page’s popup, as approved.
 
 ## Search-engine management
 

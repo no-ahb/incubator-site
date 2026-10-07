@@ -96,7 +96,6 @@ function Wordmark({ size = 20, color, className = "", as: Tag = "span", style })
 function Header({ route, onNav, onOpenMenu, compact, menuOpen }) {
   const items = [
     { id: "exhibitions", label: "Exhibitions" },
-    { id: "artists", label: "Artists" },
     { id: "press",       label: "Press" },
     { id: "about",       label: "About" },
     { id: "contact",     label: "Contact" },
@@ -452,7 +451,7 @@ function Footer({ onNav }) {
           <p>
             <a href={"mailto:" + c.enquiriesEmail}>{c.enquiriesEmail}</a><br/>
             <a href={c.instagramUrl} target="_blank" rel="noopener">{c.instagramHandle}</a><br/>
-            <a href="/contact/" onClick={(e)=>{navClick(e, onNav, "/contact");}}>Subscribe to mailing list</a>
+            <a href={c.mailingListUrl} target="_blank" rel="noopener" onClick={e => openMailingList(e, c.mailingListUrl)}>Subscribe to mailing list</a>
           </p>
         </div>
       </div>
