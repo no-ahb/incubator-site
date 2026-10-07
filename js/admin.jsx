@@ -973,7 +973,7 @@ function AdminScreen() {
     if (d) setShows(d.exhibitions.slice());
     setTab("shows");
     setEditing(null);
-    setFlash("Saved. The live site updates in about a minute, once it rebuilds.");
+    setFlash("Saved. The live site updates after a successful rebuild, usually within a few minutes.");
   }
 
   function afterToggle(id, hidden) {
@@ -982,11 +982,11 @@ function AdminScreen() {
       if (s) { if (hidden) s.hidden = true; else delete s.hidden; }
     });
     if (d) setShows(d.exhibitions.slice());
-    setFlash((hidden ? "Hidden" : "Unhidden") + ". Live in about a minute.");
+    setFlash((hidden ? "Hidden" : "Unhidden") + ". Live after the next successful rebuild.");
   }
 
   function afterContentSave() {
-    setFlash("Saved. The live site updates in about a minute, once it rebuilds.");
+    setFlash("Saved. The live site updates after a successful rebuild, usually within a few minutes.");
   }
 
   return (
