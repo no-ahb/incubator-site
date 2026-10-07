@@ -42,6 +42,9 @@ async function main() {
     @media(max-width:700px){.inc-hero__meta{grid-template-columns:1fr;gap:24px}.prototype-visit{border-left:0;border-top:1px solid var(--hairline);padding:24px 0 0}}
   `;doc.head.append(styles);
   const menu=doc.createElement('script');menu.textContent=`document.querySelector('.inc-menu-btn').addEventListener('click',function(){const open=this.getAttribute('aria-expanded')!=='true';this.setAttribute('aria-expanded',String(open));this.classList.toggle('is-open',open);const panel=document.querySelector('.inc-overlay');panel.classList.toggle('is-open',open);panel.setAttribute('aria-hidden',String(!open));});`;doc.body.append(menu);
+  const artistNav = doc.createElement('li'); artistNav.innerHTML = '<a href="/artists/">Artists</a>'; doc.querySelector('.inc-header__nav ul').children[0].after(artistNav);
+  await fs.mkdir(path.join(target,'artists'),{recursive:true});
+  await fs.copyFile('prototypes/artists.html',path.join(target,'artists/index.html'));
   await fs.writeFile(path.join(target,'index.html'),dom.serialize());
   dom.window.close();
   console.log('Prototype generated in .cache/ux-preview (not published).');

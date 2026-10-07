@@ -95,6 +95,7 @@ async function build() {
     await fs.mkdir(path.dirname(destination),{recursive:true});
     await fs.writeFile(destination,result);
   }
+  await fs.writeFile(path.join(out,'artists/index.html'), '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex, follow"><meta http-equiv="refresh" content="0;url=/"><title>Incubator</title><link rel="canonical" href="https://www.incubatorart.com/"></head><body><a href="/">Continue to Incubator</a></body></html>');
   await fs.writeFile(path.join(out,'sitemap.xml'),'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + routes.map(r => `  <url><loc>https://www.incubatorart.com${escape(pagePath(r))}</loc></url>`).join('\n') + '\n</urlset>\n');
   await fs.writeFile(path.join(out,'robots.txt'),'User-agent: *\nAllow: /\n\nSitemap: https://www.incubatorart.com/sitemap.xml\n');
   await fs.writeFile(path.join(out,'build-info.json'),json({builtAt:renderDate,routes:routes.length,images:refs.size,appBytes:code.length}));

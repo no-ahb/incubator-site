@@ -19,7 +19,7 @@ function artistShows(artist, data) {
 }
 function publicArtists(data) { return (data.artists || []).filter(a => artistShows(a, data).length); }
 function publicRoutes(data) {
-  return ["/", "/exhibitions", "/artists", "/press", "/about", "/contact",
+  return ["/", "/exhibitions", "/press", "/about", "/contact",
     ...[...(data.exhibitions || []), ...(data.archive || [])].filter(e => !e.hidden).map(e => "/exhibitions/" + e.id),
     ...publicArtists(data).map(a => "/artists/" + a.id)];
 }
@@ -45,3 +45,10 @@ function pageMetadata(route, data) {
   return {title, description, url, image:new URL(assetUrl(image), SITE_ORIGIN).href, noindex:!found || route === "/admin", jsonld:{"@context":"https://schema.org", "@graph":graph}};
 }
 if (typeof module !== "undefined") module.exports = { cleanRoute, pagePath, assetUrl, artistShows, publicArtists, publicRoutes, pageMetadata };
+
+// Both Subscribe links use the Contact page’s popup with its normal-link fallback.
+function openMailingList(e, url) {
+  if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const popup = window.open(url, "incubator-subscribe", "width=540,height=720");
+  if (popup) { popup.opener = null; e.preventDefault(); }
+}
