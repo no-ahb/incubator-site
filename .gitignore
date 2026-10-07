@@ -1,5 +1,8 @@
 .DS_Store
 *.log
+node_modules/
+_site/
+.cache/
 
 # Wrangler local state / cache (contains Cloudflare account identifiers) and
 # local secrets for `wrangler dev`.

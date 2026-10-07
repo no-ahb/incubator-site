@@ -189,7 +189,7 @@ function AdminImagePicker({ label, multiple, items, onChange }) {
       <div className="inc-admin__thumbs">
         {items.map((it) => (
           <div key={it.key} className="inc-admin__thumb">
-            <img src={it.url || it.path} alt="" />
+            <img src={assetUrl(it.url || it.path)} alt="" />
             <button type="button" className="inc-report__preview-x" aria-label="Remove image" onClick={() => remove(it.key)}>
               <span aria-hidden="true">✕</span>
             </button>
@@ -973,7 +973,7 @@ function AdminScreen() {
     if (d) setShows(d.exhibitions.slice());
     setTab("shows");
     setEditing(null);
-    setFlash("Saved. The live site updates in about a minute, once it rebuilds.");
+    setFlash("Saved. The live site updates after a successful rebuild, usually within a few minutes.");
   }
 
   function afterToggle(id, hidden) {
@@ -982,11 +982,11 @@ function AdminScreen() {
       if (s) { if (hidden) s.hidden = true; else delete s.hidden; }
     });
     if (d) setShows(d.exhibitions.slice());
-    setFlash((hidden ? "Hidden" : "Unhidden") + ". Live in about a minute.");
+    setFlash((hidden ? "Hidden" : "Unhidden") + ". Live after the next successful rebuild.");
   }
 
   function afterContentSave() {
-    setFlash("Saved. The live site updates in about a minute, once it rebuilds.");
+    setFlash("Saved. The live site updates after a successful rebuild, usually within a few minutes.");
   }
 
   return (

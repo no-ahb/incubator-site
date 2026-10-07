@@ -51,7 +51,7 @@ function Tile({ kind = "a", aspect = "4/3", className = "", style = {}, alt = ""
     return (
       <img
         className={"inc-tile inc-tile--photo " + className}
-        src={kind}
+        {...imageProps(kind, "(min-width: 900px) 16vw, 33vw")}
         alt={alt}
         loading="lazy"
         style={{ aspectRatio: aspect, ...style }}
@@ -96,6 +96,7 @@ function Wordmark({ size = 20, color, className = "", as: Tag = "span", style })
 function Header({ route, onNav, onOpenMenu, compact, menuOpen }) {
   const items = [
     { id: "exhibitions", label: "Exhibitions" },
+    { id: "artists", label: "Artists" },
     { id: "press",       label: "Press" },
     { id: "about",       label: "About" },
     { id: "contact",     label: "Contact" },
@@ -105,9 +106,9 @@ function Header({ route, onNav, onOpenMenu, compact, menuOpen }) {
     <header className={"inc-header" + (compact ? " inc-header--compact" : "")}>
       <div className="inc-header__inner container">
         <a
-          href="#/"
+          href="/"
           className="inc-header__brand"
-          onClick={(e) => { e.preventDefault(); onNav && onNav("/"); }}
+          onClick={(e) => { navClick(e, onNav, "/"); }}
         >
           <Wordmark />
         </a>
@@ -118,9 +119,9 @@ function Header({ route, onNav, onOpenMenu, compact, menuOpen }) {
               {items.map((it) => (
                 <li key={it.id}>
                   <a
-                    href={"#/" + it.id}
+                    href={"/" + it.id}
                     className={activeId === it.id ? "is-active" : ""}
-                    onClick={(e) => { e.preventDefault(); onNav && onNav("/" + it.id); }}
+                    onClick={(e) => { navClick(e, onNav, "/" + it.id); }}
                   >
                     {it.label}
                   </a>
@@ -154,7 +155,7 @@ function Poster({ ex, size = "card" }) {
       <div className={"inc-poster inc-poster--" + size + " inc-poster--photo"}>
         <img
           className="inc-poster__img"
-          src={ex.heroImage}
+          {...imageProps(ex.heroImage, size === "hero" ? "100vw" : undefined)}
           alt={[ex.artist, ex.title].filter(Boolean).join(" — ") || "Exhibition"}
           // The hero is the largest thing above the fold: fetch it at once
           // rather than lazily, so the page doesn't sit on a blank block.
@@ -241,7 +242,7 @@ function HeroPoster({ ex, size = "hero" }) {
       {open && (
         <ImageDialog label={alt} onClose={() => setOpen(false)}>
           <figure className="inc-lightbox__stage" onClick={(e) => e.stopPropagation()}>
-            <img className="inc-lightbox__img inc-lightbox__img--photo" src={ex.heroImage} alt={alt} />
+            <img className="inc-lightbox__img inc-lightbox__img--photo" src={assetUrl(ex.heroImage)} alt={alt} />
           </figure>
         </ImageDialog>
       )}
@@ -270,8 +271,8 @@ function ExhibitionCard({ ex, onNav, eyebrow }) {
   return (
     <a
       className="inc-card"
-      href={"#/exhibitions/" + ex.id}
-      onClick={(e) => { e.preventDefault(); onNav && onNav("/exhibitions/" + ex.id); }}
+      href={"/exhibitions/" + ex.id}
+      onClick={(e) => { navClick(e, onNav, "/exhibitions/" + ex.id); }}
     >
       <Poster ex={ex} size="card" />
       <div className="inc-card__meta">
@@ -293,10 +294,10 @@ function ExhibitionsListRow({ ex, onNav, onHover }) {
     <li className="inc-list__row">
       <a
         className="inc-list__link"
-        href={"#/exhibitions/" + ex.id}
+        href={"/exhibitions/" + ex.id}
         onMouseEnter={() => onHover && onHover(ex)}
         onFocus={() => onHover && onHover(ex)}
-        onClick={(e) => { e.preventDefault(); onNav && onNav("/exhibitions/" + ex.id); }}
+        onClick={(e) => { navClick(e, onNav, "/exhibitions/" + ex.id); }}
       >
         <span className="inc-list__title">
           {ex.isGroup ? (
@@ -341,7 +342,7 @@ function InstallationStrip({ frames }) {
   useEffect(() => {
     if (open < 0 || count < 2) return;
     [frames[(open + 1) % count], frames[(open - 1 + count) % count]].forEach((f) => {
-      if (isImageRef(f)) { const img = new Image(); img.src = f; }
+      if (isImageRef(f)) { const img = new Image(); img.src = assetUrl(f); }
     });
   }, [open, count, frames]);
 
@@ -384,12 +385,12 @@ function InstallationStrip({ frames }) {
             {isImageRef(frames[open]) ? (
               <div
                 className="inc-lightbox__xfade"
-                style={prevSrc ? { backgroundImage: 'url("' + prevSrc + '")' } : null}
+                style={prevSrc ? { backgroundImage: 'url("' + assetUrl(prevSrc) + '")' } : null}
               >
                 <img
                   key={open}
                   className="inc-lightbox__img inc-lightbox__img--photo"
-                  src={frames[open]}
+                  src={assetUrl(frames[open])}
                   alt={"Installation view " + (open + 1)}
                 />
               </div>
@@ -451,7 +452,7 @@ function Footer({ onNav }) {
           <p>
             <a href={"mailto:" + c.enquiriesEmail}>{c.enquiriesEmail}</a><br/>
             <a href={c.instagramUrl} target="_blank" rel="noopener">{c.instagramHandle}</a><br/>
-            <a href="#" onClick={(e)=>{e.preventDefault(); onNav && onNav("/contact");}}>Subscribe to mailing list</a>
+            <a href="/contact/" onClick={(e)=>{navClick(e, onNav, "/contact");}}>Subscribe to mailing list</a>
           </p>
         </div>
       </div>

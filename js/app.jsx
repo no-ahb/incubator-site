@@ -27,6 +27,7 @@ const withViewTransition = (apply) => {
 function MobileMenu({ open, onNav, onClose }) {
   const items = [
     ["/exhibitions", "Exhibitions"],
+    ["/artists", "Artists"],
     ["/press", "Press"],
     ["/about", "About"],
     ["/contact", "Contact"],
@@ -75,7 +76,7 @@ function MobileMenu({ open, onNav, onClose }) {
         <ul>
           {items.map(([path, label]) => (
             <li key={path}>
-              <a href={"#" + path} onClick={(e) => {
+              <a href={pagePath(path)} onClick={(e) => {
                 if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
                 e.preventDefault(); onNav(path);
               }}>
@@ -106,8 +107,9 @@ function MobileMenu({ open, onNav, onClose }) {
 
 /* ---------- ROUTER -------------------------------------------------------- */
 function routeToScreen(route, navigate) {
-  const seg = route.split("/").filter(Boolean);
+  const seg = cleanRoute(route).split("/").filter(Boolean);
 
+  if (!publicRoutes(SITE_DATA).includes(cleanRoute(route)) && route !== "/admin") return <NotFoundScreen onNav={navigate} />;
   if (seg.length === 0) return <HomeScreen onNav={navigate} />;
 
   switch (seg[0]) {
@@ -118,32 +120,13 @@ function routeToScreen(route, navigate) {
     case "artists":
       return seg[1]
         ? <ArtistScreen id={seg[1]} onNav={navigate} />
-        : <HomeScreen onNav={navigate} />;
+        : <ArtistsDirectoryScreen onNav={navigate} />;
     case "press":   return <PressScreen />;
     case "about":   return <AboutScreen />;
     case "contact": return <ContactScreen />;
     case "admin":   return <AdminScreen />;
-    default:        return <HomeScreen onNav={navigate} />;
+    default:        return <NotFoundScreen onNav={navigate} />;
   }
-}
-
-// Browser-tab / bookmark / shared-link title for a route. Every page used to
-// carry the one site-wide title, so a link to a show read as generic.
-const SITE_TITLE = "Incubator — Chiltern Street, London";
-function routeTitle(route) {
-  const seg = route.split("/").filter(Boolean);
-  const showName = (ex) => ex.isGroup ? ex.title : [ex.artist, ex.title].filter(Boolean).join(": ");
-  let page = "";
-  if (seg[0] === "exhibitions" && seg[1]) {
-    const ex = [...EXHIBITIONS, ...EXHIBITION_ARCHIVE].find((e) => e.id === seg[1]);
-    page = ex ? showName(ex) : "Exhibition";
-  } else if (seg[0] === "artists" && seg[1]) {
-    const a = ARTISTS.find((x) => x.id === seg[1]);
-    page = a ? a.name : "Artist";
-  } else if (seg[0]) {
-    page = { exhibitions: "Exhibitions", press: "Press", about: "About", contact: "Contact", admin: "Admin" }[seg[0]] || "";
-  }
-  return page ? page + " — Incubator" : SITE_TITLE;
 }
 
 /* ---------- DATA LOADING / ERROR STATES ----------------------------------- */
@@ -170,18 +153,31 @@ function SiteError({ onRetry }) {
   );
 }
 
-// Route lives in the hash (e.g. "#/exhibitions/foo") so the site works on any
-// static host and survives a refresh on a deep link. Hashes that don't start
-// with "/" are treated as in-page anchors, not routes.
+// Old hash links are still accepted, then normalised to the public page URL.
 function getRoute() {
-  const h = window.location.hash.replace(/^#/, "");
-  return h.startsWith("/") ? h : "/";
+  const h = window.location.hash.slice(1);
+  return cleanRoute(h.startsWith("/") ? h : window.location.pathname);
+}
+function updateMetadata(route) {
+  const meta = pageMetadata(route, SITE_DATA);
+  document.title = meta.title;
+  for (const [selector, value] of [
+    ['meta[name="description"]',meta.description], ['meta[property="og:title"]',meta.title],
+    ['meta[property="og:description"]',meta.description], ['meta[property="og:url"]',meta.url],
+    ['meta[property="og:image"]',meta.image], ['meta[name="twitter:title"]',meta.title],
+    ['meta[name="twitter:description"]',meta.description], ['meta[name="twitter:image"]',meta.image],
+    ['meta[name="robots"]', meta.noindex ? "noindex, follow" : "index, follow"]
+  ]) document.querySelector(selector)?.setAttribute("content",value);
+  document.querySelector('link[rel="canonical"]')?.setAttribute("href",meta.url);
+  const schema = document.getElementById("site-schema");
+  if (schema) schema.textContent = JSON.stringify(meta.jsonld);
 }
 
 function App() {
   const [route, setRoute] = appState(getRoute());
   const [menuOpen, setMenuOpen] = appState(false);
-  const [dataState, setDataState] = appState("loading"); // loading | ready | error
+  const [dataState, setDataState] = appState(SITE_DATA && getRoute() !== "/admin" ? "ready" : "loading"); // loading | ready | error
+  const [, refreshDate] = appState(0);
 
   const loadData = () => {
     setDataState("loading");
@@ -191,34 +187,41 @@ function App() {
   };
 
   const navigate = (path) => {
-    const target = "#" + path;
-    if (window.location.hash !== target) {
-      window.location.hash = target; // fires hashchange -> updates route
-    } else {
-      withViewTransition(() => {
-        setRoute(getRoute());
-        // Instant, not smooth: `html { scroll-behavior: smooth }` (app.css) would
-        // otherwise animate this reset, and the scroll-reveal layout effect would
-        // then measure element positions before the page returned to the top.
-        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-      });
-    }
-    setMenuOpen(false);
+    const route = cleanRoute(path);
+    if (getRoute() !== route) history.pushState(null, "", pagePath(route));
+    withViewTransition(() => {
+      setRoute(route);
+      setMenuOpen(false);
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    });
   };
 
-  // Fetch site content (shows + artists) once on mount.
-  appEffect(() => { loadData(); }, []);
+  appEffect(() => {
+    if (!SITE_DATA || getRoute() === "/admin") loadData();
+    // The first client render uses the build date to match the static HTML.
+    // Immediately refresh and keep date-based statuses correct across midnight.
+    delete window.__RENDER_DATE__;
+    refreshDate(n => n + 1);
+    const timer = setInterval(() => refreshDate(n => n + 1), 60000);
+    return () => clearInterval(timer);
+  }, []);
+  appEffect(() => {
+    if (route === "/admin" && dataState === "ready") loadData();
+  }, [route]);
 
   appEffect(() => {
-    const onHash = () => {
+    const onRoute = () => {
+      const next = getRoute();
+      if (window.location.hash.startsWith("#/")) history.replaceState(null, "", pagePath(next));
       withViewTransition(() => {
-        setRoute(getRoute());
+        setRoute(next);
         setMenuOpen(false);
-        window.scrollTo({ top: 0, left: 0, behavior: "instant" }); // see navigate()
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
       });
     };
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
+    window.addEventListener("hashchange", onRoute);
+    window.addEventListener("popstate", onRoute);
+    return () => { window.removeEventListener("hashchange", onRoute); window.removeEventListener("popstate", onRoute); };
   }, []);
 
   // In-page anchor links inside the screens (#installation, #release,
@@ -241,7 +244,7 @@ function App() {
   }, []);
 
   appEffect(() => {
-    document.title = dataState === "ready" ? routeTitle(route) : SITE_TITLE;
+    if (dataState === "ready") updateMetadata(route);
   }, [route, dataState]);
 
   // Lock background scroll while the mobile menu is open.
@@ -310,5 +313,13 @@ function App() {
   );
 }
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App />);
+if (window.__SERVER_RENDER__) {
+  window.renderSite = () => <App />;
+} else {
+  const node = document.getElementById("root");
+  const originalRoute = node.firstElementChild?.getAttribute("data-route");
+  const route = getRoute();
+  if (window.location.hash.startsWith("#/")) history.replaceState(null, "", pagePath(route));
+  if (originalRoute === route) ReactDOM.hydrateRoot(node, <App />);
+  else ReactDOM.createRoot(node).render(<App />);
+}

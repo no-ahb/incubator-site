@@ -1,10 +1,10 @@
 # Hosting, and how to make the repo private
 
-## Where things run today (September 2026)
+## Where things run today (October 2026)
 
 | Piece | Where | Deploys when |
 | --- | --- | --- |
-| The site (`index.html`, `js/`, `css/`, `data/`, `assets/`) | GitHub Pages, from the `main` branch of `no-ahb/incubator-site` | Every push to `main` (including the admin's own commits) |
+| The built site (`_site/`) | GitHub Pages, via the build-and-publish Actions workflow | Every push to `main` (including admin commits), plus scheduled date refreshes |
 | Domain `www.incubatorart.com` | DNS at OVH: `www` CNAME → `no-ahb.github.io`, apex A records → GitHub | — |
 | Admin Worker (`worker/`) | Cloudflare Workers, `incubator-report-issue` | Only when someone runs `npx wrangler deploy` |
 
@@ -12,7 +12,9 @@ The repo is **public**. That is currently *required*: GitHub Pages only serves
 from a private repo on a paid GitHub plan, so making it private on the free
 plan would take the site down.
 
-## Recommendation: Cloudflare Pages, free
+See [BUILD.md](BUILD.md) for local preview, clean URLs, the build workflow and rollback.
+
+## Optional future move: Cloudflare Pages
 
 Move the site's hosting from GitHub Pages to **Cloudflare Pages**, keep the
 code on GitHub as a **private** repo. Cloudflare Pages deploys from private
@@ -21,7 +23,7 @@ repos for free, sits on Cloudflare's CDN, gives HTTPS, and lets the repo's
 redirect (GitHub Pages ignores both). The admin Worker is already on Cloudflare,
 so everything server-side ends up in one free account.
 
-Nothing about the site's code changes: it's the same static files, and the
+The site remains static after `npm run build`; publish `_site/`. The
 admin Worker keeps committing to GitHub, which triggers a Pages build exactly
 as it triggers GitHub Pages today.
 
@@ -46,8 +48,8 @@ is at step 6, and it is reversible by putting the old DNS records back.
    Cloudflare GitHub App for the `no-ahb` account and choose
    `incubator-site`. (Do this **before** making the repo private; the app then
    keeps access.)
-3. Build settings: framework **None**, build command **empty**, build output
-   directory **`/`** (the repo root). Production branch **`main`**.
+3. Build settings: framework **None**, build command **`npm ci && npm run build && npm test`**, build output
+   directory **`_site`**. Use Node 22.12 or later. Production branch **`main`**.
 4. Save and deploy. You get `https://incubator-site-xxx.pages.dev`. Open it and
    click around; it should look identical to the live site. The admin page will
    say "Origin not allowed" until step 2 below.
@@ -115,8 +117,7 @@ access to the private repo.
 ### 6. Tidy up (optional)
 
 - Turn on **Cloudflare → Security → Bots → Bot Fight Mode** (free).
-- **Speed → Optimization → Brotli** is on by default; the 3 MB Babel script
-  compresses to about 600 KB.
+- The production application is precompiled; there is no browser Babel compiler.
 - The Pages free plan allows 500 builds a month. Every admin save and every
   uploaded image is one commit, so one build each; a show with ten photos is
   eleven builds. Plenty for a gallery, but worth knowing.
@@ -139,8 +140,8 @@ access to the private repo.
 - **Security headers** (`_headers`): a Content-Security-Policy that only lets
   the page talk to itself, the Worker and Google Maps; no framing; no MIME
   sniffing. Applied once the site is on Cloudflare Pages.
-- **No third-party CDN at page load.** React and Babel are served from the
-  repo (`js/vendor/`, version-pinned), so an unpkg outage can't blank the site.
+- **No third-party CDN at page load.** The compiled application includes React
+  and is served from the same site; package versions are locked at build time.
 
 ## Things to keep an eye on
 
