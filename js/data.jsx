@@ -21,7 +21,7 @@ let CONTACT = null;
 // the admin screen reads this to manage everything.
 let SITE_DATA = null;
 
-const DATA_URL = "data/shows.json";
+const DATA_URL = "/data/shows.json";
 
 // Older Worker saves appended one group per article, repeating the year heading
 // on the Press page (#110). Canonicalise at ingestion — one group per year,
@@ -84,3 +84,5 @@ Object.assign(window, {
   patchSiteData,
   getSiteData: () => SITE_DATA,
 });
+
+if (window.__SITE_DATA__) setSiteData(window.__SITE_DATA__);

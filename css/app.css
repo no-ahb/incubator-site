@@ -483,3 +483,18 @@ html { scroll-behavior: smooth; }
 .inc-admin__addimg:hover { border-color: var(--green); color: var(--green); }
 
 .inc-admin__actions { display: flex; gap: var(--s-3); align-items: center; margin-top: var(--s-2); }
+
+/* Archive controls and A–Z directory share the existing quiet type scale. */
+.inc-listbar { flex-wrap: wrap; gap: 16px; }
+.inc-year-filter { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.inc-year-filter select { font: inherit; color: inherit; background: transparent; border: 1px solid var(--rule, #ddd); border-radius: 0; padding: 8px; }
+.inc-reset { font: inherit; background: none; border: 0; padding: 0; color: var(--green); cursor: pointer; text-decoration: underline; }
+.inc-alphabet { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 0 32px; border-bottom: 1px solid var(--rule, #ddd); }
+.inc-alphabet a { display: grid; place-items: center; min-width: 36px; min-height: 44px; color: var(--green); }
+.inc-directory { padding-bottom: 80px; }
+.inc-directory section { display: grid; grid-template-columns: 80px 1fr; padding: 24px 0; border-bottom: 1px solid var(--rule, #ddd); scroll-margin-top: 100px; }
+.inc-directory h2 { font-size: 22px; font-weight: 400; color: var(--green); }
+.inc-directory ul { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 24px; list-style: none; padding: 0; margin: 0; }
+.inc-directory a { display: inline-block; padding: 8px 0; font-size: 16px; }
+@media (max-width: 700px) { .inc-directory ul { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 450px) { .inc-directory section { grid-template-columns: 44px 1fr; } .inc-directory ul { grid-template-columns: 1fr; } }

@@ -189,7 +189,7 @@ function AdminImagePicker({ label, multiple, items, onChange }) {
       <div className="inc-admin__thumbs">
         {items.map((it) => (
           <div key={it.key} className="inc-admin__thumb">
-            <img src={it.url || it.path} alt="" />
+            <img src={assetUrl(it.url || it.path)} alt="" />
             <button type="button" className="inc-report__preview-x" aria-label="Remove image" onClick={() => remove(it.key)}>
               <span aria-hidden="true">✕</span>
             </button>

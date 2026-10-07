@@ -17,7 +17,7 @@ function exhibitionStatus(ex, { heroFallback = false, today = todayISO() } = {})
 }
 
 // Exhibition dates are London calendar days, wherever the visitor lives.
-function todayISO(date = new Date()) {
+function todayISO(date = new Date(window.__RENDER_DATE__ || Date.now())) {
   const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: "Europe/London", year: "numeric", month: "2-digit", day: "2-digit",
   }).formatToParts(date);
@@ -77,8 +77,8 @@ function HomeScreen({ onNav }) {
       <section className="inc-hero">
         <a
           className="inc-hero__media"
-          href={"#/exhibitions/" + current.id}
-          onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + current.id); }}
+          href={"/exhibitions/" + current.id}
+          onClick={(e) => { navClick(e, onNav, "/exhibitions/" + current.id); }}
         >
           <Poster ex={current} size="hero" />
         </a>
@@ -86,8 +86,8 @@ function HomeScreen({ onNav }) {
           <span className="inc-eyebrow">{exhibitionStatus(current, { heroFallback: true, today: TODAY })}</span>
           <h1 className="inc-hero__title">
             <a
-              href={"#/exhibitions/" + current.id}
-              onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + current.id); }}
+              href={"/exhibitions/" + current.id}
+              onClick={(e) => { navClick(e, onNav, "/exhibitions/" + current.id); }}
             >
               {current.isGroup ? <em>{current.title}</em> : <>{current.artist}{current.title ? <>:&nbsp;<em>{current.title}</em></> : null}</>}
             </a>
@@ -97,8 +97,8 @@ function HomeScreen({ onNav }) {
             ? <div className="inc-meta">{current.openingNote}</div> : null}
           <a
             className="inc-hero__cta"
-            href={"#/exhibitions/" + current.id}
-            onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + current.id); }}
+            href={"/exhibitions/" + current.id}
+            onClick={(e) => { navClick(e, onNav, "/exhibitions/" + current.id); }}
           >
             Read more →
           </a>
@@ -114,9 +114,9 @@ function HomeScreen({ onNav }) {
         {upcoming.map((next) => (
         <div className="inc-coming" key={next.id}>
           <a
-            href={"#/exhibitions/" + next.id}
+            href={"/exhibitions/" + next.id}
             className="inc-card"
-            onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + next.id); }}
+            onClick={(e) => { navClick(e, onNav, "/exhibitions/" + next.id); }}
           >
             <Poster ex={next} size="card" />
           </a>
@@ -134,8 +134,8 @@ function HomeScreen({ onNav }) {
             {next.openingNote ? <div className="inc-meta">{next.openingNote}</div> : null}
             <a
               className="inc-hero__cta"
-              href={"#/exhibitions/" + next.id}
-              onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + next.id); }}
+              href={"/exhibitions/" + next.id}
+              onClick={(e) => { navClick(e, onNav, "/exhibitions/" + next.id); }}
             >
               Read more →
             </a>
@@ -149,7 +149,7 @@ function HomeScreen({ onNav }) {
       <section className="inc-section container">
         <header className="inc-section__head">
           <h2>Past exhibitions</h2>
-          <a href="#/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>View all</a>
+          <a href="/exhibitions" onClick={(e)=>{navClick(e, onNav, "/exhibitions");}}>View all</a>
         </header>
         <div className="inc-past">
           {past.map((ex) => (
@@ -170,12 +170,42 @@ function monthName(iso) {
    EXHIBITIONS LIST — adopts the Artists-list layout
    ===================================================================== */
 function ExhibitionsListScreen({ onNav }) {
+  const TODAY = todayISO();
   const all = msMemo(() => [...EXHIBITIONS, ...EXHIBITION_ARCHIVE], []);
   const [sort, setSort]   = msState("date");
   const [filter, setFilter] = msState("all"); // all | solo | group
   const [query, setQuery] = msState("");
+  const [year, setYear] = msState("all");
+  const [restored, setRestored] = msState(false);
+  const years = msMemo(() => [...new Set(all.flatMap(e => {
+    const start = Number((e.startISO || "").slice(0,4));
+    const end = Number((e.endISO || e.startISO || "").slice(0,4));
+    return start && end >= start && end - start < 20 ? Array.from({length:end-start+1}, (_,i) => String(start+i)) : [];
+  }))].sort().reverse(), [all]);
+  msEffect(() => {
+    let saved = "";
+    try { saved = sessionStorage.getItem("incubator:archive") || ""; } catch (_) {}
+    const p = new URLSearchParams(window.location.search || saved);
+    setQuery(p.get("q") || "");
+    setFilter(["solo", "group"].includes(p.get("type")) ? p.get("type") : "all");
+    setSort(p.get("sort") === "alpha" ? "alpha" : "date");
+    setYear(years.includes(p.get("year")) ? p.get("year") : "all");
+    setRestored(true);
+  }, []);
+  msEffect(() => {
+    if (!restored) return;
+    const p = new URLSearchParams();
+    if (query) p.set("q", query);
+    if (filter !== "all") p.set("type", filter);
+    if (sort !== "date") p.set("sort", sort);
+    if (year !== "all") p.set("year", year);
+    const search = p.size ? "?" + p.toString() : "";
+    history.replaceState(history.state, "", "/exhibitions/" + search);
+    try { sessionStorage.setItem("incubator:archive", search); } catch (_) {}
+  }, [query, filter, sort, year, restored]);
   const sorted = msMemo(() => {
     let xs = all.slice();
+    if (year !== "all") xs = xs.filter(e => (e.startISO || "").slice(0,4) <= year && (e.endISO || e.startISO || "").slice(0,4) >= year);
     if (filter === "solo")  xs = xs.filter((e) => !e.isGroup);
     if (filter === "group") xs = xs.filter((e) =>  e.isGroup);
     const q = query.trim().toLowerCase();
@@ -195,7 +225,7 @@ function ExhibitionsListScreen({ onNav }) {
         : (a.artist || a.title).localeCompare(b.artist || b.title)
     );
     return xs;
-  }, [all, sort, filter, query]);
+  }, [all, sort, filter, query, year]);
 
   // Split the (already sorted) list into status groups so the page distinguishes
   // Current / Forthcoming / Past at a glance (#132). The fixed group order holds
@@ -210,9 +240,9 @@ function ExhibitionsListScreen({ onNav }) {
       { label: "Past",        status: "Past exhibition" },
     ];
     return DEFS
-      .map((d) => ({ label: d.label, items: sorted.filter((e) => exhibitionStatus(e) === d.status) }))
+      .map((d) => ({ label: d.label, items: sorted.filter((e) => exhibitionStatus(e, {today: TODAY}) === d.status) }))
       .filter((g) => g.items.length > 0);
-  }, [sorted]);
+  }, [sorted, TODAY]);
 
   // Default the preview to the first row actually shown — the top of the first
   // non-empty group — which under A–Z sort isn't the global sorted[0].
@@ -230,7 +260,7 @@ function ExhibitionsListScreen({ onNav }) {
     const conn = navigator.connection;
     if (conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || ""))) return;
     const urls = sorted.slice(0, 8).map((e) => e.heroImage).filter(Boolean);
-    const warm = () => urls.forEach((src) => { const img = new Image(); img.src = src; });
+    const warm = () => urls.forEach((src) => { const img = new Image(); img.src = assetUrl(((window.__IMAGE_MANIFEST__ || {})[src] || []).find(v => v.width >= 640)?.url || src); });
     const ric = window.requestIdleCallback;
     if (ric) { const h = ric(warm); return () => window.cancelIdleCallback && window.cancelIdleCallback(h); }
     const t = setTimeout(warm, 200);
@@ -273,7 +303,10 @@ function ExhibitionsListScreen({ onNav }) {
               </button>
             ))}
           </div>
-          <span className="inc-eyebrow inc-listbar__count">{sorted.length} exhibition{sorted.length === 1 ? "" : "s"}</span>
+          <label className="inc-year-filter">Year <select aria-label="Exhibition year" value={year} onChange={e => setYear(e.target.value)}>
+            <option value="all">All years</option>{years.map(y => <option key={y} value={y}>{y}</option>)}
+          </select></label>
+          <span aria-live="polite" className="inc-eyebrow inc-listbar__count">{sorted.length} exhibition{sorted.length === 1 ? "" : "s"}</span>
           <div className="inc-toggle" role="tablist" aria-label="Sort">
             <button role="tab" aria-selected={sort==="date"}  className={sort==="date"  ? "is-active":""} onClick={()=>setSort("date")}>By date</button>
             <button role="tab" aria-selected={sort==="alpha"} className={sort==="alpha" ? "is-active":""} onClick={()=>setSort("alpha")}>A – Z</button>
@@ -282,7 +315,7 @@ function ExhibitionsListScreen({ onNav }) {
 
         {sorted.length === 0 && (
           <p className="inc-prose" style={{ color: "var(--ink-3)", marginTop: "var(--s-8)" }}>
-            No exhibitions match “{query}”.
+            No exhibitions match your filters. <button className="inc-reset" onClick={() => { setQuery(""); setYear("all"); setFilter("all"); setSort("date"); }}>Clear filters</button>
           </p>
         )}
 
@@ -312,9 +345,9 @@ function ExhibitionsListScreen({ onNav }) {
               // is what mobile users reach for since the poster sits above the list.
               <a
                 className="inc-list__preview-link"
-                href={"#/exhibitions/" + preview.id}
+                href={"/exhibitions/" + preview.id}
                 tabIndex={-1}
-                onClick={(e) => { e.preventDefault(); onNav && onNav("/exhibitions/" + preview.id); }}
+                onClick={(e) => { navClick(e, onNav, "/exhibitions/" + preview.id); }}
               >
                 <Poster ex={preview} size="card" />
                 <div className="inc-list__preview-meta">
@@ -354,7 +387,7 @@ function ExhibitionDetailScreen({ id, onNav }) {
         <div className="container" style={{ padding: "80px 0" }}>
           <p className="inc-prose" style={{ color: "var(--ink-3)" }}>Exhibition not found.</p>
           <p className="inc-back" style={{ marginTop: "var(--s-6)" }}>
-            <a href="#/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>← Back to exhibitions</a>
+            <a href="/exhibitions" onClick={(e)=>{navClick(e, onNav, "/exhibitions");}}>← Back to exhibitions</a>
           </p>
         </div>
       </main>
@@ -381,8 +414,8 @@ function ExhibitionDetailScreen({ id, onNav }) {
     : [];
   const artistLink = (label) => (
     <a
-      href={"#/artists/" + ex.artistId}
-      onClick={(e) => { e.preventDefault(); onNav("/artists/" + ex.artistId); }}
+      href={"/artists/" + ex.artistId}
+      onClick={(e) => { navClick(e, onNav, "/artists/" + ex.artistId); }}
     >
       {label}
     </a>
@@ -419,8 +452,8 @@ function ExhibitionDetailScreen({ id, onNav }) {
                       {i > 0 ? ", " : ""}
                       {aid ? (
                         <a
-                          href={"#/artists/" + aid}
-                          onClick={(e) => { e.preventDefault(); onNav("/artists/" + aid); }}
+                          href={"/artists/" + aid}
+                          onClick={(e) => { navClick(e, onNav, "/artists/" + aid); }}
                         >{n}</a>
                       ) : n}
                     </React.Fragment>
@@ -477,8 +510,8 @@ function ExhibitionDetailScreen({ id, onNav }) {
                 <div key={o.id} className="inc-related__row">
                   <a
                     className="inc-related__link"
-                    href={"#/exhibitions/" + o.id}
-                    onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + o.id); }}
+                    href={"/exhibitions/" + o.id}
+                    onClick={(e) => { navClick(e, onNav, "/exhibitions/" + o.id); }}
                   >
                     <span className="inc-related__title">
                       {o.title ? <em>{o.title}</em> : (o.artist || "Untitled")}
@@ -493,7 +526,7 @@ function ExhibitionDetailScreen({ id, onNav }) {
         )}
 
         <p className="container inc-back">
-          <a href="#/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>← Back to exhibitions</a>
+          <a href="/exhibitions" onClick={(e)=>{navClick(e, onNav, "/exhibitions");}}>← Back to exhibitions</a>
         </p>
       </article>
     </main>
@@ -559,7 +592,7 @@ function ArtistScreen({ id, onNav }) {
         <div className="container" style={{ padding: "80px 0" }}>
           <p className="inc-prose" style={{ color: "var(--ink-3)" }}>Artist not found.</p>
           <p className="inc-back" style={{ marginTop: "var(--s-6)" }}>
-            <a href="#/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>← Back to exhibitions</a>
+            <a href="/exhibitions" onClick={(e)=>{navClick(e, onNav, "/exhibitions");}}>← Back to exhibitions</a>
           </p>
         </div>
       </main>
@@ -590,7 +623,7 @@ function ArtistScreen({ id, onNav }) {
               {ex.title ? <h2><em>{ex.title}</em></h2> : null}
               <div className="inc-detail__show-meta">
                 {ex.isGroup ? "Group show" : "Solo show"} · {ex.dates} ·{" "}
-                <a href={"#/exhibitions/" + ex.id} onClick={(e) => { e.preventDefault(); onNav("/exhibitions/" + ex.id); }}>View exhibition →</a>
+                <a href={"/exhibitions/" + ex.id} onClick={(e) => { navClick(e, onNav, "/exhibitions/" + ex.id); }}>View exhibition →</a>
               </div>
             </header>
 
@@ -617,7 +650,7 @@ function ArtistScreen({ id, onNav }) {
         </p>
 
         <p className="container inc-back">
-          <a href="#/exhibitions" onClick={(e)=>{e.preventDefault(); onNav("/exhibitions");}}>← Back to exhibitions</a>
+          <a href="/exhibitions" onClick={(e)=>{navClick(e, onNav, "/exhibitions");}}>← Back to exhibitions</a>
         </p>
       </article>
     </main>
@@ -686,7 +719,7 @@ function AboutScreen() {
         </header>
         <div className="inc-about__intro">
           <Prose paragraphs={paragraphs} />
-          <img className="inc-about__img" src={image} alt="Inside the Incubator gallery on Chiltern Street" loading="lazy" />
+          <img className="inc-about__img" {...imageProps(image)} alt="Inside the Incubator gallery on Chiltern Street" loading="lazy" />
         </div>
 
         {team.length > 0 && (
@@ -847,3 +880,22 @@ Object.assign(window, {
   ContactScreen,
   slug,
 });
+
+function ArtistsDirectoryScreen({ onNav }) {
+  const artists = publicArtists(SITE_DATA);
+  const names = sortByLastName(artists.map(a => a.name));
+  const groups = names.reduce((out, name) => {
+    const letter = name.trim().split(/\s+/).pop()[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+    (out[letter] ||= []).push(artists.find(a => a.name === name)); return out;
+  }, {});
+  return <main className="inc-main"><div className="container">
+    <header className="inc-pagehead"><h1>Artists</h1><p className="inc-meta">Artists who have exhibited at Incubator, A–Z by surname.</p></header>
+    <nav className="inc-alphabet" aria-label="Artist surname initial">{Object.keys(groups).map(letter => <a key={letter} href={"#letter-" + letter}>{letter}</a>)}</nav>
+    <div className="inc-directory">{Object.entries(groups).map(([letter, entries]) => <section key={letter} id={"letter-" + letter}>
+      <h2>{letter}</h2><ul>{entries.map(a => <li key={a.id}><a href={pagePath("/artists/" + a.id)} onClick={e => navClick(e,onNav,"/artists/" + a.id)}>{a.name}</a></li>)}</ul>
+    </section>)}</div>
+  </div></main>;
+}
+function NotFoundScreen({onNav}) {
+  return <main className="inc-main container"><header className="inc-pagehead"><h1>Page not found</h1></header><p className="inc-prose">This page may have moved. <a href="/exhibitions/" onClick={e => navClick(e,onNav,"/exhibitions")}>Browse exhibitions</a>.</p></main>;
+}
