@@ -8,8 +8,7 @@ const { useState: msState, useMemo: msMemo, useEffect: msEffect } = React;
 // opens — see #90). A show whose date range spans today is "Current"; one that
 // hasn't opened yet is "Forthcoming"; anything else is past. heroFallback: on
 // the home hero, a past fallback show reads as the "Most recent exhibition".
-function exhibitionStatus(ex, { heroFallback = false } = {}) {
-  const today = todayISO();
+function exhibitionStatus(ex, { heroFallback = false, today = todayISO() } = {}) {
   const started = ex.startISO && ex.startISO <= today;
   const ended = ex.endISO && ex.endISO < today;
   if (started && !ended) return "Current exhibition";
@@ -17,13 +16,25 @@ function exhibitionStatus(ex, { heroFallback = false } = {}) {
   return heroFallback ? "Most recent exhibition" : "Past exhibition";
 }
 
-// Today's date as YYYY-MM-DD in the visitor's local time zone (show dates are
-// London calendar days). toISOString() would give UTC, so a show would flip to
-// "Current" an hour early or late around midnight.
-function todayISO() {
-  const d = new Date();
-  const p = (n) => String(n).padStart(2, "0");
-  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+// Exhibition dates are London calendar days, wherever the visitor lives.
+function todayISO(date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/London", year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(date);
+  const part = (type) => parts.find((p) => p.type === type).value;
+  return part("year") + "-" + part("month") + "-" + part("day");
+}
+
+function homeExhibition(shows, today) {
+  const visible = shows.filter((e) => !e.hidden);
+  const dated = visible.filter((e) => e.startISO)
+    .sort((a, b) => a.startISO.localeCompare(b.startISO));
+  const started = dated.filter((e) => e.startISO <= today).reverse();
+  const next = dated.find((e) => e.startISO > today);
+  // Promote the next show on the previous show's final day. Its status stays
+  // Forthcoming until its own start date; with no successor, keep the last show.
+  const onView = started.find((e) => !e.endISO || e.endISO > today);
+  return onView || next || started[0] || visible[0];
 }
 
 /* =====================================================================
@@ -32,14 +43,7 @@ function todayISO() {
 function HomeScreen({ onNav }) {
   const TODAY = todayISO();
   const all = [...EXHIBITIONS, ...EXHIBITION_ARCHIVE];
-  // Pick the lead show purely by date: whatever is on view now (most recently
-  // opened wins), else the most recently opened show overall. There's no admin
-  // "current" pin anymore — dates decide, so a stale flag can never mislead (#90).
-  const started = EXHIBITIONS
-    .filter((e) => (e.startISO || "") <= TODAY)
-    .sort((a, b) => (b.startISO || "").localeCompare(a.startISO || ""));
-  const onView = started.filter((e) => !e.endISO || e.endISO >= TODAY);
-  const current = onView[0] || started[0] || EXHIBITIONS[0];
+  const current = homeExhibition(EXHIBITIONS, TODAY);
 
   // No visible exhibitions (e.g. all hidden, or a brand-new gallery). Render a
   // calm placeholder rather than dereferencing an undefined `current`.
@@ -60,9 +64,10 @@ function HomeScreen({ onNav }) {
   const upcoming = EXHIBITIONS
     .filter((e) => e.id !== current.id && (e.startISO || "") > TODAY)
     .sort((a, b) => (a.startISO || "").localeCompare(b.startISO || ""));
-  // Everything already opened except the lead show (upcoming = startISO > TODAY).
+  // The closing show is still current on its final day, even after its
+  // successor takes the hero, so it must not appear under Past exhibitions yet.
   const past = all
-    .filter((e) => e.id !== current.id && (e.startISO || "") <= TODAY)
+    .filter((e) => e.id !== current.id && exhibitionStatus(e, { today: TODAY }) === "Past exhibition")
     .sort((a, b) => (b.startISO || "").localeCompare(a.startISO || ""))
     .slice(0, 8);
 
@@ -78,7 +83,7 @@ function HomeScreen({ onNav }) {
           <Poster ex={current} size="hero" />
         </a>
         <div className="container inc-hero__meta">
-          <span className="inc-eyebrow">{exhibitionStatus(current, { heroFallback: true })}</span>
+          <span className="inc-eyebrow">{exhibitionStatus(current, { heroFallback: true, today: TODAY })}</span>
           <h1 className="inc-hero__title">
             <a
               href={"#/exhibitions/" + current.id}
@@ -88,6 +93,8 @@ function HomeScreen({ onNav }) {
             </a>
           </h1>
           <div className="inc-meta">{current.dates}</div>
+          {current.openingNote && current.startISO > TODAY
+            ? <div className="inc-meta">{current.openingNote}</div> : null}
           <a
             className="inc-hero__cta"
             href={"#/exhibitions/" + current.id}
@@ -454,14 +461,7 @@ function ExhibitionDetailScreen({ id, onNav }) {
 
         {/* Coverage of this show specifically — kept off the site-wide Press
             page on purpose (#115–#124). */}
-        {(ex.press || []).length > 0 && (
-          <section className="container inc-detail__press">
-            <h3>Press</h3>
-            <div className="inc-press-list">
-              {ex.press.map((it, i) => <PressItem key={i} item={it} />)}
-            </div>
-          </section>
-        )}
+        <ExhibitionPress items={ex.press} />
 
         {!ex.isGroup && ex.artist && (
           <p className="container inc-detail__enquire">
@@ -508,6 +508,18 @@ function hasRichContent(v) {
   return String(v || "").replace(/<[^>]*>|&nbsp;/gi, "").trim().length > 0;
 }
 
+function ExhibitionPress({ items = [] }) {
+  if (!Array.isArray(items) || !items.length) return null;
+  return (
+    <section className="container inc-detail__press">
+      <h3>Press</h3>
+      <div className="inc-press-list">
+        {items.map((it, i) => <PressItem key={i} item={it} />)}
+      </div>
+    </section>
+  );
+}
+
 function slug(name) {
   return name.toLowerCase()
     .replace(/[\u201C\u201D"'']/g, "")
@@ -537,7 +549,7 @@ function ArtistScreen({ id, onNav }) {
   // appears on each featured artist's page even when the stored id was slugged
   // differently from the name (e.g. accents or a legacy import typo).
   const artistName = artist ? artist.name.trim().toLowerCase() : "";
-  const shows = EXHIBITIONS
+  const shows = [...EXHIBITIONS, ...EXHIBITION_ARCHIVE]
     .filter((e) => e.artistId === id || (e.isGroup && (e.groupArtists || []).some((n) => slug(n) === id || (artistName && n.trim().toLowerCase() === artistName))))
     .sort((a, b) => (b.startISO || "").localeCompare(a.startISO || ""));
   // Same honest not-found as the exhibition page, with a way back.
@@ -556,6 +568,13 @@ function ArtistScreen({ id, onNav }) {
   // Header image comes from the artist's own (most recent) solo show, not from a
   // group show they merely appeared in — those images aren't theirs (#97).
   const heroShow = shows.find((e) => !e.isGroup) || shows[0];
+  const seenPress = new Set();
+  const press = shows.flatMap((e) => e.press || []).filter((it) => {
+    const key = it.href || it.pub + "\n" + it.title;
+    if (seenPress.has(key)) return false;
+    seenPress.add(key);
+    return true;
+  });
   return (
     <main className="inc-main">
       <article className="inc-detail">
@@ -590,6 +609,8 @@ function ArtistScreen({ id, onNav }) {
           <h3>Biography</h3>
           <Prose paragraphs={artist.bio} />
         </section>
+
+        <ExhibitionPress items={press} />
 
         <p className="container inc-detail__enquire">
           <EnquireButton name={artist.name} />

@@ -199,9 +199,9 @@ async function uploadScreenshot(env, owner, repo, dataUrl, name) {
 function safeHttpUrl(value) {
   const v = String(value == null ? "" : value).trim();
   if (!v) return "";
-  if (/^https?:\/\//i.test(v)) return v;
-  if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(\/|$)/i.test(v)) return "https://" + v;
-  return "";
+  const candidate = /^https?:\/\//i.test(v) ? v
+    : /^[a-z0-9-]+(\.[a-z0-9-]+)+(\/|$)/i.test(v) ? "https://" + v : "";
+  try { return new URL(candidate).hostname ? candidate : ""; } catch (_) { return ""; }
 }
 
 function slugify(s) {
@@ -428,7 +428,9 @@ function sanitizeRichHtml(input) {
   let out = "";
   const re = /<[^>]*>/g;
   let last = 0, m;
-  const emitText = (t) => { if (t) out += t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
+  // Keep existing entities stable across saves; escaping every ampersand made
+  // quotes and ampersands accumulate visible "&amp;" layers on every edit.
+  const emitText = (t) => { if (t) out += t.replace(/&(?!(?:#\d+|#x[\da-f]+|[a-z][\da-z]+);)/gi, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
   while ((m = re.exec(s))) {
     emitText(s.slice(last, m.index));
     last = re.lastIndex;
@@ -504,6 +506,11 @@ function normalizeShow(input) {
   show.openingNote = String(input.openingNote || "").trim();
   if (input.privateView) show.privateView = safeHttpUrl(input.privateView);
   if (input.heroImage) show.heroImage = String(input.heroImage).trim();
+  // An older admin that does not send press must preserve existing coverage;
+  // an explicit empty array removes all articles.
+  if (Object.prototype.hasOwnProperty.call(input, "press")) {
+    show.press = normalizePressItems(input.press);
+  }
   // Visibility is managed solely via /admin/visibility, never the show form, so
   // `hidden` is deliberately not read here — save-show preserves the prior flag.
   return show;
@@ -528,6 +535,10 @@ async function handleAdminSaveShow(request, env, cors) {
   const payload = body.payload;
 
   const show = normalizeShow(payload.show || {});
+  if (Object.prototype.hasOwnProperty.call(payload.show || {}, "press") &&
+      (!Array.isArray(payload.show.press) || show.press.some((it) => !it.title || !it.href))) {
+    return json({ ok: false, error: "Every press article needs a title and a valid web link." }, 400, cors);
+  }
   // Solo shows may be announced before they have a title (#125); group shows
   // are named by their title.
   if (show.isGroup ? !show.title : !show.artist) {
@@ -580,7 +591,7 @@ async function handleAdminSaveShow(request, env, cors) {
   });
 
   if (result.error) return json({ ok: false, error: result.error }, result.status, cors);
-  return json({ ok: true, id: show.id }, 200, cors);
+  return json({ ok: true, id: show.id, press: show.press || [] }, 200, cors);
 }
 
 /* ---------------------------------------------------------------------------
@@ -628,20 +639,21 @@ function normalizeContact(input) {
   };
 }
 
+function normalizePressItems(input) {
+  return Array.isArray(input) ? input.map((it) => ({
+    pub: String((it && it.pub) || "").trim(),
+    title: String((it && it.title) || "").trim(),
+    href: safeHttpUrl(it && it.href),
+  })) : [];
+}
+
 function normalizePress(input) {
   if (!Array.isArray(input)) return [];
   return input
     .map((group) => {
       const year = parseInt((group && group.year) || 0, 10) || 0;
-      const items = Array.isArray(group && group.items)
-        ? group.items
-            .map((it) => ({
-              pub: String((it && it.pub) || "").trim(),
-              title: String((it && it.title) || "").trim(),
-              href: safeHttpUrl(it && it.href),
-            }))
-            .filter((it) => it.title || it.pub || it.href)
-        : [];
+      const items = normalizePressItems(group && group.items)
+        .filter((it) => it.title || it.pub || it.href);
       return { year, items };
     })
     .filter((g) => g.year && g.items.length)
