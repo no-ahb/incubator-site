@@ -182,7 +182,7 @@ function Poster({ ex, size = "card" }) {
    The lead image on a detail page. When the show has a real hero photo,
    clicking it opens the full image in the same lightbox the installation
    strip uses; placeholder posters stay static. */
-function ImageDialog({ label, onClose, onKeyDown, children }) {
+function ImageDialog({ label, onClose, onKeyDown, children, className = "" }) {
   const ref = useRef(null);
   useEffect(() => {
     const dialog = ref.current;
@@ -199,7 +199,7 @@ function ImageDialog({ label, onClose, onKeyDown, children }) {
   return (
     <dialog
       ref={ref}
-      className="inc-lightbox"
+      className={"inc-lightbox " + className}
       aria-label={label}
       onCancel={(e) => { e.preventDefault(); onClose(); }}
       onKeyDown={(e) => {
@@ -322,6 +322,64 @@ function ExhibitionsListRow({ ex, onNav, onHover }) {
 /* ---------- INSTALLATION STRIP --------------------------------------------
    A row of installation views. Each opens a full-screen lightbox you can
    step through with the arrow keys or the on-screen ‹ › controls. */
+function InstallationSlides({ frames, index }) {
+  const [slides, setSlides] = useState(() => [{ frame: frames[index], index }]);
+  const [error, setError] = useState(false);
+  const current = slides[slides.length - 1];
+
+  useEffect(() => {
+    setError(false);
+    // Finish the current dissolve before following the latest requested index.
+    // This keeps rapid clicks from repeatedly resetting the incoming opacity.
+    if (slides.length > 1 || (current.index === index && current.frame === frames[index])) return;
+    let cancelled = false;
+    const next = { frame: frames[index], index };
+    const show = () => {
+      if (cancelled) return;
+      const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      setSlides(reduceMotion ? [next] : [current, next]);
+    };
+    if (isImageRef(next.frame)) {
+      const image = new Image();
+      image.src = assetUrl(next.frame);
+      image.decode().then(show, () => { if (!cancelled) setError(true); });
+    } else show();
+    return () => { cancelled = true; };
+  }, [index, frames, slides]);
+
+  return (
+    <>
+      <div className="inc-lightbox__media">
+        {slides.map((slide, i) => (
+          <div
+            key={slide.index + ":" + slide.frame}
+            className={"inc-lightbox__slide" + (i === 1 ? " inc-lightbox__slide--incoming" : "")}
+            aria-hidden={i === 0 && slides.length > 1 ? true : undefined}
+            onAnimationEnd={(e) => {
+              if (i === 1 && e.target === e.currentTarget) setSlides((active) => active.slice(-1));
+            }}
+          >
+            {isImageRef(slide.frame) ? (
+              <img
+                className="inc-lightbox__img inc-lightbox__img--photo"
+                src={assetUrl(slide.frame)}
+                alt={"Installation view " + (slide.index + 1)}
+                onError={() => setError(true)}
+              />
+            ) : (
+              <Tile kind={slide.frame} aspect="3/2" className="inc-lightbox__img" />
+            )}
+          </div>
+        ))}
+      </div>
+      <figcaption className="inc-lightbox__caption">
+        {(current.index + 1) + " / " + frames.length}
+        {error && <span role="status"> — Image could not load. Try another view.</span>}
+      </figcaption>
+    </>
+  );
+}
+
 function InstallationStrip({ frames }) {
   const [open, setOpen] = useState(-1);
   const count = frames.length;
@@ -354,6 +412,7 @@ function InstallationStrip({ frames }) {
       {open >= 0 && (
         <ImageDialog
           label="Installation views"
+          className="inc-lightbox--installation"
           onClose={() => setOpen(-1)}
           onKeyDown={(e) => {
             if (e.key === "ArrowRight") { e.preventDefault(); go(1); }
@@ -368,23 +427,7 @@ function InstallationStrip({ frames }) {
             >‹</button>
           )}
           <figure className="inc-lightbox__stage" onClick={(e) => e.stopPropagation()}>
-            {/* Keep exactly one photograph in the viewer. A previous-image
-                background leaks around the edges when aspect ratios differ. */}
-            {isImageRef(frames[open]) ? (
-              <div
-                className="inc-lightbox__media"
-              >
-                <img
-                  key={open}
-                  className="inc-lightbox__img inc-lightbox__img--photo"
-                  src={assetUrl(frames[open])}
-                  alt={"Installation view " + (open + 1)}
-                />
-              </div>
-            ) : (
-              <Tile key={open} kind={frames[open]} aspect="3/2" className="inc-lightbox__img" />
-            )}
-            <figcaption className="inc-lightbox__caption">{(open + 1) + " / " + count}</figcaption>
+            <InstallationSlides frames={frames} index={open} />
           </figure>
           {count > 1 && (
             <button
