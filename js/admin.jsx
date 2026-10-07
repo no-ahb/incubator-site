@@ -346,6 +346,7 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
     const a = (data.artists || []).find((x) => x.id === aid);
     return a && a.bio ? window.RichText.fromProse(a.bio) : "";
   });
+  const [bioEdited, setBioEdited] = adState(false);
   const [hero, setHero] = adState(init.heroImage ? [{ key: "hero", path: init.heroImage }] : []);
   const [installs, setInstalls] = adState(
     (init.installation || [])
@@ -427,7 +428,7 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
       const res = await adAuthFetch("/admin/save-show", pw, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ show, artistBio }),
+        body: JSON.stringify({ show, ...(bioEdited ? { artistBio } : {}) }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || "Save failed.");
@@ -435,7 +436,8 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
       if (!Array.isArray(data.press)) throw new Error("The server needs an update to save exhibition press. Your other changes were saved; keep this form open and ask the site administrator to deploy the updated Worker, then save again.");
       show.press = data.press;
 
-      onSaved({ ...show, id: data.id, artistId: isGroup ? null : slug(showArtist) }, artistBio);
+      onSaved({ ...show, id: data.id, artistId: isGroup ? null : slug(showArtist) },
+        "artistBio" in data ? data.artistBio : (bioEdited ? artistBio : undefined));
     } catch (err) {
       setError(err.message || "Save failed.");
       setBusy(false);
@@ -489,7 +491,7 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
       {!isGroup && (
         <>
           <label className="inc-report__label">Artist bio (optional)</label>
-          <RichTextEditor value={artistBio} onChange={setArtistBio} roles={false} ariaLabel="Artist bio" />
+          <RichTextEditor value={artistBio} onChange={(value) => { setArtistBio(value); setBioEdited(true); }} roles={false} ariaLabel="Artist bio" />
         </>
       )}
 
@@ -963,8 +965,8 @@ function AdminScreen() {
       if (!saved.isGroup && saved.artistId) {
         d.artists = Array.isArray(d.artists) ? d.artists : [];
         const a = d.artists.find((x) => x.id === saved.artistId);
-        const hasBio = !!(artistBio && artistBio.trim());
-        if (a) { if (hasBio) a.bio = artistBio; if (!a.name) a.name = saved.artist; }
+        const hasBio = !!(artistBio && artistBio.length);
+        if (a) { if (artistBio !== undefined) a.bio = artistBio; if (!a.name) a.name = saved.artist; }
         else d.artists.push({ id: saved.artistId, name: saved.artist, bio: hasBio ? artistBio : [] });
       }
     });

@@ -182,19 +182,48 @@ function Poster({ ex, size = "card" }) {
    The lead image on a detail page. When the show has a real hero photo,
    clicking it opens the full image in the same lightbox the installation
    strip uses; placeholder posters stay static. */
-function HeroPoster({ ex, size = "hero" }) {
-  const [open, setOpen] = useState(false);
+function ImageDialog({ label, onClose, onKeyDown, children }) {
+  const ref = useRef(null);
   useEffect(() => {
-    if (!open) return;
-    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
-    document.addEventListener("keydown", onKey);
+    const dialog = ref.current;
+    const trigger = document.activeElement;
     const prevOverflow = document.body.style.overflow;
+    dialog.showModal();
     document.body.style.overflow = "hidden";
     return () => {
-      document.removeEventListener("keydown", onKey);
+      dialog.close();
       document.body.style.overflow = prevOverflow;
+      if (trigger && trigger.isConnected) trigger.focus({ preventScroll: true });
     };
-  }, [open]);
+  }, []);
+  return (
+    <dialog
+      ref={ref}
+      className="inc-lightbox"
+      aria-label={label}
+      onCancel={(e) => { e.preventDefault(); onClose(); }}
+      onKeyDown={(e) => {
+        if (e.key === "Tab") {
+          const buttons = ref.current.querySelectorAll("button:not([disabled])");
+          const first = buttons[0], last = buttons[buttons.length - 1];
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault(); last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault(); first.focus();
+          }
+        }
+        if (onKeyDown) onKeyDown(e);
+      }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <button type="button" autoFocus className="inc-lightbox__close" aria-label="Close" onClick={onClose}>✕</button>
+      {children}
+    </dialog>
+  );
+}
+
+function HeroPoster({ ex, size = "hero" }) {
+  const [open, setOpen] = useState(false);
 
   if (!ex.heroImage) return <Poster ex={ex} size={size} />;
 
@@ -210,18 +239,11 @@ function HeroPoster({ ex, size = "hero" }) {
         <Poster ex={ex} size={size} />
       </button>
       {open && (
-        <div
-          className="inc-lightbox"
-          role="dialog"
-          aria-modal="true"
-          aria-label={alt}
-          onClick={() => setOpen(false)}
-        >
-          <button className="inc-lightbox__close" aria-label="Close" onClick={() => setOpen(false)}>✕</button>
+        <ImageDialog label={alt} onClose={() => setOpen(false)}>
           <figure className="inc-lightbox__stage" onClick={(e) => e.stopPropagation()}>
             <img className="inc-lightbox__img inc-lightbox__img--photo" src={ex.heroImage} alt={alt} />
           </figure>
-        </div>
+        </ImageDialog>
       )}
     </>
   );
@@ -323,22 +345,6 @@ function InstallationStrip({ frames }) {
     });
   }, [open, count, frames]);
 
-  useEffect(() => {
-    if (open < 0) return;
-    const onKey = (e) => {
-      if (e.key === "Escape") setOpen(-1);
-      else if (e.key === "ArrowRight") { e.preventDefault(); go(1); }
-      else if (e.key === "ArrowLeft")  { e.preventDefault(); go(-1); }
-    };
-    document.addEventListener("keydown", onKey);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [open, count]);
-
   return (
     <>
       <div className="inc-strip">
@@ -356,14 +362,14 @@ function InstallationStrip({ frames }) {
       </div>
 
       {open >= 0 && (
-        <div
-          className="inc-lightbox"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Installation views"
-          onClick={() => setOpen(-1)}
+        <ImageDialog
+          label="Installation views"
+          onClose={() => setOpen(-1)}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowRight") { e.preventDefault(); go(1); }
+            else if (e.key === "ArrowLeft") { e.preventDefault(); go(-1); }
+          }}
         >
-          <button className="inc-lightbox__close" aria-label="Close" onClick={() => setOpen(-1)}>✕</button>
           {count > 1 && (
             <button
               className="inc-lightbox__nav inc-lightbox__nav--prev"
@@ -399,7 +405,7 @@ function InstallationStrip({ frames }) {
               onClick={(e) => { e.stopPropagation(); go(1); }}
             >›</button>
           )}
-        </div>
+        </ImageDialog>
       )}
     </>
   );

@@ -455,7 +455,10 @@ function sanitizeRichHtml(input) {
 // Accept rich text as either the new canonical HTML string (sanitised) or the
 // legacy array of plain paragraph strings (kept as-is for un-migrated content).
 function normalizeRich(value) {
-  if (typeof value === "string") return sanitizeRichHtml(value);
+  if (typeof value === "string") {
+    const html = sanitizeRichHtml(value);
+    return html.replace(/<[^>]*>|&nbsp;|&#160;|&#x[aA]0;/g, "").trim() ? html : "";
+  }
   if (Array.isArray(value)) return value.filter((p) => typeof p === "string" && p.trim()).map((p) => p.trim());
   return "";
 }
@@ -505,7 +508,9 @@ function normalizeShow(input) {
   // private-view link has no form field, so it is only touched when posted.
   show.openingNote = String(input.openingNote || "").trim();
   if (input.privateView) show.privateView = safeHttpUrl(input.privateView);
-  if (input.heroImage) show.heroImage = String(input.heroImage).trim();
+  if (Object.prototype.hasOwnProperty.call(input, "heroImage")) {
+    show.heroImage = String(input.heroImage || "").trim();
+  }
   // An older admin that does not send press must preserve existing coverage;
   // an explicit empty array removes all articles.
   if (Object.prototype.hasOwnProperty.call(input, "press")) {
@@ -517,7 +522,7 @@ function normalizeShow(input) {
 }
 
 // Optional show fields that an edit may clear: stored only when non-empty.
-const OPTIONAL_SHOW_KEYS = ["openingNote", "privateView"];
+const OPTIONAL_SHOW_KEYS = ["openingNote", "privateView", "heroImage"];
 function dropEmptyOptional(show) {
   for (const k of OPTIONAL_SHOW_KEYS) if (!show[k]) delete show[k];
   return show;
@@ -535,6 +540,8 @@ async function handleAdminSaveShow(request, env, cors) {
   const payload = body.payload;
 
   const show = normalizeShow(payload.show || {});
+  const isEdit = !!(payload.show && payload.show.id);
+  const baseId = show.id;
   if (Object.prototype.hasOwnProperty.call(payload.show || {}, "press") &&
       (!Array.isArray(payload.show.press) || show.press.some((it) => !it.title || !it.href))) {
     return json({ ok: false, error: "Every press article needs a title and a valid web link." }, 400, cors);
@@ -544,16 +551,27 @@ async function handleAdminSaveShow(request, env, cors) {
   if (show.isGroup ? !show.title : !show.artist) {
     return json({ ok: false, error: show.isGroup ? "A group show needs a title." : "Artist is required." }, 400, cors);
   }
+  if (!baseId) return json({ ok: false, error: "The exhibition needs a name containing letters or numbers." }, 400, cors);
 
   // Rich text: new canonical HTML string, or legacy plain-paragraph array.
   const bio = normalizeRich(payload.artistBio);
+  const hasBioUpdate = Object.prototype.hasOwnProperty.call(payload, "artistBio");
   const bioHasContent = !!bio && bio.length > 0; // string or array both use .length
+  let savedBio;
 
   const result = await commitJsonUpdate(env, owner, repo, SHOWS_PATH, (data) => {
     data.exhibitions = Array.isArray(data.exhibitions) ? data.exhibitions : [];
     data.artists = Array.isArray(data.artists) ? data.artists : [];
 
+    // An omitted ID means create, even when the artist/title slug is already
+    // used. Recalculate after a concurrent-write retry against the latest IDs.
+    if (!isEdit) {
+      const used = new Set([...data.exhibitions, ...(data.archive || [])].map((e) => e.id));
+      show.id = baseId;
+      for (let suffix = 2; used.has(show.id); suffix++) show.id = baseId + "-" + suffix;
+    }
     const idx = data.exhibitions.findIndex((e) => e.id === show.id);
+    if (isEdit && idx < 0) return { status: 404, error: "This exhibition no longer exists. Reload the list before editing." };
     const prevArtistId = idx >= 0 ? data.exhibitions[idx].artistId : null;
     if (idx >= 0) {
       // Editing: always carry the prior hidden flag (the form never sets it).
@@ -572,11 +590,12 @@ async function handleAdminSaveShow(request, env, cors) {
     if (show.artistId) {
       const aIdx = data.artists.findIndex((a) => a.id === show.artistId);
       if (aIdx >= 0) {
-        if (bioHasContent) data.artists[aIdx].bio = bio;
+        if (hasBioUpdate && (isEdit || bioHasContent)) data.artists[aIdx].bio = bio;
         if (!data.artists[aIdx].name) data.artists[aIdx].name = show.artist;
       } else {
         data.artists.push({ id: show.artistId, name: show.artist, bio: bioHasContent ? bio : [] });
       }
+      savedBio = data.artists.find((a) => a.id === show.artistId).bio;
     }
 
     // If this edit moved the show off its old artist (solo→group, or an artist
@@ -591,7 +610,7 @@ async function handleAdminSaveShow(request, env, cors) {
   });
 
   if (result.error) return json({ ok: false, error: result.error }, result.status, cors);
-  return json({ ok: true, id: show.id, press: show.press || [] }, 200, cors);
+  return json({ ok: true, id: show.id, press: show.press || [], artistBio: savedBio }, 200, cors);
 }
 
 /* ---------------------------------------------------------------------------
