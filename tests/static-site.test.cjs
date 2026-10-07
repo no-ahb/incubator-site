@@ -56,3 +56,14 @@ test('exhibition schema preserves actual dates and unique artist/exhibition iden
   assert.equal(event['@type'],'ExhibitionEvent');
   assert.equal(pageMetadata('/artists/amelia-cross',data).jsonld['@graph'][1]['@type'],'Person');
 });
+test('unapproved directory and visitor information stay local; footer signup is direct', () => {
+  const dom = new JSDOM(fs.readFileSync(path.join(root,'index.html'),'utf8'));
+  const doc = dom.window.document;
+  assert.equal(publicRoutes(data).includes('/artists'),false);
+  assert.equal([...doc.querySelectorAll('nav a')].some(a => a.textContent === 'Artists'),false);
+  assert.equal(doc.querySelector('.prototype-visit'),null);
+  assert.equal(fs.existsSync(path.join(root,'prototypes')),false);
+  const subscribe = [...doc.querySelectorAll('footer a')].find(a => a.textContent === 'Subscribe to mailing list');
+  assert.equal(subscribe.href,data.contact.mailingListUrl);
+  dom.window.close();
+});

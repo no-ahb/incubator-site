@@ -327,16 +327,6 @@ function InstallationStrip({ frames }) {
   const count = frames.length;
   const go = (delta) => setOpen((i) => (i + delta + count) % count);
 
-  // The frame shown before this one — rendered behind the incoming image so a
-  // step reads as a dissolve rather than a blink to the dark backdrop. The ref
-  // updates after paint, so during a render it still holds the outgoing frame.
-  const prevIdx = useRef(-1);
-  useEffect(() => { prevIdx.current = open; }, [open]);
-  const prevSrc =
-    open >= 0 && prevIdx.current >= 0 && prevIdx.current !== open && isImageRef(frames[prevIdx.current])
-      ? frames[prevIdx.current]
-      : null;
-
   // Warm the neighbours while the lightbox is open so stepping never waits.
   useEffect(() => {
     if (open < 0 || count < 2) return;
@@ -378,13 +368,11 @@ function InstallationStrip({ frames }) {
             >‹</button>
           )}
           <figure className="inc-lightbox__stage" onClick={(e) => e.stopPropagation()}>
-            {/* key={open} remounts the media each step and fades it in; the
-                outgoing frame is held as the wrapper's background so the fade
-                is a true dissolve between images, never a blink to black. */}
+            {/* Keep exactly one photograph in the viewer. A previous-image
+                background leaks around the edges when aspect ratios differ. */}
             {isImageRef(frames[open]) ? (
               <div
-                className="inc-lightbox__xfade"
-                style={prevSrc ? { backgroundImage: 'url("' + assetUrl(prevSrc) + '")' } : null}
+                className="inc-lightbox__media"
               >
                 <img
                   key={open}
