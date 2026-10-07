@@ -78,9 +78,9 @@ function adAuthFetch(path, pw, options = {}) {
 // becomes "". Keep the two in step.
 function adNormalizeUrl(v) {
   const s = String(v || "").trim();
-  if (/^https?:\/\//i.test(s)) return s;
-  if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(\/|$)/i.test(s)) return "https://" + s;
-  return "";
+  const candidate = /^https?:\/\//i.test(s) ? s
+    : /^[a-z0-9-]+(\.[a-z0-9-]+)+(\/|$)/i.test(s) ? "https://" + s : "";
+  try { return new URL(candidate).hostname ? candidate : ""; } catch (_) { return ""; }
 }
 
 /* ---------- HEALTH BANNER --------------------------------------------------
@@ -308,6 +308,13 @@ function RichTextEditor({ value, onChange, roles, ariaLabel }) {
         contentEditable
         suppressContentEditableWarning
         aria-label={ariaLabel}
+        onPaste={(e) => {
+          e.preventDefault();
+          const html = e.clipboardData.getData("text/html") || e.clipboardData.getData("text/plain")
+            .split(/\r?\n/).map((line) => "<p>" + escapeHtml(line) + "</p>").join("");
+          document.execCommand("insertHTML", false, window.RichText.canonicalize(html));
+          emit();
+        }}
         onInput={emit}
         onBlur={emit}
       />
@@ -331,6 +338,7 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
   // (paragraph arrays) are converted up front so existing content opens already
   // structured; the bio is prefilled from the loaded site data.
   const [pressRelease, setPressRelease] = adState(() => window.RichText.fromRelease(init.pressRelease));
+  const [press, setPress] = adState((init.press || []).map((it) => ({ pub: it.pub || "", title: it.title || "", href: it.href || "" })));
   const [artistBio, setArtistBio] = adState(() => {
     if (init.isGroup) return "";
     const aid = init.artistId || slug(init.artist || "");
@@ -385,6 +393,13 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
       setError("The end date is before the start date.");
       return;
     }
+    const articles = press.map((it) => ({
+      pub: it.pub.trim(), title: it.title.trim(), href: adNormalizeUrl(it.href), rawHref: it.href.trim(),
+    })).filter((it) => it.pub || it.title || it.rawHref);
+    if (articles.some((it) => !it.title || !it.href)) {
+      setError("Every press article needs a title and a valid web link (https://…).");
+      return;
+    }
     setBusy(true);
     setError("");
     setStatus("");
@@ -405,6 +420,7 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
         endISO: endISO.trim(),
         openingNote: openingNote.trim(),
         pressRelease,
+        press: articles.map(({ pub, title, href }) => ({ pub, title, href })),
         heroImage: heroPath,
         installation,
       };
@@ -415,6 +431,9 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data || !data.ok) throw new Error((data && data.error) || "Save failed.");
+
+      if (!Array.isArray(data.press)) throw new Error("The server needs an update to save exhibition press. Your other changes were saved; keep this form open and ask the site administrator to deploy the updated Worker, then save again.");
+      show.press = data.press;
 
       onSaved({ ...show, id: data.id, artistId: isGroup ? null : slug(showArtist) }, artistBio);
     } catch (err) {
@@ -447,8 +466,25 @@ function AdminShowForm({ pw, existing, onSaved, onCancel }) {
       <AdminImagePicker label="Installation views" multiple={true} items={installs} onChange={setInstalls} />
 
       <label className="inc-report__label">Press release</label>
-      <p className="inc-admin__hint">Select text, then use the toolbar for <strong>bold</strong>/<em>italic</em>, quotation blocks, attributions and the byline. Enter starts a new paragraph.</p>
+      <p className="inc-admin__hint">Text size is the same for every exhibition. Pasted fonts and sizes are removed. Use ¶ for body text, and Attribution only for a credit under a quote. Enter starts a new paragraph.</p>
       <RichTextEditor value={pressRelease} onChange={setPressRelease} roles={true} ariaLabel="Press release" />
+
+      <fieldset className="inc-admin__press">
+        <legend>Exhibition press</legend>
+        <p className="inc-admin__hint">Articles added here appear on this exhibition and its artists’ pages. Use the Press tab for gallery-wide coverage.</p>
+        {press.length === 0 && <p className="inc-admin__muted">No articles yet.</p>}
+        {press.map((it, i) => (
+          <div key={i} className="inc-admin__formgrid">
+            {[ ["pub", "Publication"], ["title", "Article title"], ["href", "Article link"] ].map(([key, label]) => (
+              <label key={key}>{label}<input className="inc-report__input" value={it[key] || ""}
+                placeholder={key === "href" ? "https://…" : undefined}
+                onChange={(e) => setPress((items) => items.map((item, n) => n === i ? { ...item, [key]: e.target.value } : item))} /></label>
+            ))}
+            <button type="button" className="inc-admin__btn-ghost" onClick={() => setPress((items) => items.filter((_, n) => n !== i))}>Remove article</button>
+          </div>
+        ))}
+        <button type="button" className="inc-admin__btn-ghost" onClick={() => setPress((items) => [...items, { pub: "", title: "", href: "" }])}>+ Add press article</button>
+      </fieldset>
 
       {!isGroup && (
         <>

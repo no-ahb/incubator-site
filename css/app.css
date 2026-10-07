@@ -219,6 +219,9 @@ html { scroll-behavior: smooth; }
 
 /* ---------- Rich-text editor (press releases & bios) --------------------- */
 .inc-admin__hint { font-size: 13px; color: var(--ink-3); margin: 0 0 8px; }
+.inc-admin__press { border: 1px solid var(--hairline); padding: var(--s-4); min-width: 0; }
+.inc-admin__press legend { font-size: 14px; padding: 0 var(--s-2); }
+.inc-admin__press .inc-admin__formgrid { margin: var(--s-4) 0; align-items: end; }
 .inc-admin__hint strong { font-weight: 600; }
 .inc-admin__hint em { font-style: italic; }
 .inc-rte {

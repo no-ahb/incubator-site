@@ -347,6 +347,12 @@ ul { list-style: none; padding: 0; margin: 0; }
 .inc-prose em { font-style: italic; }
 .inc-prose strong { font-weight: 600; }
 
+/* One body size for every exhibition, including biography fallbacks and the
+   editor. Paragraph roles must never be used to choose a smaller text size. */
+:root { --exhibition-body-size: 14px; }
+.inc-detail__bio .inc-prose p,
+.inc-rte__area p { font-size: var(--exhibition-body-size); }
+
 /* Artist biography spans the full content width as a single column, rather than
    the narrow measure used for other prose (#91). */
 .inc-detail__bio .inc-prose { max-width: none; }
@@ -365,7 +371,7 @@ ul { list-style: none; padding: 0; margin: 0; }
 
 /* Body paragraphs — spaced, no first-line indent (space OR indent, never both). */
 .inc-release .inc-release__para {
-  font-size: 18px;
+  font-size: var(--exhibition-body-size);
   line-height: 1.62;
   margin: 0 0 1.3em;               /* extra space between paragraphs */
   text-wrap: pretty;               /* discourage widows / short last lines */
@@ -397,7 +403,7 @@ ul { list-style: none; padding: 0; margin: 0; }
    Spans the full width so a long credit doesn't wrap awkwardly under the quote. */
 .inc-release .inc-release__attrib {
   margin: 0 0 var(--s-10);
-  font-size: 14px;
+  font-size: var(--exhibition-body-size);
   line-height: 1.45;
   letter-spacing: 0.01em;
   color: var(--ink-3);
@@ -418,7 +424,6 @@ ul { list-style: none; padding: 0; margin: 0; }
 }
 
 @media (max-width: 640px) {
-  .inc-release .inc-release__para { font-size: 17px; }
   .inc-release .inc-release__quote { font-size: 19px; }
 }
 
