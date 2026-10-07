@@ -75,7 +75,10 @@ function MobileMenu({ open, onNav, onClose }) {
         <ul>
           {items.map(([path, label]) => (
             <li key={path}>
-              <a href={path} onClick={(e) => { e.preventDefault(); onNav(path); }}>
+              <a href={"#" + path} onClick={(e) => {
+                if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                e.preventDefault(); onNav(path);
+              }}>
                 {label}
               </a>
             </li>

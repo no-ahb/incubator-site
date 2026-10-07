@@ -34,6 +34,13 @@ zone-level rate-limiting rule (free plan includes one) can cap it properly.
 | `/admin/issues` | GET | List open reported issues. |
 | `/admin/create-issue` | POST | File a new issue from the admin page. |
 
+For `/admin/save-show`, omit `show.id` to create an exhibition. The Worker
+chooses a unique ID, including when an artist has multiple untitled shows.
+Send an existing `show.id` to edit; a missing ID returns 404. Omitting
+`heroImage` or `artistBio` preserves the stored value; explicitly clearing
+them on an edit removes the content. A blank biography on a new exhibition
+preserves any existing biography for that artist.
+
 There is no anonymous route any more. The public "Report an issue" button was
 removed from the site, and an unauthenticated endpoint that commits files and
 opens issues was a spam vector.
