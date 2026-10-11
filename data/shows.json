@@ -1807,7 +1807,7 @@
       "endISO": "2024-04-28",
       "current": false,
       "isGroup": true,
-      "palette": "sky",
+      "palette": "sap",
       "groupArtists": [
         "Maggi Hambling",
         "Jelly Green",
@@ -1820,10 +1820,7 @@
         "Ingrid Pollard",
         "Matthew Arthur Williams"
       ],
-      "pressRelease": [
-        "Incubator is pleased to present Five by Five, a group exhibition showcasing the work of five established artists working in the UK, each paired with an emerging artist selected by them: Maggi Hambling & Jelly Green, Mona Hatoum & Tamara Al-Mashouk, Georgie Hopton & Alice McCabe, Abigail Lane & Rebecca Hancock, and Ingrid Pollard & Matthew Arthur Williams.",
-        "Across painting, sculpture, photography, video and installation, these ten artists explore a diverse range of themes. A range of overlapping concerns and materials among the pairings gives rise to a rich and nuanced artistic tapestry, and Five by Five stands as a testament to the power of intergenerational collaboration and mentorship."
-      ],
+      "pressRelease": "<p>Incubator is pleased to present Five by Five, a group exhibition showcasing the work of five established artists working in the UK, each paired with an emerging artist selected by them: Maggi Hambling &amp; Jelly Green, Mona Hatoum &amp; Tamara Al-Mashouk, Georgie Hopton &amp; Alice McCabe, Abigail Lane &amp; Rebecca Hancock, and Ingrid Pollard &amp; Matthew Arthur Williams.</p><p>Across painting, sculpture, photography, video and installation, these ten artists explore a diverse range of themes. A range of overlapping concerns and materials among the pairings gives rise to a rich and nuanced artistic tapestry, and Five by Five stands as a testament to the power of intergenerational collaboration and mentorship.</p>",
       "installation": [
         "assets/shows/five-by-five/1.jpg",
         "assets/shows/five-by-five/2.jpg",
@@ -1838,6 +1835,11 @@
           "pub": "Elephant",
           "title": "Rendering the Invisible Visible: Five by Five at the Incubator",
           "href": "https://elephant.art/five-by-five-at-the-incubator/"
+        },
+        {
+          "pub": "Plaster Magazine",
+          "title": "Five art legends on five rising stars",
+          "href": "https://plastermagazine.com/interviews/five-art-legends-on-five-rising-stars/"
         }
       ]
     },
