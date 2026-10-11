@@ -149,7 +149,14 @@
         "assets/shows/charlie-gosling-good-luck-with-me-here/5.jpg",
         "assets/shows/charlie-gosling-good-luck-with-me-here/6.jpg"
       ],
-      "heroImage": "assets/shows/charlie-gosling-good-luck-with-me-here/1784212298923-Screenshot_2026-07-16_at_15_31_22.jpg"
+      "heroImage": "assets/shows/charlie-gosling-good-luck-with-me-here/1784212298923-Screenshot_2026-07-16_at_15_31_22.jpg",
+      "press": [
+        {
+          "pub": "Wallpaper*",
+          "title": "Emerging artist Charlie Gosling is being compared to Frank Auerbach. Discover his haunting portraits in London",
+          "href": "https://www.wallpaper.com/art/exhibitions-shows/charlie-gosling-incubator-london"
+        }
+      ]
     },
     {
       "id": "xiaochi-dong-leaves-leave",
