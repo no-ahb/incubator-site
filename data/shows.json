@@ -1995,7 +1995,7 @@
       "endISO": "2026-01-31",
       "current": false,
       "isGroup": true,
-      "palette": "persimmon",
+      "palette": "sap",
       "groupArtists": [
         "Rebecca Ackroyd",
         "Valentina Attolini",
@@ -2044,10 +2044,7 @@
         "Kasia Wozniak",
         "Losel Yauch"
       ],
-      "pressRelease": [
-        "Notes from the Studio brings together artists of different generations and disciplines, each sharing an item fixed to their studio wall — a note, sketch, postcard, colour test or other small artefact — to reveal the immediacy of their process and evoke a collective studio environment focused on the fragments that shape their work.",
-        "Forty-six visual artists, writers, musicians and designers — including Tracey Emin, Christian Marclay, Mona Hatoum, Michael Stipe, Ben Okri, Paul Simonon, Francesco Risso, Claire Keegan, Bella Freud, Harland Miller, Talia Byre and Amanda Harlech — each contributed a single item they had pinned, taped or otherwise fixed to the wall of their studio or workspace, from a single dragonfly wing shared by Fleur Dempsey to flattened beer cans from Christian Marclay."
-      ],
+      "pressRelease": "<p>Notes from the Studio brings together artists of different generations and disciplines, each sharing an item fixed to their studio wall — a note, sketch, postcard, colour test or other small artefact — to reveal the immediacy of their process and evoke a collective studio environment focused on the fragments that shape their work.</p><p>Forty-six visual artists, writers, musicians and designers — including Tracey Emin, Christian Marclay, Mona Hatoum, Michael Stipe, Ben Okri, Paul Simonon, Francesco Risso, Claire Keegan, Bella Freud, Harland Miller, Talia Byre and Amanda Harlech — each contributed a single item they had pinned, taped or otherwise fixed to the wall of their studio or workspace, from a single dragonfly wing shared by Fleur Dempsey to flattened beer cans from Christian Marclay.</p>",
       "installation": [
         "assets/shows/notes-from-the-studio/1.jpg",
         "assets/shows/notes-from-the-studio/2.jpg",
@@ -2067,6 +2064,11 @@
           "pub": "Wallpaper",
           "title": "What do creatives pin to their walls? Artists from Tracey Emin to Michael Stipe reveal all",
           "href": "https://www.wallpaper.com/art/exhibitions-shows/notes-from-the-studio-artists-pin-ups-incubator-london"
+        },
+        {
+          "pub": "Broadsheet",
+          "title": "Notes From the Studio Is a Glimpse Into What Inspires Your Favourite Artists",
+          "href": "https://broadsheet.com/london/articles/notes-from-the-studio"
         }
       ]
     }
