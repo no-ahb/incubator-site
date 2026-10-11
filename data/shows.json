@@ -115,7 +115,18 @@
       ],
       "privateView": "https://privateviews.artlogic.net/2/a7bd9f910e791f39a67271/",
       "heroImage": "assets/shows/eva-dixon-crash/1783617297497-Incubator_-_Eva_Dixon_-_Works_-_057.jpg",
-      "press": []
+      "press": [
+        {
+          "pub": "The Wick",
+          "title": "Viewing Eva Dixon: Crash",
+          "href": "https://thewickculture.com/wick-list-eva-dixon-crash-incubator/"
+        },
+        {
+          "pub": "FETCH London Magazine",
+          "title": "EVA DIXON IS MAKING CRASHING SEXY AGAIN",
+          "href": "https://www.fetch.london/post/eva-dixon-is-making-crashing-sexy-again"
+        }
+      ]
     },
     {
       "id": "charlie-gosling-good-luck-with-me-here",
