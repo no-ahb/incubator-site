@@ -51,6 +51,14 @@ ul { list-style: none; padding: 0; margin: 0; }
   align-items: center; gap: 8px;
   background: none; border: 0; padding: 6px 0; cursor: pointer;
   font-family: var(--font-serif); font-size: 14px;
+  /* iOS Safari: a fast double-tap on the bare button otherwise triggers a
+     native gesture (double-tap zoom / text-selection callout / drag-lift
+     preview) that flashes a stray blue glyph over the icon (#hamburger).
+     Treat it as a pure tap target. (tap-highlight is already cleared globally
+     on html.) */
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none; user-select: none;
 }
 .inc-menu-btn__ic { display: inline-flex; flex-direction: column; gap: 4px; }
 .inc-menu-btn__ic span {
