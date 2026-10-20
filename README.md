@@ -25,4 +25,4 @@ Open http://127.0.0.1:8003. The build writes the public site to `_site/`. Editin
 
 See [build notes](docs/BUILD.md) for more detail.
 
-Built by [Noah Berrie](https://portfolio.noahberrie.com).
+[Portfolio](https://portfolio.noahberrie.com)
